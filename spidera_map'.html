@@ -1,0 +1,1648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Spider Map</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0a0e1a;--card:#111827;--card2:#1c2537;
+  --bdr:#1f2937;--bdr2:#374151;
+  --acc:#3b82f6;--acc2:#8b5cf6;
+  --txt:#f1f5f9;--txt2:#94a3b8;--muted:#475569;
+  --green:#10b981;--yellow:#f59e0b;--red:#ef4444;
+}
+html,body{
+  width:100%;height:100%;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:var(--bg);color:var(--txt);
+  overflow:hidden;position:fixed;
+  -webkit-user-select:none;user-select:none;
+}
+#map{
+  position:absolute;top:0;left:0;
+  width:100%;height:100%;z-index:1;
+}
+
+/* TOP BAR */
+#topbar{
+  position:fixed;top:0;left:0;right:0;height:52px;
+  background:rgba(10,14,26,0.97);
+  border-bottom:1px solid var(--bdr);
+  display:flex;align-items:center;
+  justify-content:space-between;
+  padding:0 12px;z-index:1000;
+}
+#topbar::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--acc),var(--acc2),transparent);
+}
+.logo{display:flex;align-items:center;gap:8px}
+.logo-ico{
+  width:30px;height:30px;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));
+  border-radius:8px;display:flex;align-items:center;
+  justify-content:center;font-size:15px;
+}
+.logo h1{font-size:12px;font-weight:700}
+.logo p{font-size:9px;color:var(--txt2)}
+.top-stats{display:flex;gap:5px}
+.stat-pill{
+  background:var(--card);border:1px solid var(--bdr);
+  border-radius:8px;padding:3px 9px;text-align:center;
+}
+.stat-pill-n{font-size:14px;font-weight:800;color:var(--acc);line-height:1}
+.stat-pill-l{font-size:8px;color:var(--muted);text-transform:uppercase}
+
+/* GPS STATUS BOX — shown when GPS not working */
+#gps-status-box{
+  position:fixed;top:60px;left:0;right:0;
+  z-index:2000;padding:0 12px;display:none;
+}
+.gps-alert{
+  background:#1e3a5f;border:1px solid #3b82f6;
+  border-radius:12px;padding:12px 14px;
+  font-size:12px;color:#93c5fd;line-height:1.6;
+}
+.gps-alert b{color:#fff;display:block;margin-bottom:4px;font-size:13px}
+.gps-alert-close{
+  float:right;background:none;border:none;
+  color:#64748b;font-size:16px;cursor:pointer;
+  padding:0;margin-top:-2px;
+}
+
+/* MODE BANNER */
+#mode-banner{
+  position:fixed;top:62px;left:50%;
+  transform:translateX(-50%);
+  padding:10px 18px;border-radius:30px;
+  font-size:12px;font-weight:700;
+  z-index:1200;display:none;
+  white-space:nowrap;max-width:90vw;text-align:center;
+  box-shadow:0 4px 20px rgba(0,0,0,0.5);
+  align-items:center;gap:10px;flex-wrap:wrap;
+  justify-content:center;
+}
+#mode-banner.show{display:flex}
+#mode-banner.strat{background:#1d4ed8;color:white}
+#mode-banner.patch{background:#b45309;color:white}
+#mode-banner.tree{background:#065f46;color:white}
+.cancel-x{
+  background:rgba(255,255,255,0.2);border-radius:20px;
+  padding:3px 12px;cursor:pointer;border:none;
+  color:white;font-size:11px;font-weight:700;
+  font-family:inherit;touch-action:manipulation;
+}
+
+/* FAB */
+#fab-group{
+  position:fixed;right:12px;bottom:76px;
+  z-index:900;display:flex;flex-direction:column;gap:9px;
+}
+.fab{
+  width:48px;height:48px;border-radius:50%;border:none;
+  font-size:20px;display:flex;align-items:center;
+  justify-content:center;cursor:pointer;
+  touch-action:manipulation;
+  box-shadow:0 4px 16px rgba(0,0,0,0.5);
+  transition:transform 0.1s;
+}
+.fab:active{transform:scale(0.9)}
+.fab-gps{background:linear-gradient(135deg,#10b981,#059669)}
+.fab-fit{
+  background:rgba(17,24,39,0.96);
+  border:1.5px solid var(--bdr);
+  color:var(--txt2);font-size:16px;
+}
+.fab-heat{
+  background:rgba(17,24,39,0.96);
+  border:1.5px solid var(--bdr);
+  color:#ef4444;font-size:18px;
+}
+.fab-heat.on{background:rgba(239,68,68,0.2);border-color:var(--red)}
+
+/* TILE BTN */
+#tile-btn{
+  position:fixed;top:62px;right:12px;
+  background:rgba(10,14,26,0.96);
+  border:1.5px solid var(--bdr);
+  border-radius:10px;padding:7px 11px;
+  font-size:11px;font-weight:700;color:var(--txt2);
+  z-index:900;cursor:pointer;touch-action:manipulation;
+  font-family:inherit;
+}
+
+/* OPEN SHEET BUTTON */
+#open-sheet-btn{
+  position:fixed;bottom:0;left:0;right:0;height:58px;
+  background:rgba(10,14,26,0.98);
+  border-top:1px solid var(--bdr);
+  display:flex;align-items:center;
+  justify-content:center;gap:10px;
+  z-index:900;cursor:pointer;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+}
+#open-sheet-btn:active{background:var(--card)}
+.osb-icon{font-size:20px}
+.osb-text{
+  display:flex;flex-direction:column;
+  font-size:13px;font-weight:700;color:var(--txt);
+}
+.osb-sub{font-size:10px;color:var(--muted);font-weight:400}
+
+/* SHEET OVERLAY */
+#sheet-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.6);
+  z-index:1500;display:none;opacity:0;transition:opacity 0.3s;
+}
+#sheet-overlay.show{display:block;opacity:1}
+
+/* BOTTOM SHEET */
+#bottom-sheet{
+  position:fixed;left:0;right:0;bottom:0;
+  max-height:90vh;
+  background:var(--bg);
+  border-top:1.5px solid var(--bdr);
+  border-radius:20px 20px 0 0;
+  z-index:1600;
+  display:flex;flex-direction:column;
+  transform:translateY(100%);
+  transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);
+  overflow:hidden;
+}
+#bottom-sheet.open{transform:translateY(0)}
+.sheet-handle{
+  width:36px;height:4px;background:var(--bdr2);
+  border-radius:2px;margin:10px auto 4px;flex-shrink:0;
+}
+
+/* SHEET TABS */
+.sheet-tabs{
+  display:flex;border-bottom:1px solid var(--bdr);
+  background:rgba(10,14,26,0.9);flex-shrink:0;
+  overflow-x:auto;
+}
+.sheet-tabs::-webkit-scrollbar{display:none}
+.stab{
+  flex-shrink:0;padding:11px 13px;background:none;border:none;
+  color:var(--muted);font-size:10px;font-weight:700;
+  text-transform:uppercase;letter-spacing:0.5px;
+  border-bottom:2px solid transparent;
+  cursor:pointer;white-space:nowrap;font-family:inherit;
+  touch-action:manipulation;min-height:44px;
+}
+.stab.on{color:var(--acc);border-bottom-color:var(--acc);background:rgba(59,130,246,0.05)}
+
+/* SHEET CONTENT */
+.sheet-content{
+  flex:1;overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  padding:12px;display:flex;flex-direction:column;gap:10px;
+}
+.sheet-content::-webkit-scrollbar{display:none}
+.tab-pane{display:none;flex-direction:column;gap:10px}
+.tab-pane.on{display:flex}
+
+/* CARDS */
+.card{
+  background:var(--card);border:1px solid var(--bdr);
+  border-radius:12px;padding:13px;
+}
+.card-title{
+  font-size:9px;font-weight:700;color:var(--acc);
+  text-transform:uppercase;letter-spacing:1px;
+  margin-bottom:11px;display:flex;align-items:center;gap:6px;
+}
+.card-title::after{content:'';flex:1;height:1px;background:var(--bdr)}
+
+/* FORM */
+.row{display:flex;gap:7px;margin-bottom:7px}
+.fg{flex:1;display:flex;flex-direction:column;gap:4px}
+label{font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.4px}
+
+input,select,textarea{
+  background:rgba(0,0,0,0.5);
+  border:1.5px solid var(--bdr2);
+  border-radius:9px;padding:11px 12px;
+  color:var(--txt);font-size:15px;width:100%;
+  font-family:inherit;-webkit-appearance:none;
+  -webkit-text-fill-color:var(--txt);
+  touch-action:manipulation;
+}
+input:focus,select:focus,textarea:focus{
+  outline:none;border-color:var(--acc);
+  background:rgba(59,130,246,0.06);
+}
+input::placeholder{color:var(--muted);-webkit-text-fill-color:var(--muted)}
+select option{background:#1c2537;color:var(--txt)}
+textarea{resize:none;min-height:68px}
+
+/* BUTTONS */
+.btn{
+  width:100%;min-height:50px;border:none;border-radius:12px;
+  font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+  transition:opacity 0.1s,transform 0.1s;padding:0 14px;
+  letter-spacing:0.2px;
+}
+.btn:active{opacity:0.8;transform:scale(0.97)}
+.btn-primary{background:linear-gradient(135deg,#3b82f6,#2563eb);color:white;box-shadow:0 4px 14px rgba(59,130,246,0.3)}
+.btn-green{background:linear-gradient(135deg,#10b981,#059669);color:white;box-shadow:0 4px 14px rgba(16,185,129,0.25)}
+.btn-yellow{background:linear-gradient(135deg,#d97706,#b45309);color:white}
+.btn-purple{background:linear-gradient(135deg,#7c3aed,#6d28d9);color:white}
+.btn-ghost{background:var(--card2);border:1.5px solid var(--bdr2);color:var(--txt2)}
+.btn-red{background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.25);color:var(--red)}
+.btn-half{flex:1}
+.btn-row{display:flex;gap:7px}
+
+/* GPS FIX BOX */
+.gps-fix-box{
+  background:rgba(16,185,129,0.08);
+  border:1px solid rgba(16,185,129,0.25);
+  border-radius:10px;padding:11px 13px;
+  font-size:11px;color:#6ee7b7;line-height:1.7;
+}
+.gps-fix-box b{color:#a7f3d0;display:block;margin-bottom:3px}
+
+/* INFO BOXES */
+.info-box{border-radius:10px;padding:11px 13px;font-size:12px;line-height:1.6}
+.info-blue{background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);color:#93c5fd}
+.info-green{background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);color:#6ee7b7}
+.info-yellow{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);color:#fde68a}
+
+/* SWATCHES */
+.swatches{display:flex;gap:9px;flex-wrap:wrap;padding:3px 0}
+.swatch{
+  width:30px;height:30px;border-radius:50%;
+  border:2px solid transparent;cursor:pointer;
+  touch-action:manipulation;transition:all 0.15s;
+}
+.swatch:active{transform:scale(1.2)}
+.swatch.on{border-color:white;transform:scale(1.15);box-shadow:0 0 8px rgba(255,255,255,0.4)}
+
+/* PHOTO */
+.photo-upload{
+  border:2px dashed var(--bdr2);border-radius:12px;
+  padding:18px;text-align:center;cursor:pointer;
+  touch-action:manipulation;color:var(--muted);
+}
+.photo-upload:active{border-color:var(--acc);background:rgba(59,130,246,0.05)}
+.photo-upload input{display:none}
+.photo-strip{display:flex;gap:7px;overflow-x:auto;padding:4px 0;margin-top:8px}
+.photo-strip::-webkit-scrollbar{display:none}
+.ph-wrap{position:relative;flex-shrink:0}
+.ph-img{width:62px;height:62px;border-radius:9px;object-fit:cover;border:1.5px solid var(--bdr);display:block}
+.ph-del{
+  position:absolute;top:-5px;right:-5px;
+  width:20px;height:20px;background:var(--red);color:white;
+  border-radius:50%;border:none;font-size:11px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;touch-action:manipulation;
+}
+
+/* STEPS BOX */
+.steps-box{
+  background:rgba(59,130,246,0.07);
+  border:1px solid rgba(59,130,246,0.2);
+  border-radius:10px;padding:10px;display:none;
+}
+.steps-box.show{display:block}
+.steps-title{font-size:10px;font-weight:700;color:var(--acc);margin-bottom:5px}
+.steps-list{font-size:10px;color:var(--txt2);line-height:2}
+
+/* DATA LIST */
+.list-item{
+  background:var(--card2);border:1px solid var(--bdr);
+  border-radius:10px;padding:10px 12px;
+  display:flex;align-items:center;gap:9px;
+  cursor:pointer;touch-action:manipulation;margin-bottom:5px;
+}
+.list-item:active{border-color:var(--acc)}
+.list-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+.list-sq{width:11px;height:11px;border-radius:3px;flex-shrink:0}
+.list-body{flex:1;min-width:0}
+.list-title{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.list-sub{font-size:10px;color:var(--muted);margin-top:1px}
+.del-btn{
+  background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.25);
+  color:var(--red);border-radius:7px;padding:6px 10px;
+  font-size:11px;font-weight:700;cursor:pointer;
+  touch-action:manipulation;flex-shrink:0;font-family:inherit;min-height:34px;
+}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat-card{
+  background:var(--card2);border:1px solid var(--bdr);
+  border-radius:11px;padding:13px;text-align:center;
+  position:relative;overflow:hidden;
+}
+.stat-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--acc),var(--acc2));
+}
+.stat-n{
+  font-size:26px;font-weight:800;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;line-height:1;
+}
+.stat-l{font-size:9px;color:var(--muted);text-transform:uppercase;margin-top:4px}
+
+.chart-row{display:flex;align-items:center;gap:7px;margin-bottom:7px}
+.chart-lbl{font-size:10px;color:var(--txt2);width:62px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chart-track{flex:1;background:rgba(0,0,0,0.4);border-radius:4px;height:13px;overflow:hidden}
+.chart-fill{height:100%;border-radius:4px;transition:width 0.6s ease}
+.chart-val{font-size:10px;color:var(--txt2);width:16px;text-align:right}
+
+.leg-item{display:flex;align-items:center;gap:9px;margin-bottom:8px;font-size:12px;color:var(--txt2)}
+.leg-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+
+/* POPUP */
+.leaflet-popup-content-wrapper{
+  background:rgba(12,16,28,0.98)!important;
+  border:1px solid #1f2937!important;
+  border-radius:16px!important;
+  box-shadow:0 20px 60px rgba(0,0,0,0.8)!important;
+  padding:0!important;overflow:hidden;
+}
+.leaflet-popup-content{margin:0!important}
+.leaflet-popup-tip-container{display:none!important}
+.leaflet-popup-close-button{
+  color:#64748b!important;font-size:20px!important;
+  top:6px!important;right:8px!important;z-index:10;
+}
+
+.popup-wrap{width:268px;overflow:hidden;font-family:-apple-system,sans-serif}
+.popup-gallery{
+  width:100%;height:165px;background:#0a0e1a;
+  position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.popup-gallery.empty{height:52px;background:linear-gradient(135deg,rgba(59,130,246,0.07),rgba(139,92,246,0.07))}
+.pop-img{width:100%;height:100%;object-fit:cover;cursor:pointer;display:block}
+.pop-img-count{
+  position:absolute;bottom:7px;right:8px;
+  background:rgba(0,0,0,0.72);color:white;
+  border-radius:12px;padding:2px 8px;font-size:10px;font-weight:700;
+}
+.pop-nav{
+  position:absolute;top:50%;transform:translateY(-50%);
+  background:rgba(0,0,0,0.55);color:white;border:none;
+  width:30px;height:30px;border-radius:50%;font-size:16px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  touch-action:manipulation;
+}
+.pop-nav-l{left:5px}
+.pop-nav-r{right:5px}
+
+.popup-body{padding:12px 13px 9px}
+.popup-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:9px}
+.popup-name{font-size:15px;font-weight:800;color:#f1f5f9}
+.popup-species{font-size:11px;color:#64748b;font-style:italic;margin-top:2px}
+.spider-chip{
+  display:flex;flex-direction:column;align-items:center;
+  border-radius:10px;padding:5px 9px;min-width:42px;
+  border:1.5px solid;flex-shrink:0;
+}
+.spider-chip-n{font-size:19px;font-weight:800;line-height:1}
+.spider-chip-l{font-size:8px;color:#64748b;text-transform:uppercase;letter-spacing:0.4px}
+
+.popup-fields{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:8px}
+.pop-field{background:rgba(255,255,255,0.03);border:1px solid #1f2937;border-radius:7px;padding:6px 8px}
+.pop-field-l{font-size:9px;color:#475569;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:2px}
+.pop-field-v{font-size:12px;font-weight:600;color:#e2e8f0}
+.popup-notes{
+  background:rgba(59,130,246,0.05);border:1px solid rgba(59,130,246,0.13);
+  border-radius:7px;padding:7px 9px;font-size:11px;color:#94a3b8;
+  line-height:1.5;font-style:italic;margin-bottom:7px;
+}
+.popup-gps{font-size:9px;color:#475569;text-align:center;font-family:'Courier New',monospace}
+
+.thumb-row{display:flex;gap:5px;padding:0 13px 11px;overflow-x:auto}
+.thumb-row::-webkit-scrollbar{display:none}
+.thumb-img{
+  width:44px;height:44px;border-radius:7px;object-fit:cover;
+  flex-shrink:0;border:2px solid transparent;cursor:pointer;
+}
+.thumb-img.on{border-color:#3b82f6}
+
+/* TOAST */
+#toast{
+  position:fixed;bottom:68px;left:50%;
+  transform:translateX(-50%) translateY(14px);
+  background:var(--card);border:1px solid var(--bdr2);
+  border-radius:11px;padding:10px 16px;font-size:12px;
+  font-weight:600;color:var(--txt);z-index:9999;opacity:0;
+  pointer-events:none;transition:all 0.28s;
+  display:flex;align-items:center;gap:7px;
+  max-width:calc(100vw - 32px);
+  box-shadow:0 8px 28px rgba(0,0,0,0.5);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast-bar{
+  position:absolute;bottom:0;left:0;height:3px;border-radius:0 0 11px 11px;
+  background:linear-gradient(90deg,var(--acc),var(--acc2));
+  animation:tbar 3s linear forwards;
+}
+@keyframes tbar{from{width:100%}to{width:0}}
+#toast.err .toast-bar{background:var(--red)}
+
+.empty-state{text-align:center;padding:22px;color:var(--muted)}
+.empty-state .icon{font-size:28px;margin-bottom:7px}
+.empty-state p{font-size:12px;line-height:1.6}
+
+.tag{display:inline-block;padding:1px 7px;border-radius:20px;font-size:9px;font-weight:700}
+.tag-b{background:rgba(59,130,246,0.15);color:#60a5fa;border:1px solid rgba(59,130,246,0.25)}
+.tag-o{background:rgba(245,158,11,0.15);color:#fbbf24;border:1px solid rgba(245,158,11,0.25)}
+.tag-r{background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.25)}
+.tag-v{background:rgba(139,92,246,0.15);color:#a78bfa;border:1px solid rgba(139,92,246,0.25)}
+
+.divider{height:1px;background:var(--bdr);margin:8px 0}
+.scroll-end{height:18px;flex-shrink:0}
+</style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<!-- TOP BAR -->
+<div id="topbar">
+  <div class="logo">
+    <div class="logo-ico">🕷️</div>
+    <div><h1>Spider Map</h1><p>Field Research Tool</p></div>
+  </div>
+  <div class="top-stats">
+    <div class="stat-pill"><div class="stat-pill-n" id="h-trees">0</div><div class="stat-pill-l">Trees</div></div>
+    <div class="stat-pill"><div class="stat-pill-n" id="h-sp">0</div><div class="stat-pill-l">Spiders</div></div>
+    <div class="stat-pill"><div class="stat-pill-n" id="h-z">0</div><div class="stat-pill-l">Zones</div></div>
+  </div>
+</div>
+
+<!-- GPS STATUS BOX -->
+<div id="gps-status-box">
+  <div class="gps-alert">
+    <button class="gps-alert-close" onclick="document.getElementById('gps-status-box').style.display='none'">✕</button>
+    <b id="gps-alert-title">GPS Issue</b>
+    <span id="gps-alert-msg"></span>
+  </div>
+</div>
+
+<!-- MODE BANNER -->
+<div id="mode-banner">
+  <span id="banner-txt">Tap on map</span>
+  <button class="cancel-x" onclick="cancelMode()">✕ Cancel</button>
+</div>
+
+<!-- TILE BTN -->
+<button id="tile-btn" onclick="cycleTile()">🛰️ Satellite</button>
+
+<!-- FAB -->
+<div id="fab-group">
+  <button class="fab fab-heat" id="heat-fab" onclick="toggleHeat()">🔥</button>
+  <button class="fab fab-fit" onclick="fitAll()">🎯</button>
+  <button class="fab fab-gps" onclick="jumpGPS()">📍</button>
+</div>
+
+<!-- OPEN SHEET -->
+<div id="open-sheet-btn" onclick="openSheet()">
+  <span class="osb-icon">☰</span>
+  <div class="osb-text">
+    Open Field Menu
+    <span class="osb-sub">Trees · Strata · Patches · Data</span>
+  </div>
+</div>
+
+<!-- SHEET OVERLAY -->
+<div id="sheet-overlay" onclick="closeSheet()"></div>
+
+<!-- BOTTOM SHEET -->
+<div id="bottom-sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-tabs">
+    <button class="stab on" onclick="swTab('tree',this)">🌳 Tree</button>
+    <button class="stab" onclick="swTab('strata',this)">📐 Strata</button>
+    <button class="stab" onclick="swTab('patch',this)">⬛ Patch</button>
+    <button class="stab" onclick="swTab('data',this)">📋 Data</button>
+    <button class="stab" onclick="swTab('stats',this)">📊 Stats</button>
+    <button class="stab" onclick="swTab('help',this)">❓ Help</button>
+  </div>
+
+  <div class="sheet-content">
+
+    <!-- TREE TAB -->
+    <div class="tab-pane on" id="tab-tree">
+
+      <!-- GPS FIX INSTRUCTIONS — always visible -->
+      <div class="gps-fix-box">
+        <b>📱 How to get GPS on your phone:</b>
+        Method 1 — Stand at the tree → tap <b>"📍 Capture My GPS"</b><br>
+        Method 2 — Open Google Maps on phone → long press your location → copy the numbers → paste in Lat/Lon fields below<br>
+        Method 3 — Tap <b>"🗺️ Tap Map"</b> → tap where tree is on map
+      </div>
+
+      <div class="card">
+        <div class="card-title">🪪 Tree Identity</div>
+        <div class="row">
+          <div class="fg"><label>Tree ID</label><input id="t-id" placeholder="S1-P1-T1" autocomplete="off" autocorrect="off" spellcheck="false"></div>
+          <div class="fg"><label>Species</label><input id="t-sp" placeholder="Neem" autocomplete="off" list="sp-list"></div>
+        </div>
+        <datalist id="sp-list">
+          <option>Neem</option><option>Mango</option><option>Peepal</option>
+          <option>Banyan</option><option>Ashoka</option><option>Gulmohar</option>
+          <option>Jamun</option><option>Bamboo</option><option>Amaltas</option>
+        </datalist>
+        <div class="row">
+          <div class="fg">
+            <label>Stratum</label>
+            <select id="t-str">
+              <option value="">—</option>
+              <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+            </select>
+          </div>
+          <div class="fg"><label>Patch ID</label><input id="t-pt" placeholder="P1" autocomplete="off"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📍 GPS — 3 Ways to Set Location</div>
+
+        <!-- METHOD 1: GPS button -->
+        <button class="btn btn-green" style="margin-bottom:8px" onclick="captureGPS()">
+          📍 Capture My GPS (Stand at Tree)
+        </button>
+        <div id="gps-result" style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:8px;display:none"></div>
+
+        <!-- METHOD 2: Manual entry -->
+        <div class="row" style="margin-bottom:8px">
+          <div class="fg"><label>Latitude (from Google Maps)</label><input id="t-lat" type="number" placeholder="28.9456" step="0.000001" inputmode="decimal"></div>
+          <div class="fg"><label>Longitude (from Google Maps)</label><input id="t-lon" type="number" placeholder="77.1015" step="0.000001" inputmode="decimal"></div>
+        </div>
+
+        <!-- METHOD 3: Tap map -->
+        <button class="btn btn-purple" onclick="startMode('tree')">
+          🗺️ Tap Location on Map
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🔬 Spider Observation</div>
+        <div class="row">
+          <div class="fg"><label>Spider Count</label><input id="t-cnt" type="number" placeholder="0" min="0" inputmode="numeric"></div>
+          <div class="fg">
+            <label>Bark Type</label>
+            <select id="t-bark">
+              <option value="">—</option>
+              <option>Rough</option><option>Smooth</option>
+              <option>Fissured</option><option>Scaly</option><option>Fibrous</option>
+            </select>
+          </div>
+        </div>
+        <div class="fg" style="margin-bottom:7px">
+          <label>Web Type</label>
+          <select id="t-web">
+            <option>None</option><option>Orb web</option><option>Sheet web</option>
+            <option>Cobweb</option><option>Funnel web</option><option>Tangle web</option>
+          </select>
+        </div>
+        <div class="fg" style="margin-bottom:7px">
+          <label>Spider Height on Tree</label>
+          <select id="t-ht">
+            <option value="">—</option>
+            <option>Ground (0–0.5m)</option><option>Low (0.5–1.5m)</option>
+            <option>Mid (1.5–3m)</option><option>High (3m+)</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Field Notes</label>
+          <textarea id="t-notes" placeholder="Spider behavior, web location, bark texture..."></textarea>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📷 Photos</div>
+        <div class="photo-upload" onclick="document.getElementById('t-photo').click()">
+          <input type="file" id="t-photo" accept="image/*" multiple onchange="handlePhotos(this)">
+          <div style="font-size:30px;margin-bottom:5px">📸</div>
+          <div style="font-size:13px;font-weight:700">Tap to Add Photos</div>
+          <div style="font-size:11px;margin-top:3px;color:var(--muted)">Tree · Bark · Spider · Web</div>
+        </div>
+        <div class="photo-strip" id="ph-strip"></div>
+        <div id="ph-count" style="font-size:11px;color:var(--muted);text-align:center;margin-top:5px"></div>
+      </div>
+
+      <button class="btn btn-primary" onclick="saveTree()">＋ Save Tree to Map</button>
+      <div class="scroll-end"></div>
+    </div>
+
+    <!-- STRATA TAB -->
+    <div class="tab-pane" id="tab-strata">
+      <div class="info-box info-blue">
+        📱 <b>On phone:</b> Walk to corner → tap <b>"📍 Add Corner at My GPS"</b> → repeat all corners → tap <b>"✅ Done"</b> → Save
+      </div>
+      <div class="card">
+        <div class="card-title">📋 Stratum Details</div>
+        <div class="row">
+          <div class="fg"><label>Stratum ID</label><input id="s-id" placeholder="S1" autocomplete="off"></div>
+          <div class="fg"><label>Number</label>
+            <select id="s-num"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+          </div>
+        </div>
+        <div class="fg"><label>Description</label><input id="s-name" placeholder="Near main gate / Academic block" autocomplete="off"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">🎨 Color</div>
+        <div class="swatches" id="s-sw">
+          <div class="swatch on" style="background:#3b82f6" data-c="#3b82f6" onclick="pickC(this,'s')"></div>
+          <div class="swatch" style="background:#10b981" data-c="#10b981" onclick="pickC(this,'s')"></div>
+          <div class="swatch" style="background:#f59e0b" data-c="#f59e0b" onclick="pickC(this,'s')"></div>
+          <div class="swatch" style="background:#ef4444" data-c="#ef4444" onclick="pickC(this,'s')"></div>
+          <div class="swatch" style="background:#8b5cf6" data-c="#8b5cf6" onclick="pickC(this,'s')"></div>
+          <div class="swatch" style="background:#06b6d4" data-c="#06b6d4" onclick="pickC(this,'s')"></div>
+          <div class="swatch" style="background:#f97316" data-c="#f97316" onclick="pickC(this,'s')"></div>
+          <div class="swatch" style="background:#ec4899" data-c="#ec4899" onclick="pickC(this,'s')"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🗺️ Draw on Map</div>
+        <div class="btn-row" style="margin-bottom:8px">
+          <button class="btn btn-primary btn-half" id="start-s-btn" onclick="startMode('strat')">🖱️ Tap Map Corners</button>
+          <button class="btn btn-green btn-half" id="done-s-btn" onclick="finishStrat()" style="display:none">✅ Done</button>
+        </div>
+        <button class="btn btn-green" style="margin-bottom:8px" onclick="addGPSCorner()">📍 Add Corner at My GPS Location</button>
+        <div class="steps-box" id="s-steps">
+          <div class="steps-title">Corners: <span id="corner-n">0</span> added (need 3+)</div>
+          <div class="steps-list" id="corner-list"></div>
+        </div>
+        <div class="divider"></div>
+        <p style="font-size:10px;color:var(--muted);margin-bottom:7px">Or type corners manually:</p>
+        <div class="row"><div class="fg"><label>C1 Lat</label><input class="slat" type="number" step="0.000001" placeholder="28.9454" inputmode="decimal"></div><div class="fg"><label>C1 Lon</label><input class="slon" type="number" step="0.000001" placeholder="77.1012" inputmode="decimal"></div></div>
+        <div class="row"><div class="fg"><label>C2 Lat</label><input class="slat" type="number" step="0.000001" placeholder="28.9460" inputmode="decimal"></div><div class="fg"><label>C2 Lon</label><input class="slon" type="number" step="0.000001" placeholder="77.1012" inputmode="decimal"></div></div>
+        <div class="row"><div class="fg"><label>C3 Lat</label><input class="slat" type="number" step="0.000001" placeholder="28.9460" inputmode="decimal"></div><div class="fg"><label>C3 Lon</label><input class="slon" type="number" step="0.000001" placeholder="77.1022" inputmode="decimal"></div></div>
+        <div class="row"><div class="fg"><label>C4 Lat</label><input class="slat" type="number" step="0.000001" placeholder="28.9454" inputmode="decimal"></div><div class="fg"><label>C4 Lon</label><input class="slon" type="number" step="0.000001" placeholder="77.1022" inputmode="decimal"></div></div>
+      </div>
+      <button class="btn btn-primary" onclick="saveStrat()">💾 Save Stratum</button>
+      <div class="scroll-end"></div>
+    </div>
+
+    <!-- PATCH TAB -->
+    <div class="tab-pane" id="tab-patch">
+      <div class="info-box info-green">
+        ✅ <b>Patches = exactly 8×8 meters.</b> Stand at center → tap <b>"📍 Place at My GPS"</b> → perfect square appears.
+      </div>
+      <div class="card">
+        <div class="card-title">📋 Patch Details</div>
+        <div class="row">
+          <div class="fg"><label>Patch ID</label><input id="p-id" placeholder="P1" autocomplete="off"></div>
+          <div class="fg"><label>In Stratum</label>
+            <select id="p-str"><option value="">—</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+          </div>
+        </div>
+        <div class="fg"><label>Notes</label><input id="p-name" placeholder="Near main gate..." autocomplete="off"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">🎨 Color</div>
+        <div class="swatches" id="p-sw">
+          <div class="swatch on" style="background:#fbbf24" data-c="#fbbf24" onclick="pickC(this,'p')"></div>
+          <div class="swatch" style="background:#f59e0b" data-c="#f59e0b" onclick="pickC(this,'p')"></div>
+          <div class="swatch" style="background:#86efac" data-c="#86efac" onclick="pickC(this,'p')"></div>
+          <div class="swatch" style="background:#fb923c" data-c="#fb923c" onclick="pickC(this,'p')"></div>
+          <div class="swatch" style="background:#f472b6" data-c="#f472b6" onclick="pickC(this,'p')"></div>
+          <div class="swatch" style="background:#a3e635" data-c="#a3e635" onclick="pickC(this,'p')"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📍 Place on Map</div>
+        <div class="fg" style="margin-bottom:9px">
+          <label>Tap point is the...</label>
+          <select id="p-anchor">
+            <option value="center">Center of patch</option>
+            <option value="tl">Top-Left corner</option>
+            <option value="tr">Top-Right corner</option>
+            <option value="bl">Bottom-Left corner</option>
+            <option value="br">Bottom-Right corner</option>
+          </select>
+        </div>
+        <button class="btn btn-green" style="margin-bottom:8px" onclick="patchAtGPS()">📍 Place at My GPS Location</button>
+        <button class="btn btn-yellow" onclick="startMode('patch')">🗺️ Tap Map to Place Patch</button>
+        <div class="info-box info-green" id="patch-ready" style="display:none;margin-top:8px">✅ 8×8m patch preview shown on map! Fill ID above then tap Save.</div>
+      </div>
+      <div class="card" id="patch-coord-card" style="display:none">
+        <div class="card-title">📏 Patch Corners</div>
+        <div id="patch-coords" style="font-size:10px;color:var(--muted);line-height:1.9"></div>
+      </div>
+      <button class="btn btn-primary" onclick="savePatch()">💾 Save 8×8m Patch</button>
+      <div class="scroll-end"></div>
+    </div>
+
+    <!-- DATA TAB -->
+    <div class="tab-pane" id="tab-data">
+      <div class="card">
+        <div class="card-title">🔍 Search</div>
+        <input placeholder="Search ID, species, patch..." oninput="filterList(this.value)" autocomplete="off">
+      </div>
+      <div class="card">
+        <div class="card-title">🌳 Trees (<span id="tc-n">0</span>)</div>
+        <div id="tree-list"><div class="empty-state"><div class="icon">🌳</div><p>No trees yet.</p></div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📐 Strata (<span id="sc-n">0</span>)</div>
+        <div id="strat-list"><div class="empty-state"><div class="icon">📐</div><p>No strata yet.</p></div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">⬛ Patches (<span id="pc-n">0</span>)</div>
+        <div id="patch-list"><div class="empty-state"><div class="icon">⬛</div><p>No patches yet.</p></div></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-green btn-half" onclick="exportCSV()">📥 Export CSV</button>
+        <button class="btn btn-red btn-half" onclick="clearAll()">🗑️ Clear All</button>
+      </div>
+      <div class="scroll-end"></div>
+    </div>
+
+    <!-- STATS TAB -->
+    <div class="tab-pane" id="tab-stats">
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-n" id="st-tr">0</div><div class="stat-l">Total Trees</div></div>
+        <div class="stat-card"><div class="stat-n" id="st-sp">0</div><div class="stat-l">Spiders</div></div>
+        <div class="stat-card"><div class="stat-n" id="st-in">0</div><div class="stat-l">Infested</div></div>
+        <div class="stat-card"><div class="stat-n" id="st-rt">0%</div><div class="stat-l">Rate</div></div>
+        <div class="stat-card"><div class="stat-n" id="st-av">0.0</div><div class="stat-l">Avg/Tree</div></div>
+        <div class="stat-card"><div class="stat-n" id="st-mx">0</div><div class="stat-l">Max on 1</div></div>
+      </div>
+      <div class="card"><div class="card-title">By Species</div><div id="ch-sp"><div class="empty-state"><p>Add trees.</p></div></div></div>
+      <div class="card"><div class="card-title">By Stratum</div><div id="ch-st"><div class="empty-state"><p>Add trees.</p></div></div></div>
+      <div class="card"><div class="card-title">By Bark</div><div id="ch-bk"><div class="empty-state"><p>Add trees.</p></div></div></div>
+      <div class="scroll-end"></div>
+    </div>
+
+    <!-- HELP TAB -->
+    <div class="tab-pane" id="tab-help">
+      <div class="card">
+        <div class="card-title">🔧 GPS Not Working? Read This</div>
+        <div style="font-size:12px;color:var(--txt2);line-height:2">
+          <b style="color:#fbbf24">Problem: File opened from Downloads folder</b><br>
+          Local files (file://) cannot use GPS on Android/iPhone.<br><br>
+          <b style="color:#6ee7b7">Fix Option 1 — Use Google Maps for coordinates:</b><br>
+          1. Open Google Maps<br>
+          2. Walk to your tree<br>
+          3. Long-press on map at your location<br>
+          4. Coordinates appear at top (like 28.9456, 77.1015)<br>
+          5. Tap them → Copy<br>
+          6. Paste into Lat/Lon fields in Tree tab<br><br>
+          <b style="color:#6ee7b7">Fix Option 2 — Upload file to Google Drive:</b><br>
+          1. Upload spider_map_v6.html to Google Drive<br>
+          2. Open Drive on phone<br>
+          3. Tap file → Open with Chrome<br>
+          4. GPS works because it runs from a server URL<br><br>
+          <b style="color:#6ee7b7">Fix Option 3 — Use GitHub Pages (free):</b><br>
+          Upload file to github.com → enable Pages → open the https:// link → GPS works perfectly
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📱 Step by Step Field Guide</div>
+        <div style="font-size:12px;color:var(--txt2);line-height:2">
+          <b style="color:var(--txt)">Step 1 — Add Strata</b><br>
+          Strata tab → Walk to corner → "Add Corner at My GPS" → repeat → Done → Save<br>
+          <b style="color:var(--txt)">Step 2 — Add Patches</b><br>
+          Patch tab → Stand at center → "Place at My GPS" → Save<br>
+          <b style="color:var(--txt)">Step 3 — Add Trees</b><br>
+          Tree tab → Stand at tree → "Capture My GPS" → fill data → photos → Save<br>
+          <b style="color:var(--txt)">Step 4 — View</b><br>
+          Tap dot on map → photos + info popup appears
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🎨 Dot Colors</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#9e9e9e"></div>0 spiders</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#ffb300"></div>1 spider</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#ef6c00"></div>2 spiders</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#d32f2f"></div>3–4 spiders</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#7b1fa2"></div>5+ spiders</div>
+      </div>
+      <div class="scroll-end"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast">
+  <span id="t-icon">✅</span>
+  <span id="t-msg"></span>
+  <div class="toast-bar" id="tbar"></div>
+</div>
+
+<script>
+// ═══════════════════
+// STATE
+// ═══════════════════
+let trees=[],strata=[],patches=[];
+let tMkrs=[],sLayers=[],pLayers=[];
+let heatLayer=null,heatOn=false;
+let photoURLs=[];
+let mode=null;
+let stratCorners=[],tempMkrs=[],previewPoly=null,pendingPatch=null;
+let sColor='#3b82f6',pColor='#fbbf24';
+let tileIdx=0;
+let galIdx={};
+
+// ═══════════════════
+// MAP
+// ═══════════════════
+const map=L.map('map',{
+  center:[28.9456,77.1015],zoom:16,
+  zoomControl:false,tap:true,tapTolerance:20
+});
+L.control.zoom({position:'topright'}).addTo(map);
+
+const tiles=[
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OSM',maxZoom:22}),
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri',maxZoom:22}),
+  L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',{attribution:'© Google',maxZoom:22}),
+];
+const tileNames=['🛰️ Satellite','🌍 Hybrid','🗺️ Street'];
+tiles[0].addTo(map);
+
+function cycleTile(){
+  map.removeLayer(tiles[tileIdx]);
+  tileIdx=(tileIdx+1)%tiles.length;
+  tiles[tileIdx].addTo(map);
+  document.getElementById('tile-btn').textContent=tileNames[(tileIdx+1)%tiles.length];
+  showToast('Map: '+tileNames[tileIdx]);
+}
+
+// ═══════════════════
+// MAP CLICK
+// ═══════════════════
+map.on('click',function(e){
+  const lat=e.latlng.lat,lon=e.latlng.lng;
+  if(mode==='tree'){
+    document.getElementById('t-lat').value=lat.toFixed(6);
+    document.getElementById('t-lon').value=lon.toFixed(6);
+    cancelMode();openSheet();
+    showToast('📍 Tree location set from map!');
+    return;
+  }
+  if(mode==='strat'){
+    addStratCorner(lat,lon);return;
+  }
+  if(mode==='patch'){
+    const c=make8x8(lat,lon,document.getElementById('p-anchor').value);
+    setPendingPatch(c);
+    cancelMode();openSheet();
+    showToast('✅ 8×8m patch placed!');
+    return;
+  }
+});
+
+// ═══════════════════
+// GPS — FIXED VERSION
+// Uses multiple fallback methods
+// ═══════════════════
+function captureGPS(){
+  // Check if geolocation exists
+  if(!navigator.geolocation){
+    showGPSAlert(
+      '❌ GPS Not Supported',
+      'Your browser does not support GPS. Use Google Maps to copy coordinates manually and paste them in the Lat/Lon fields.'
+    );
+    return;
+  }
+
+  const resultEl=document.getElementById('gps-result');
+  resultEl.style.display='block';
+  resultEl.style.color='#6ee7b7';
+  resultEl.textContent='📡 Searching for GPS signal... (stay outdoors)';
+  showToast('📡 Getting GPS...','info');
+
+  // Try high accuracy first
+  const opts1={enableHighAccuracy:true,timeout:12000,maximumAge:0};
+  const opts2={enableHighAccuracy:false,timeout:8000,maximumAge:30000};
+
+  navigator.geolocation.getCurrentPosition(
+    function(pos){
+      const lat=pos.coords.latitude;
+      const lon=pos.coords.longitude;
+      const acc=Math.round(pos.coords.accuracy);
+      document.getElementById('t-lat').value=lat.toFixed(6);
+      document.getElementById('t-lon').value=lon.toFixed(6);
+      resultEl.textContent=`✅ GPS captured! Accuracy: ±${acc} meters${acc>50?' (move outdoors for better signal)':''}`;
+      resultEl.style.color=acc>50?'#fbbf24':'#6ee7b7';
+      showToast(`📍 Got GPS! ±${acc}m accuracy`);
+    },
+    function(err){
+      // First attempt failed — try low accuracy
+      navigator.geolocation.getCurrentPosition(
+        function(pos){
+          const lat=pos.coords.latitude;
+          const lon=pos.coords.longitude;
+          const acc=Math.round(pos.coords.accuracy);
+          document.getElementById('t-lat').value=lat.toFixed(6);
+          document.getElementById('t-lon').value=lon.toFixed(6);
+          resultEl.textContent=`✅ GPS captured (low accuracy) ±${acc}m`;
+          resultEl.style.color='#fbbf24';
+          showToast(`📍 Got approximate GPS! ±${acc}m`);
+        },
+        function(err2){
+          resultEl.style.display='none';
+          handleGPSError(err2);
+        },
+        opts2
+      );
+    },
+    opts1
+  );
+}
+
+function handleGPSError(err){
+  let title,msg;
+  switch(err.code){
+    case 1: // PERMISSION_DENIED
+      title='🔒 GPS Permission Blocked';
+      msg='Chrome blocked location access.\n\n'+
+          'Fix: Tap the 🔒 lock icon in Chrome address bar → Site settings → Location → Allow\n\n'+
+          'OR use Google Maps to copy your coordinates manually.';
+      break;
+    case 2: // POSITION_UNAVAILABLE
+      title='📡 GPS Signal Not Found';
+      msg='Cannot find GPS signal. Try:\n'+
+          '• Go outside / near a window\n'+
+          '• Turn on Location in phone Settings\n'+
+          '• Enable Wi-Fi (helps GPS indoors)\n\n'+
+          'OR use Google Maps to copy coordinates.';
+      break;
+    case 3: // TIMEOUT
+      title='⏱️ GPS Timed Out';
+      msg='GPS took too long. Try again outdoors.\n\n'+
+          'OR use Google Maps: long-press your location → copy the coordinates → paste in Lat/Lon fields.';
+      break;
+    default:
+      title='❌ GPS Failed';
+      msg='Unknown GPS error. Use Google Maps to get coordinates manually.';
+  }
+  showGPSAlert(title,msg);
+  showToast('GPS failed — see instructions below','err');
+}
+
+function showGPSAlert(title,msg){
+  document.getElementById('gps-alert-title').textContent=title;
+  document.getElementById('gps-alert-msg').textContent=msg;
+  document.getElementById('gps-status-box').style.display='block';
+}
+
+// GPS for strata corner
+function addGPSCorner(){
+  if(!navigator.geolocation){
+    showGPSAlert('❌ GPS Not Supported','Use Google Maps to get coordinates and enter them in the manual fields.');
+    return;
+  }
+  showToast('📡 Getting GPS corner...','info');
+  navigator.geolocation.getCurrentPosition(
+    function(pos){
+      const lat=pos.coords.latitude,lon=pos.coords.longitude;
+      if(mode!=='strat')startMode('strat');
+      addStratCorner(lat,lon);
+      showToast(`📍 Corner ${stratCorners.length} added! ±${Math.round(pos.coords.accuracy)}m`);
+    },
+    function(err){handleGPSError(err);},
+    {enableHighAccuracy:true,timeout:15000,maximumAge:0}
+  );
+}
+
+// GPS for patch
+function patchAtGPS(){
+  if(!navigator.geolocation){
+    showGPSAlert('❌ GPS Not Supported','Tap "Tap Map to Place Patch" instead and tap your location on map.');
+    return;
+  }
+  showToast('📡 Getting GPS...','info');
+  navigator.geolocation.getCurrentPosition(
+    function(pos){
+      const c=make8x8(pos.coords.latitude,pos.coords.longitude,document.getElementById('p-anchor').value);
+      setPendingPatch(c);
+      showToast(`📍 8×8m patch placed! ±${Math.round(pos.coords.accuracy)}m`);
+    },
+    function(err){handleGPSError(err);},
+    {enableHighAccuracy:true,timeout:15000,maximumAge:0}
+  );
+}
+
+// Jump to GPS on map
+function jumpGPS(){
+  if(!navigator.geolocation){showToast('GPS not supported','err');return;}
+  showToast('📡 Finding you...','info');
+  navigator.geolocation.getCurrentPosition(
+    function(pos){
+      const lat=pos.coords.latitude,lon=pos.coords.longitude;
+      map.flyTo([lat,lon],18,{duration:1});
+      L.circleMarker([lat,lon],{radius:9,color:'#3b82f6',fillColor:'#3b82f6',fillOpacity:0.5,weight:2})
+        .addTo(map).bindTooltip('📍 You are here',{permanent:false,direction:'top'}).openTooltip();
+      showToast(`📍 Found you! ±${Math.round(pos.coords.accuracy)}m`);
+    },
+    function(err){handleGPSError(err);},
+    {enableHighAccuracy:true,timeout:10000,maximumAge:5000}
+  );
+}
+
+// ═══════════════════
+// 8×8m MATH
+// ═══════════════════
+function make8x8(lat,lon,anchor){
+  const dLat=8/111111;
+  const dLon=8/(111111*Math.cos(lat*Math.PI/180));
+  let tl;
+  switch(anchor){
+    case 'center':tl=[lat+dLat/2,lon-dLon/2];break;
+    case 'tl':tl=[lat,lon];break;
+    case 'tr':tl=[lat,lon-dLon];break;
+    case 'bl':tl=[lat+dLat,lon];break;
+    case 'br':tl=[lat+dLat,lon-dLon];break;
+    default:tl=[lat+dLat/2,lon-dLon/2];
+  }
+  return[[tl[0],tl[1]],[tl[0],tl[1]+dLon],[tl[0]-dLat,tl[1]+dLon],[tl[0]-dLat,tl[1]]];
+}
+
+function setPendingPatch(c){
+  pendingPatch={corners:c};
+  if(previewPoly){map.removeLayer(previewPoly);previewPoly=null;}
+  previewPoly=L.polygon(c,{color:pColor,fillColor:pColor,fillOpacity:0.35,weight:2.5,dashArray:'6,3'}).addTo(map);
+  map.flyToBounds(previewPoly.getBounds(),{padding:[40,40],duration:0.8});
+  document.getElementById('patch-ready').style.display='block';
+  document.getElementById('patch-coord-card').style.display='block';
+  document.getElementById('patch-coords').innerHTML=
+    c.map((pt,i)=>`<div>C${i+1}: ${pt[0].toFixed(5)}, ${pt[1].toFixed(5)}</div>`).join('')+
+    '<div style="color:#10b981;margin-top:4px">✅ 8m × 8m</div>';
+}
+
+// ═══════════════════
+// STRATA CORNERS
+// ═══════════════════
+function addStratCorner(lat,lon){
+  stratCorners.push([lat,lon]);
+  const icon=L.divIcon({
+    html:`<div style="background:#3b82f6;color:white;border-radius:50%;
+      width:22px;height:22px;display:flex;align-items:center;justify-content:center;
+      font-size:10px;font-weight:700;border:2px solid white;
+      box-shadow:0 2px 8px rgba(0,0,0,0.5)">${stratCorners.length}</div>`,
+    iconSize:[22,22],iconAnchor:[11,11],className:''
+  });
+  tempMkrs.push(L.marker([lat,lon],{icon}).addTo(map));
+  updateStratPreview();
+  document.getElementById('corner-n').textContent=stratCorners.length;
+  document.getElementById('corner-list').innerHTML=
+    stratCorners.map((c,i)=>`<div>C${i+1}: ${c[0].toFixed(5)}, ${c[1].toFixed(5)}</div>`).join('');
+  document.getElementById('s-steps').classList.add('show');
+}
+
+function updateStratPreview(){
+  if(previewPoly){map.removeLayer(previewPoly);previewPoly=null;}
+  if(stratCorners.length<2)return;
+  previewPoly=L.polygon(stratCorners,{color:sColor,fillColor:sColor,fillOpacity:0.12,weight:2,dashArray:'8,4'}).addTo(map);
+}
+
+function finishStrat(){
+  if(stratCorners.length<3){showToast('Need at least 3 corners!','err');return;}
+  cancelMode();openSheet();
+  showToast(`✅ ${stratCorners.length} corners. Fill details & Save.`);
+}
+
+// ═══════════════════
+// SAVE STRATUM
+// ═══════════════════
+function saveStrat(){
+  const sid=document.getElementById('s-id').value.trim();
+  const snum=document.getElementById('s-num').value;
+  const snm=document.getElementById('s-name').value.trim();
+  if(!sid){showToast('Enter Stratum ID','err');return;}
+  if(!snm){showToast('Enter description','err');return;}
+
+  let corners=[...stratCorners];
+  if(corners.length<3){
+    const lats=document.querySelectorAll('.slat');
+    const lons=document.querySelectorAll('.slon');
+    corners=[];
+    for(let i=0;i<lats.length;i++){
+      const la=parseFloat(lats[i].value),lo=parseFloat(lons[i].value);
+      if(!isNaN(la)&&!isNaN(lo))corners.push([la,lo]);
+    }
+  }
+  if(corners.length<3){showToast('Need 3+ corners — draw on map or type coordinates','err');return;}
+
+  if(previewPoly){map.removeLayer(previewPoly);previewPoly=null;}
+  tempMkrs.forEach(m=>map.removeLayer(m));tempMkrs=[];
+
+  const poly=L.polygon(corners,{color:sColor,fillColor:sColor,fillOpacity:0.1,weight:2.5,dashArray:'10,5'})
+    .addTo(map).bindPopup(zonePopup('Stratum',snum,snm,sid,corners.length+'c'));
+  sLayers.push(poly);
+  strata.push({id:sid,num:snum,name:snm,color:sColor,corners});
+  map.flyToBounds(poly.getBounds(),{padding:[30,30],duration:1});
+  animN('h-z',strata.length+patches.length);
+  save();refreshLists();clearStratForm();
+  showToast(`✅ Stratum ${snum} saved!`);
+}
+
+// ═══════════════════
+// SAVE PATCH
+// ═══════════════════
+function savePatch(){
+  const pid=document.getElementById('p-id').value.trim();
+  const pstr=document.getElementById('p-str').value;
+  const pnm=document.getElementById('p-name').value.trim();
+  if(!pid){showToast('Enter Patch ID','err');return;}
+  if(!pendingPatch){showToast('Place patch on map first!','err');return;}
+  const c=pendingPatch.corners;
+  if(previewPoly){map.removeLayer(previewPoly);previewPoly=null;}
+  const poly=L.polygon(c,{color:pColor,fillColor:pColor,fillOpacity:0.35,weight:2.5})
+    .addTo(map).bindPopup(zonePopup('Patch',pid,pnm||'',pstr||'—','8×8m'));
+  pLayers.push(poly);
+  patches.push({id:pid,str:pstr,name:pnm,color:pColor,corners:c});
+  pendingPatch=null;
+  map.flyToBounds(poly.getBounds(),{padding:[30,30],duration:1});
+  animN('h-z',strata.length+patches.length);
+  save();refreshLists();clearPatchForm();
+  showToast(`✅ Patch ${pid} (8×8m) saved!`);
+}
+
+function zonePopup(type,a,b,c,d){
+  return`<div style="font-family:-apple-system,sans-serif;padding:11px;background:#0a0e1a;border-radius:12px">
+    <b style="font-size:13px;color:#f1f5f9">${type} ${a}: ${b}</b><br>
+    <span style="font-size:11px;color:#64748b">${c} · ${d}</span></div>`;
+}
+
+// ═══════════════════
+// SAVE TREE
+// ═══════════════════
+function saveTree(){
+  const id=document.getElementById('t-id').value.trim();
+  const sp=document.getElementById('t-sp').value.trim();
+  const str=document.getElementById('t-str').value;
+  const pt=document.getElementById('t-pt').value.trim();
+  const lat=parseFloat(document.getElementById('t-lat').value);
+  const lon=parseFloat(document.getElementById('t-lon').value);
+  const cnt=parseInt(document.getElementById('t-cnt').value)||0;
+  const bark=document.getElementById('t-bark').value;
+  const web=document.getElementById('t-web').value;
+  const ht=document.getElementById('t-ht').value;
+  const nts=document.getElementById('t-notes').value.trim();
+  const ph=[...photoURLs];
+
+  if(!id){showToast('Enter Tree ID','err');return;}
+  if(!sp){showToast('Enter species name','err');return;}
+  if(isNaN(lat)||isNaN(lon)){
+    showToast('Set GPS location — use one of the 3 methods above','err');return;
+  }
+
+  const tree={id,sp,str,pt,lat,lon,cnt,bark,web,ht,nts,ph};
+  trees.push(tree);
+  tMkrs.push(makeMarker(tree,trees.length-1));
+  map.flyTo([lat,lon],19,{duration:1});
+  animN('h-trees',trees.length);
+  animN('h-sp',trees.reduce((s,t)=>s+t.cnt,0));
+  save();refreshLists();clearTreeForm();
+  showToast(`✅ ${sp} saved — ${cnt} spider(s)`);
+}
+
+// ═══════════════════
+// TREE MARKER
+// ═══════════════════
+function emoji(sp){
+  const s=(sp||'').toLowerCase();
+  if(s.includes('neem'))return'🌿';
+  if(s.includes('mango'))return'🥭';
+  if(s.includes('peepal'))return'🍃';
+  if(s.includes('banyan'))return'🌳';
+  if(s.includes('ashoka'))return'🌲';
+  if(s.includes('bamboo'))return'🎋';
+  if(s.includes('jamun'))return'🫐';
+  if(s.includes('gulmohar'))return'🌺';
+  return'🌳';
+}
+function tColor(n){
+  if(n===0)return'#9e9e9e';if(n===1)return'#ffb300';
+  if(n===2)return'#ef6c00';if(n<=4)return'#d32f2f';return'#7b1fa2';
+}
+function tRad(n){return n===0?7:n===1?9:n===2?11:n<=4?13:15;}
+function tTag(n){
+  if(n===0)return'<span class="tag tag-b">Clean</span>';
+  if(n<=2)return'<span class="tag tag-o">Low</span>';
+  if(n<=4)return'<span class="tag tag-r">High</span>';
+  return'<span class="tag tag-v">V.High</span>';
+}
+function rgb(h){return[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)].join(',');}
+
+function makeMarker(tree,idx){
+  const col=tColor(tree.cnt);
+  const mkr=L.circleMarker([tree.lat,tree.lon],{
+    radius:tRad(tree.cnt),color:col,fillColor:col,fillOpacity:0.88,weight:2.5
+  }).addTo(map);
+  mkr.bindTooltip(`${emoji(tree.sp)} <b>${tree.sp}</b> · ${tree.cnt} spider${tree.cnt!==1?'s':''}`,{sticky:true});
+  mkr.bindPopup(()=>buildPopup(tree,idx),{maxWidth:285,autoPan:true});
+  return mkr;
+}
+
+function buildPopup(tree,idx){
+  const col=tColor(tree.cnt);
+  const ph=tree.ph||[];
+  galIdx[idx]=0;
+
+  const gal=ph.length>0?`
+    <div class="popup-gallery" id="pg-${idx}">
+      <img class="pop-img" id="pi-${idx}" src="${ph[0]}"
+        onclick="openImg('${ph[0].replace(/'/g,"\\'")}')">
+      ${ph.length>1?`<div class="pop-img-count">1/${ph.length}</div>
+        <button class="pop-nav pop-nav-l" onclick="event.stopPropagation();navImg(${idx},-1,${ph.length})">‹</button>
+        <button class="pop-nav pop-nav-r" onclick="event.stopPropagation();navImg(${idx},1,${ph.length})">›</button>`:''}
+    </div>`:`<div class="popup-gallery empty"><div style="font-size:36px;opacity:0.2">${emoji(tree.sp)}</div></div>`;
+
+  const flds=[
+    tree.str?{l:'Stratum',v:tree.str}:null,
+    tree.pt?{l:'Patch',v:tree.pt}:null,
+    tree.bark?{l:'Bark',v:tree.bark}:null,
+    (tree.web&&tree.web!=='None')?{l:'Web',v:tree.web}:null,
+    tree.ht?{l:'Height',v:tree.ht,span:2}:null,
+  ].filter(Boolean);
+
+  const div=document.createElement('div');
+  div.className='popup-wrap';
+  div.innerHTML=`
+    ${gal}
+    <div class="popup-body">
+      <div class="popup-header">
+        <div>
+          <div class="popup-name">${emoji(tree.sp)} ${tree.id}</div>
+          <div class="popup-species">${tree.sp}</div>
+        </div>
+        <div class="spider-chip" style="border-color:rgba(${rgb(col)},0.35);background:rgba(${rgb(col)},0.12)">
+          <div class="spider-chip-n" style="color:${col}">${tree.cnt}</div>
+          <div class="spider-chip-l">spiders</div>
+        </div>
+      </div>
+      ${flds.length?`<div class="popup-fields">${flds.map(f=>`<div class="pop-field"${f.span?` style="grid-column:span ${f.span}"`:''}>
+        <div class="pop-field-l">${f.l}</div><div class="pop-field-v">${f.v}</div></div>`).join('')}</div>`:''}
+      ${tree.nts?`<div class="popup-notes">"${tree.nts}"</div>`:''}
+      <div class="popup-gps">📍 ${tree.lat.toFixed(5)}, ${tree.lon.toFixed(5)}</div>
+    </div>
+    ${ph.length>1?`<div class="thumb-row" id="tr-${idx}">
+      ${ph.map((p,i)=>`<img class="thumb-img${i===0?' on':''}" src="${p}" onclick="setImg(${idx},${i},${ph.length})">`).join('')}
+    </div>`:''}`; 
+  return div;
+}
+
+function navImg(idx,dir,total){
+  galIdx[idx]=((galIdx[idx]||0)+dir+total)%total;
+  const i=galIdx[idx],ph=trees[idx].ph;
+  const img=document.getElementById('pi-'+idx);
+  const cnt=document.querySelector('#pg-'+idx+' .pop-img-count');
+  if(img){img.src=ph[i];img.onclick=()=>openImg(ph[i]);}
+  if(cnt)cnt.textContent=`${i+1}/${total}`;
+  document.querySelectorAll('#tr-'+idx+' .thumb-img').forEach((t,j)=>t.classList.toggle('on',j===i));
+}
+function setImg(idx,i,total){
+  galIdx[idx]=i;
+  const ph=trees[idx].ph;
+  const img=document.getElementById('pi-'+idx);
+  const cnt=document.querySelector('#pg-'+idx+' .pop-img-count');
+  if(img){img.src=ph[i];img.onclick=()=>openImg(ph[i]);}
+  if(cnt)cnt.textContent=`${i+1}/${total}`;
+  document.querySelectorAll('#tr-'+idx+' .thumb-img').forEach((t,j)=>t.classList.toggle('on',j===i));
+}
+function openImg(src){
+  const w=window.open('','_blank');
+  if(w)w.document.write(`<html><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh;cursor:pointer" onclick="window.close()">
+    <img src="${src}" style="max-width:100%;max-height:100vh;object-fit:contain"></body></html>`);
+}
+
+// ═══════════════════
+// PHOTOS
+// ═══════════════════
+photoURLs=[];
+function handlePhotos(inp){
+  Array.from(inp.files).forEach(f=>{
+    const r=new FileReader();
+    r.onload=e=>{photoURLs.push(e.target.result);renderStrip();};
+    r.readAsDataURL(f);
+  });
+  inp.value='';
+}
+function renderStrip(){
+  document.getElementById('ph-strip').innerHTML=photoURLs.map((u,i)=>
+    `<div class="ph-wrap">
+      <img class="ph-img" src="${u}" onclick="openImg('${u.replace(/'/g,"\\'")}')">
+      <button class="ph-del" onclick="delPhoto(${i})">✕</button>
+    </div>`).join('');
+  document.getElementById('ph-count').textContent=photoURLs.length?`${photoURLs.length} photo${photoURLs.length>1?'s':''} added`:'';
+}
+function delPhoto(i){photoURLs.splice(i,1);renderStrip();}
+
+// ═══════════════════
+// COLORS
+// ═══════════════════
+function pickC(el,t){
+  const gid=t==='s'?'s-sw':'p-sw';
+  document.querySelectorAll('#'+gid+' .swatch').forEach(s=>s.classList.remove('on'));
+  el.classList.add('on');
+  if(t==='s')sColor=el.dataset.c;else pColor=el.dataset.c;
+}
+
+// ═══════════════════
+// MODE
+// ═══════════════════
+function startMode(m){
+  cancelMode();mode=m;closeSheet();
+  const b=document.getElementById('mode-banner');
+  const t=document.getElementById('banner-txt');
+  b.className='mode-banner show '+m;
+  if(m==='tree')t.textContent='🌳 Tap where tree is located';
+  if(m==='strat'){
+    t.textContent='📐 Tap corners of stratum';
+    document.getElementById('done-s-btn').style.display='flex';
+    document.getElementById('start-s-btn').style.display='none';
+    stratCorners=[];
+    document.getElementById('s-steps').classList.add('show');
+  }
+  if(m==='patch')t.textContent='⬛ Tap to place 8×8m patch';
+  map.getContainer().style.cursor='crosshair';
+}
+function cancelMode(){
+  mode=null;
+  document.getElementById('mode-banner').className='mode-banner';
+  document.getElementById('done-s-btn').style.display='none';
+  document.getElementById('start-s-btn').style.display='flex';
+  map.getContainer().style.cursor='';
+}
+
+// ═══════════════════
+// SHEET
+// ═══════════════════
+function openSheet(){
+  document.getElementById('bottom-sheet').classList.add('open');
+  document.getElementById('sheet-overlay').classList.add('show');
+}
+function closeSheet(){
+  document.getElementById('bottom-sheet').classList.remove('open');
+  document.getElementById('sheet-overlay').classList.remove('show');
+}
+
+// ═══════════════════
+// TABS
+// ═══════════════════
+function swTab(id,btn){
+  document.querySelectorAll('.stab').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('on'));
+  document.getElementById('tab-'+id).classList.add('on');
+  btn.classList.add('on');
+  if(id==='stats')refreshStats();
+  if(id==='data')refreshLists();
+}
+
+// ═══════════════════
+// TOAST
+// ═══════════════════
+let tT=null;
+function showToast(msg,type='ok'){
+  const el=document.getElementById('toast');
+  const bar=document.getElementById('tbar');
+  document.getElementById('t-msg').textContent=msg;
+  document.getElementById('t-icon').textContent=type==='ok'?'✅':type==='err'?'❌':'📡';
+  el.className='toast show'+(type==='err'?' err':'');
+  bar.style.animation='none';void bar.offsetWidth;
+  bar.style.animation='tbar 3s linear forwards';
+  clearTimeout(tT);tT=setTimeout(()=>el.classList.remove('show'),3500);
+}
+
+// ═══════════════════
+// COUNTER
+// ═══════════════════
+function animN(id,target){
+  const el=document.getElementById(id);
+  const s=parseInt(el.textContent)||0,d=target-s,steps=15;let i=0;
+  const t=setInterval(()=>{
+    i++;el.textContent=Math.round(s+(d*i/steps));
+    if(i>=steps){el.textContent=target;clearInterval(t);}
+  },20);
+}
+
+// ═══════════════════
+// HEAT MAP
+// ═══════════════════
+function refreshHeat(){
+  if(!heatOn)return;
+  if(heatLayer)map.removeLayer(heatLayer);
+  const pts=trees.filter(t=>t.cnt>0).map(t=>[t.lat,t.lon,t.cnt]);
+  if(pts.length)heatLayer=L.heatLayer(pts,{radius:25,blur:20,maxZoom:22,gradient:{0.2:'#ffb300',0.5:'#ef6c00',0.8:'#d32f2f',1:'#7b1fa2'}}).addTo(map);
+}
+function toggleHeat(){
+  heatOn=!heatOn;
+  const btn=document.getElementById('heat-fab');
+  if(heatOn){refreshHeat();btn.classList.add('on');showToast('🔥 Heat map ON');}
+  else{if(heatLayer){map.removeLayer(heatLayer);heatLayer=null;}btn.classList.remove('on');showToast('Heat map OFF');}
+}
+function fitAll(){
+  const all=[...tMkrs,...sLayers,...pLayers];
+  if(!all.length){showToast('Nothing on map yet','err');return;}
+  map.flyToBounds(L.featureGroup(all).getBounds(),{padding:[50,50],duration:1});
+}
+
+// ═══════════════════
+// LISTS
+// ═══════════════════
+function filterList(q){refreshLists(q.toLowerCase());}
+function refreshLists(f=''){
+  document.getElementById('tc-n').textContent=trees.length;
+  const fil=trees.filter(t=>t.id.toLowerCase().includes(f)||t.sp.toLowerCase().includes(f)||(t.pt&&t.pt.toLowerCase().includes(f)));
+  document.getElementById('tree-list').innerHTML=fil.length
+    ?fil.map(t=>{const i=trees.indexOf(t);return`
+      <div class="list-item" onclick="focusTree(${i})">
+        <div class="list-dot" style="background:${tColor(t.cnt)}"></div>
+        <div class="list-body">
+          <div class="list-title">${emoji(t.sp)} ${t.id} — ${t.sp} ${tTag(t.cnt)}</div>
+          <div class="list-sub">${t.cnt} spider(s) · S${t.str||'?'} · P${t.pt||'?'} · 📷${t.ph.length}</div>
+        </div>
+        <button class="del-btn" onclick="event.stopPropagation();remTree(${i})">✕</button>
+      </div>`;}).join('')
+    :`<div class="empty-state"><div class="icon">🌳</div><p>${f?'No matches.':'No trees yet.'}</p></div>`;
+
+  document.getElementById('sc-n').textContent=strata.length;
+  document.getElementById('strat-list').innerHTML=strata.length
+    ?strata.map((s,i)=>`<div class="list-item" onclick="focusZone('s',${i})">
+        <div class="list-sq" style="background:${s.color}"></div>
+        <div class="list-body">
+          <div class="list-title">Stratum ${s.num}: ${s.name}</div>
+          <div class="list-sub">ID: ${s.id} · ${s.corners.length} corners</div>
+        </div>
+        <button class="del-btn" onclick="event.stopPropagation();remStrat(${i})">✕</button>
+      </div>`).join('')
+    :`<div class="empty-state"><div class="icon">📐</div><p>No strata yet.</p></div>`;
+
+  document.getElementById('pc-n').textContent=patches.length;
+  document.getElementById('patch-list').innerHTML=patches.length
+    ?patches.map((p,i)=>`<div class="list-item" onclick="focusZone('p',${i})">
+        <div class="list-sq" style="background:${p.color}"></div>
+        <div class="list-body">
+          <div class="list-title">⬛ Patch ${p.id} <span class="tag tag-o">8×8m</span></div>
+          <div class="list-sub">Stratum ${p.str||'—'} ${p.name?'· '+p.name:''}</div>
+        </div>
+        <button class="del-btn" onclick="event.stopPropagation();remPatch(${i})">✕</button>
+      </div>`).join('')
+    :`<div class="empty-state"><div class="icon">⬛</div><p>No patches yet.</p></div>`;
+}
+
+function focusTree(i){closeSheet();map.flyTo([trees[i].lat,trees[i].lon],20,{duration:1});setTimeout(()=>tMkrs[i].openPopup(),1100);}
+function focusZone(t,i){closeSheet();const l=t==='s'?sLayers[i]:pLayers[i];map.flyToBounds(l.getBounds(),{padding:[30,30],duration:1});}
+function remTree(i){map.removeLayer(tMkrs[i]);trees.splice(i,1);tMkrs.splice(i,1);animN('h-trees',trees.length);animN('h-sp',trees.reduce((s,t)=>s+t.cnt,0));refreshHeat();save();refreshLists();showToast('Tree removed','err');}
+function remStrat(i){map.removeLayer(sLayers[i]);strata.splice(i,1);sLayers.splice(i,1);animN('h-z',strata.length+patches.length);save();refreshLists();showToast('Stratum removed','err');}
+function remPatch(i){map.removeLayer(pLayers[i]);patches.splice(i,1);pLayers.splice(i,1);animN('h-z',strata.length+patches.length);save();refreshLists();showToast('Patch removed','err');}
+
+// ═══════════════════
+// STATS
+// ═══════════════════
+function refreshStats(){
+  const tot=trees.length,sp=trees.reduce((s,t)=>s+t.cnt,0);
+  const inf=trees.filter(t=>t.cnt>0).length;
+  const rt=tot?Math.round((inf/tot)*100):0;
+  const av=tot?(sp/tot).toFixed(1):'0.0';
+  const mx=tot?Math.max(...trees.map(t=>t.cnt)):0;
+  document.getElementById('st-tr').textContent=tot;
+  document.getElementById('st-sp').textContent=sp;
+  document.getElementById('st-in').textContent=inf;
+  document.getElementById('st-rt').textContent=rt+'%';
+  document.getElementById('st-av').textContent=av;
+  document.getElementById('st-mx').textContent=mx;
+  mkChart('ch-sp',grpBy('sp'),'#3b82f6');
+  mkChart('ch-st',grpBySt(),'#10b981');
+  mkChart('ch-bk',grpBy('bark'),'#f59e0b');
+}
+function grpBy(k){const m={};trees.forEach(t=>{const v=t[k]||'?';m[v]=(m[v]||0)+t.cnt;});return m;}
+function grpBySt(){const m={};trees.forEach(t=>{const k=t.str?`S${t.str}`:'?';m[k]=(m[k]||0)+t.cnt;});return m;}
+function mkChart(id,data,col){
+  const el=document.getElementById(id);const ent=Object.entries(data);
+  if(!ent.length){el.innerHTML='<div class="empty-state"><p>No data.</p></div>';return;}
+  const mx=Math.max(...ent.map(e=>e[1]),1);
+  el.innerHTML=ent.sort((a,b)=>b[1]-a[1]).map(([l,v])=>
+    `<div class="chart-row"><div class="chart-lbl" title="${l}">${l}</div>
+    <div class="chart-track"><div class="chart-fill" style="width:${(v/mx)*100}%;background:${col}"></div></div>
+    <div class="chart-val">${v}</div></div>`).join('');
+}
+
+// ═══════════════════
+// EXPORT
+// ═══════════════════
+function exportCSV(){
+  if(!trees.length){showToast('No data to export','err');return;}
+  const h='tree_id,stratum,patch,lat,lon,species,spiders,bark,web,height,notes,photos';
+  const r=trees.map(t=>[t.id,t.str,t.pt,t.lat,t.lon,t.sp,t.cnt,t.bark,t.web,t.ht,`"${t.nts||''}"`,t.ph.length].join(','));
+  const blob=new Blob([[h,...r].join('\n')],{type:'text/csv'});
+  const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(blob),download:'spider_data.csv'});
+  a.click();showToast('📥 CSV downloaded!');
+}
+
+// ═══════════════════
+// CLEAR ALL
+// ═══════════════════
+function clearAll(){
+  if(!confirm('Delete ALL data? Cannot be undone.'))return;
+  tMkrs.forEach(m=>map.removeLayer(m));
+  sLayers.forEach(l=>map.removeLayer(l));
+  pLayers.forEach(l=>map.removeLayer(l));
+  if(heatLayer){map.removeLayer(heatLayer);heatLayer=null;}
+  if(previewPoly){map.removeLayer(previewPoly);previewPoly=null;}
+  tempMkrs.forEach(m=>map.removeLayer(m));tempMkrs=[];
+  trees=[];strata=[];patches=[];tMkrs=[];sLayers=[];pLayers=[];
+  pendingPatch=null;stratCorners=[];
+  ['h-trees','h-sp','h-z'].forEach(id=>document.getElementById(id).textContent='0');
+  localStorage.removeItem('spMap_v6');
+  refreshLists();cancelMode();
+  showToast('All data cleared','err');
+}
+
+// ═══════════════════
+// SAVE / LOAD
+// ═══════════════════
+function save(){
+  try{
+    const meta=trees.map(t=>({...t,ph:[]}));
+    localStorage.setItem('spMap_v6',JSON.stringify({trees:meta,strata,patches}));
+    trees.forEach(t=>{
+      if(t.ph&&t.ph.length){
+        try{localStorage.setItem('spMap_v6_ph_'+t.id,JSON.stringify(t.ph));}
+        catch(e){console.warn('Photo storage full for',t.id);}
+      }
+    });
+  }catch(e){showToast('Storage full! Export CSV now.','err');}
+}
+
+function load(){
+  try{
+    const raw=localStorage.getItem('spMap_v6');
+    if(!raw)return;
+    const d=JSON.parse(raw);
+    (d.trees||[]).forEach(t=>{
+      try{const p=localStorage.getItem('spMap_v6_ph_'+t.id);t.ph=p?JSON.parse(p):[];}
+      catch(e){t.ph=[];}
+      trees.push(t);
+      tMkrs.push(makeMarker(t,trees.length-1));
+    });
+    (d.strata||[]).forEach(s=>{
+      strata.push(s);
+      sLayers.push(L.polygon(s.corners,{color:s.color,fillColor:s.color,fillOpacity:0.1,weight:2.5,dashArray:'10,5'})
+        .addTo(map).bindPopup(zonePopup('Stratum',s.num,s.name,s.id,s.corners.length+'c')));
+    });
+    (d.patches||[]).forEach(p=>{
+      patches.push(p);
+      pLayers.push(L.polygon(p.corners,{color:p.color,fillColor:p.color,fillOpacity:0.35,weight:2.5})
+        .addTo(map).bindPopup(zonePopup('Patch',p.id,p.name||'',p.str||'—','8×8m')));
+    });
+    document.getElementById('h-trees').textContent=trees.length;
+    document.getElementById('h-sp').textContent=trees.reduce((s,t)=>s+t.cnt,0);
+    document.getElementById('h-z').textContent=strata.length+patches.length;
+    refreshLists();
+    if(trees.length||strata.length||patches.length){
+      showToast(`📂 Loaded ${trees.length} trees, ${strata.length} strata, ${patches.length} patches`);
+      setTimeout(fitAll,900);
+    }
+  }catch(e){console.warn('Load error:',e);}
+}
+
+// ═══════════════════
+// CLEAR FORMS
+// ═══════════════════
+function clearTreeForm(){
+  ['t-id','t-sp','t-pt','t-lat','t-lon','t-cnt','t-notes'].forEach(id=>document.getElementById(id).value='');
+  ['t-str','t-bark','t-ht'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('t-web').value='None';
+  document.getElementById('ph-strip').innerHTML='';
+  document.getElementById('ph-count').textContent='';
+  document.getElementById('gps-result').style.display='none';
+  photoURLs=[];
+}
+function clearStratForm(){
+  ['s-id','s-name'].forEach(id=>document.getElementById(id).value='');
+  document.querySelectorAll('.slat,.slon').forEach(el=>el.value='');
+  stratCorners=[];tempMkrs.forEach(m=>map.removeLayer(m));tempMkrs=[];
+  document.getElementById('corner-n').textContent='0';
+  document.getElementById('corner-list').innerHTML='';
+  document.getElementById('s-steps').classList.remove('show');
+}
+function clearPatchForm(){
+  ['p-id','p-name'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('p-str').value='';
+  document.getElementById('patch-ready').style.display='none';
+  document.getElementById('patch-coord-card').style.display='none';
+  pendingPatch=null;
+}
+
+// ═══════════════════
+// INIT
+// ═══════════════════
+window.addEventListener('load',()=>setTimeout(load,600));
+</script>
+</body>
+</html>
