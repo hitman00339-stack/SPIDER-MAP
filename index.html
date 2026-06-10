@@ -9,8 +9,36 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--bg:#050810;--card:#0d1424;--card2:#172033;--bdr:#1f293b;--bdr2:#334155;--acc:#3b82f6;--acc2:#8b5cf6;--txt:#f8fafc;--txt2:#94a3b8;--muted:#475569;--green:#10b981;--yellow:#f59e0b;--red:#ef4444}
-html,body{width:100%;height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--txt);overflow:hidden;position:fixed}
-#map{position:absolute;top:0;left:0;width:100%;height:100%;z-index:1}
+
+html,body{
+  width:100vw;
+  height:100vh;
+  height:100dvh;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:var(--bg);
+  color:var(--txt);
+  overflow:hidden;
+  position:fixed;
+  top:0;
+  left:0;
+}
+
+#map{
+  position:fixed !important;
+  top:0;
+  left:0;
+  width:100vw !important;
+  height:100vh !important;
+  height:100dvh !important;
+  z-index:1;
+  background:#050810;
+}
+
+.leaflet-container{
+  width:100% !important;
+  height:100% !important;
+  background:#050810 !important;
+}
 
 #auth-overlay{position:fixed;inset:0;background:linear-gradient(135deg,#050810,#0d1424);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:24px;padding:20px;text-align:center}
 .auth-logo{width:80px;height:80px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:36px;box-shadow:0 8px 30px rgba(59,130,246,0.5)}
@@ -20,19 +48,20 @@ html,body{width:100%;height:100%;font-family:-apple-system,BlinkMacSystemFont,'S
 .auth-btn:active{transform:scale(0.97)}
 .auth-loading{color:var(--txt2);font-size:13px;display:none}
 
-#topbar{position:fixed;top:0;left:0;right:0;height:54px;background:rgba(5,8,16,0.98);border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;padding:0 12px;z-index:1000;backdrop-filter:blur(20px)}
+#topbar{position:fixed;top:0;left:0;right:0;height:54px;background:rgba(5,8,16,0.95);border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;padding:0 12px;z-index:1000;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
 #topbar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--acc),var(--acc2),transparent)}
-.logo{display:flex;align-items:center;gap:8px}
-.logo-ico{width:32px;height:32px;background:linear-gradient(135deg,var(--acc),var(--acc2));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px}
-.logo h1{font-size:13px;font-weight:800;line-height:1.1}
-.logo p{font-size:9px;color:var(--txt2)}
-.top-right{display:flex;align-items:center;gap:6px}
-.stat-pill{background:var(--card);border:1px solid var(--bdr);border-radius:8px;padding:4px 9px;text-align:center;position:relative;min-width:42px}
+.logo{display:flex;align-items:center;gap:8px;min-width:0;flex-shrink:1}
+.logo-ico{width:32px;height:32px;background:linear-gradient(135deg,var(--acc),var(--acc2));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.logo-text{min-width:0;overflow:hidden}
+.logo h1{font-size:12px;font-weight:800;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.logo p{font-size:9px;color:var(--txt2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top-right{display:flex;align-items:center;gap:5px;flex-shrink:0}
+.stat-pill{background:var(--card);border:1px solid var(--bdr);border-radius:8px;padding:3px 7px;text-align:center;position:relative;min-width:36px}
 .stat-pill::before{content:'';position:absolute;top:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,var(--acc),var(--acc2))}
-.stat-pill-n{font-size:13px;font-weight:800;color:var(--acc);line-height:1}
-.stat-pill-l{font-size:7px;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px}
-.user-btn{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--bdr);cursor:pointer;overflow:hidden;background:var(--card)}
-.user-btn img{width:100%;height:100%;object-fit:cover}
+.stat-pill-n{font-size:12px;font-weight:800;color:var(--acc);line-height:1}
+.stat-pill-l{font-size:7px;color:var(--muted);text-transform:uppercase;letter-spacing:0.3px}
+.user-btn{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--bdr);cursor:pointer;overflow:hidden;background:var(--card);flex-shrink:0}
+.user-btn img{width:100%;height:100%;object-fit:cover;display:block}
 
 #save-ind{position:fixed;top:60px;right:12px;z-index:850;background:rgba(16,185,129,0.18);border:1px solid rgba(16,185,129,0.35);color:#6ee7b7;font-size:10px;font-weight:600;padding:5px 11px;border-radius:20px;opacity:0;transition:opacity 0.3s;display:flex;align-items:center;gap:6px;pointer-events:none}
 #save-ind.show{opacity:1}
@@ -52,9 +81,9 @@ html,body{width:100%;height:100%;font-family:-apple-system,BlinkMacSystemFont,'S
 .fab-gps{background:linear-gradient(135deg,#10b981,#059669);color:white}
 .fab-fit{background:rgba(13,20,36,0.96);border:1.5px solid var(--bdr2);color:var(--txt2);font-size:17px}
 
-#tile-btn{position:fixed;top:62px;left:12px;background:rgba(13,20,36,0.96);border:1.5px solid var(--bdr2);border-radius:10px;padding:8px 13px;font-size:11px;font-weight:700;color:var(--txt);z-index:900;cursor:pointer;font-family:inherit;backdrop-filter:blur(10px)}
+#tile-btn{position:fixed;top:62px;left:12px;background:rgba(13,20,36,0.96);border:1.5px solid var(--bdr2);border-radius:10px;padding:8px 12px;font-size:11px;font-weight:700;color:var(--txt);z-index:900;cursor:pointer;font-family:inherit;backdrop-filter:blur(10px)}
 
-#open-sheet-btn{position:fixed;bottom:0;left:0;right:0;height:60px;background:rgba(5,8,16,0.99);border-top:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;gap:12px;z-index:900;cursor:pointer;backdrop-filter:blur(20px)}
+#open-sheet-btn{position:fixed;bottom:0;left:0;right:0;height:60px;background:rgba(5,8,16,0.97);border-top:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;gap:12px;z-index:900;cursor:pointer;backdrop-filter:blur(20px)}
 #open-sheet-btn::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--acc),var(--acc2),transparent)}
 
 #sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1500;display:none;opacity:0;transition:opacity 0.3s;backdrop-filter:blur(4px)}
@@ -62,8 +91,8 @@ html,body{width:100%;height:100%;font-family:-apple-system,BlinkMacSystemFont,'S
 
 #bottom-sheet{position:fixed;left:0;right:0;bottom:0;max-height:92vh;background:var(--bg);border-top:1.5px solid var(--bdr);border-radius:24px 24px 0 0;z-index:1600;display:flex;flex-direction:column;transform:translateY(100%);transition:transform 0.4s cubic-bezier(0.32,0.72,0,1);overflow:hidden}
 #bottom-sheet.open{transform:translateY(0)}
-.sheet-handle{width:40px;height:4px;background:var(--bdr2);border-radius:3px;margin:10px auto 6px}
-.sheet-tabs{display:flex;border-bottom:1px solid var(--bdr);background:rgba(5,8,16,0.9);overflow-x:auto}
+.sheet-handle{width:40px;height:4px;background:var(--bdr2);border-radius:3px;margin:10px auto 6px;flex-shrink:0}
+.sheet-tabs{display:flex;border-bottom:1px solid var(--bdr);background:rgba(5,8,16,0.9);overflow-x:auto;flex-shrink:0}
 .sheet-tabs::-webkit-scrollbar{display:none}
 .stab{flex-shrink:0;padding:12px 13px;background:none;border:none;color:var(--muted);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;font-family:inherit;min-height:46px}
 .stab.on{color:var(--acc);border-bottom-color:var(--acc);background:rgba(59,130,246,0.08)}
@@ -75,7 +104,7 @@ html,body{width:100%;height:100%;font-family:-apple-system,BlinkMacSystemFont,'S
 .card-title{font-size:9px;font-weight:800;color:var(--acc);text-transform:uppercase;letter-spacing:1.1px;margin-bottom:11px;display:flex;align-items:center;gap:6px}
 .card-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--bdr),transparent)}
 .row{display:flex;gap:7px;margin-bottom:7px}
-.fg{flex:1;display:flex;flex-direction:column;gap:4px}
+.fg{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}
 label{font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.4px}
 input,select,textarea{background:rgba(0,0,0,0.5);border:1.5px solid var(--bdr2);border-radius:9px;padding:11px 12px;color:var(--txt);font-size:15px;width:100%;font-family:inherit;-webkit-appearance:none;-webkit-text-fill-color:var(--txt)}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--acc);background:rgba(59,130,246,0.06)}
@@ -103,8 +132,8 @@ textarea{resize:none;min-height:60px}
 .parent-opt{background:rgba(0,0,0,0.35);border:1.5px solid var(--bdr);border-radius:9px;padding:10px 11px;cursor:pointer;display:flex;align-items:center;gap:9px;margin-bottom:5px;transition:all 0.2s}
 .parent-opt.on{border-color:var(--acc);background:rgba(59,130,246,0.15)}
 .parent-opt-dot{width:11px;height:11px;border-radius:3px;flex-shrink:0}
-.parent-opt-title{font-size:12px;font-weight:600;flex:1;color:var(--txt)}
-.parent-opt-check{width:19px;height:19px;border-radius:50%;border:1.5px solid var(--bdr2);display:flex;align-items:center;justify-content:center;font-size:11px;color:white}
+.parent-opt-title{font-size:12px;font-weight:600;flex:1;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.parent-opt-check{width:19px;height:19px;border-radius:50%;border:1.5px solid var(--bdr2);display:flex;align-items:center;justify-content:center;font-size:11px;color:white;flex-shrink:0}
 .parent-opt.on .parent-opt-check{background:var(--acc);border-color:var(--acc)}
 
 .boundary-warning{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:10px;padding:10px;font-size:11px;color:#fca5a5;margin-top:8px;display:none}
@@ -128,6 +157,20 @@ textarea{resize:none;min-height:60px}
 
 .empty-state{text-align:center;padding:20px;color:var(--muted);font-size:12px}
 .scroll-end{height:18px}
+
+/* Loading screen */
+#map-loading{position:fixed;inset:0;background:#050810;z-index:500;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;pointer-events:none;transition:opacity 0.4s}
+#map-loading.hide{opacity:0;pointer-events:none}
+.loader{width:36px;height:36px;border:3px solid var(--bdr);border-top-color:var(--acc);border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader-text{font-size:12px;color:var(--txt2)}
+
+/* Fix leaflet controls */
+.leaflet-control-zoom{margin-top:60px !important;margin-right:12px !important}
+.leaflet-control-zoom a{background:rgba(13,20,36,0.95) !important;color:var(--txt) !important;border:1px solid var(--bdr2) !important}
+.leaflet-control-zoom a:hover{background:var(--card) !important}
+.leaflet-control-attribution{background:rgba(5,8,16,0.7) !important;color:var(--muted) !important;font-size:9px !important}
+.leaflet-control-attribution a{color:var(--txt2) !important}
 </style>
 </head>
 <body>
@@ -145,13 +188,17 @@ textarea{resize:none;min-height:60px}
 
 <div id="app" style="display:none">
 <div id="map"></div>
+<div id="map-loading"><div class="loader"></div><div class="loader-text">Loading map...</div></div>
 
 <div id="topbar">
-  <div class="logo"><div class="logo-ico">🕷️</div><div><h1>Spider Map</h1><p>Cloud Synced</p></div></div>
+  <div class="logo">
+    <div class="logo-ico">🕷️</div>
+    <div class="logo-text"><h1>Spider Map</h1><p>Cloud Synced</p></div>
+  </div>
   <div class="top-right">
     <div class="stat-pill"><div class="stat-pill-n" id="h-trees">0</div><div class="stat-pill-l">Trees</div></div>
-    <div class="stat-pill"><div class="stat-pill-n" id="h-sp">0</div><div class="stat-pill-l">Spiders</div></div>
-    <div class="stat-pill"><div class="stat-pill-n" id="h-z">0</div><div class="stat-pill-l">Zones</div></div>
+    <div class="stat-pill"><div class="stat-pill-n" id="h-sp">0</div><div class="stat-pill-l">Sp</div></div>
+    <div class="stat-pill"><div class="stat-pill-n" id="h-z">0</div><div class="stat-pill-l">Z</div></div>
     <div class="user-btn" onclick="confirmSignOut()"><img id="user-avatar" src="" alt="U"></div>
   </div>
 </div>
@@ -186,9 +233,8 @@ textarea{resize:none;min-height:60px}
 
   <div class="sheet-content">
 
-    <!-- STRATA -->
     <div class="tab-pane" id="tab-strata">
-      <div class="info-box info-blue"><b>Step 1:</b> Walk to each corner of your stratum → tap "📍 Add GPS Corner". After 3+ corners → Save.</div>
+      <div class="info-box info-blue"><b>Step 1:</b> Walk to corners → tap "📍 Add GPS Corner" → Save after 3+ corners.</div>
       <div class="card">
         <div class="card-title">📋 Stratum Info</div>
         <div class="row">
@@ -197,7 +243,7 @@ textarea{resize:none;min-height:60px}
             <select id="s-num"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
           </div>
         </div>
-        <div class="fg"><label>Description</label><input id="s-name" placeholder="Academic Block Zone"></div>
+        <div class="fg"><label>Description</label><input id="s-name" placeholder="Academic Block"></div>
       </div>
       <div class="card">
         <div class="card-title">🎨 Color</div>
@@ -220,15 +266,14 @@ textarea{resize:none;min-height:60px}
       <div class="scroll-end"></div>
     </div>
 
-    <!-- PATCH -->
     <div class="tab-pane" id="tab-patch">
-      <div class="info-box info-green"><b>Step 2:</b> Patches go INSIDE a stratum. Pick parent first, then place patch. 8×8m auto-sized.</div>
+      <div class="info-box info-green"><b>Step 2:</b> Patches inside stratum. 8×8m auto-sized.</div>
       <div class="card">
         <div class="parent-sel">
           <div class="parent-sel-title">🔗 Parent Stratum</div>
           <div id="patch-parent-opts"></div>
         </div>
-        <div class="boundary-warning" id="patch-warn">⚠️ Place patch inside the stratum boundary</div>
+        <div class="boundary-warning" id="patch-warn">⚠️ Place inside stratum boundary</div>
       </div>
       <div class="card">
         <div class="card-title">📋 Patch Info</div>
@@ -247,23 +292,22 @@ textarea{resize:none;min-height:60px}
       </div>
       <div class="card">
         <div class="card-title">📍 Place 8×8m Patch</div>
-        <button class="btn btn-green" style="margin-bottom:8px" onclick="patchAtGPS()">📍 Place at My GPS Location</button>
+        <button class="btn btn-green" style="margin-bottom:8px" onclick="patchAtGPS()">📍 Place at My GPS</button>
         <button class="btn btn-yellow" onclick="startMode('patch')">🗺️ Tap Map to Place</button>
-        <div class="info-box info-green" id="patch-ready" style="display:none;margin-top:8px;font-size:11px">✅ Patch placed! Fill ID and Save.</div>
+        <div class="info-box info-green" id="patch-ready" style="display:none;margin-top:8px;font-size:11px">✅ Placed! Fill ID and Save.</div>
       </div>
       <button class="btn btn-primary" onclick="savePatch()">💾 Save Patch</button>
       <div class="scroll-end"></div>
     </div>
 
-    <!-- TREE -->
     <div class="tab-pane on" id="tab-tree">
-      <div class="info-box info-blue"><b>Step 3:</b> Stand at tree. Tap GPS — takes 5 readings for best accuracy.</div>
+      <div class="info-box info-blue"><b>Step 3:</b> Stand at tree. GPS takes 5 readings for accuracy.</div>
       <div class="card">
         <div class="parent-sel">
           <div class="parent-sel-title">🔗 Parent Patch</div>
           <div id="tree-parent-opts"></div>
         </div>
-        <div class="boundary-warning" id="tree-warn">⚠️ Tree must be inside the patch</div>
+        <div class="boundary-warning" id="tree-warn">⚠️ Must be inside patch</div>
       </div>
       <div class="card">
         <div class="card-title">🪪 Tree Identity</div>
@@ -278,15 +322,15 @@ textarea{resize:none;min-height:60px}
         <button class="btn btn-green" style="margin-bottom:8px" onclick="captureGPS()">📍 Capture GPS (5 readings)</button>
         <div id="gps-result" style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:8px;display:none;line-height:1.6"></div>
         <div class="row" style="margin-bottom:7px">
-          <div class="fg"><label>Latitude</label><input id="t-lat" type="number" step="0.000001" inputmode="decimal"></div>
-          <div class="fg"><label>Longitude</label><input id="t-lon" type="number" step="0.000001" inputmode="decimal"></div>
+          <div class="fg"><label>Lat</label><input id="t-lat" type="number" step="0.000001" inputmode="decimal"></div>
+          <div class="fg"><label>Lon</label><input id="t-lon" type="number" step="0.000001" inputmode="decimal"></div>
         </div>
         <button class="btn btn-purple" onclick="startMode('tree')">🗺️ Tap on Map</button>
       </div>
       <div class="card">
         <div class="card-title">🔬 Observation</div>
         <div class="row">
-          <div class="fg"><label>Spider Count</label><input id="t-cnt" type="number" min="0" value="0" inputmode="numeric"></div>
+          <div class="fg"><label>Spiders</label><input id="t-cnt" type="number" min="0" value="0" inputmode="numeric"></div>
           <div class="fg"><label>Bark</label>
             <select id="t-bark"><option value="">—</option><option>Rough</option><option>Smooth</option><option>Fissured</option><option>Scaly</option></select>
           </div>
@@ -300,9 +344,8 @@ textarea{resize:none;min-height:60px}
       <div class="scroll-end"></div>
     </div>
 
-    <!-- DATA -->
     <div class="tab-pane" id="tab-data">
-      <div class="info-box info-yellow">💾 All data auto-syncs to cloud. Same data on phone & laptop.</div>
+      <div class="info-box info-yellow">💾 Auto-syncs to cloud across all devices.</div>
       <div class="card">
         <div class="card-title">📐 Strata (<span id="sc-n">0</span>)</div>
         <div id="strat-list"><div class="empty-state">No strata yet</div></div>
@@ -318,18 +361,17 @@ textarea{resize:none;min-height:60px}
       <div class="scroll-end"></div>
     </div>
 
-    <!-- EXPORT -->
     <div class="tab-pane" id="tab-export">
-      <div class="info-box info-blue">📤 Generate beautiful standalone HTML map. Share via WhatsApp, email, or anywhere.</div>
+      <div class="info-box info-blue">📤 Generate standalone HTML map. Share via WhatsApp, email, anywhere.</div>
       <div class="card">
         <div class="card-title">📝 Project Info</div>
-        <div class="fg" style="margin-bottom:7px"><label>Title</label><input id="exp-title" placeholder="Spider Distribution at Ashoka University"></div>
+        <div class="fg" style="margin-bottom:7px"><label>Title</label><input id="exp-title" placeholder="Spider Distribution at Ashoka"></div>
         <div class="fg" style="margin-bottom:7px"><label>Researcher</label><input id="exp-author" placeholder="Your Name"></div>
         <div class="fg"><label>Institution</label><input id="exp-inst" placeholder="Ashoka University"></div>
       </div>
-      <button class="btn btn-purple" onclick="exportHTML()">📄 Generate Beautiful HTML Map</button>
+      <button class="btn btn-purple" onclick="exportHTML()">📄 Generate Beautiful HTML</button>
       <div style="height:8px"></div>
-      <button class="btn btn-green" onclick="exportCSV()">📊 Export CSV Data</button>
+      <button class="btn btn-green" onclick="exportCSV()">📊 Export CSV</button>
       <div style="height:8px"></div>
       <button class="btn btn-red" onclick="confirmSignOut()">🚪 Sign Out</button>
       <div class="scroll-end"></div>
@@ -366,19 +408,41 @@ let mode=null, stratCorners=[], tempMkrs=[], previewPoly=null, pendingPatch=null
 let selectedPatchStratum=null, selectedTreePatch=null;
 let sColor='#3b82f6', pColor='#fbbf24';
 let tileIdx=2, unsubs=[];
+let map=null, tiles=null;
 
-const map = L.map('map', {center:[28.9456,77.1015], zoom:16, zoomControl:false, tap:true, tapTolerance:20});
-L.control.zoom({position:'topright'}).addTo(map);
-
-const tiles = [
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:22}),
-  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:22}),
-  L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',{maxZoom:22})
-];
 const tileNames = ['🗺️ Street','🛰️ Satellite','🌍 Hybrid'];
-tiles[tileIdx].addTo(map);
 
-// ═══════ AUTH ═══════
+function initMap() {
+  if (map) return;
+  map = L.map('map', {
+    center:[28.9456,77.1015],
+    zoom:16,
+    zoomControl:true,
+    tap:true,
+    tapTolerance:20,
+    preferCanvas:false
+  });
+
+  tiles = [
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:22,attribution:'© OpenStreetMap'}),
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:22,attribution:'© Esri'}),
+    L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',{maxZoom:22,attribution:'© Google'})
+  ];
+  tiles[tileIdx].addTo(map);
+
+  map.on('click', mapClickHandler);
+
+  // Force size recalculation multiple times to ensure map renders
+  setTimeout(() => {
+    map.invalidateSize(true);
+    document.getElementById('map-loading').classList.add('hide');
+    setTimeout(() => document.getElementById('map-loading').style.display='none', 500);
+  }, 100);
+  setTimeout(() => map.invalidateSize(true), 500);
+  setTimeout(() => map.invalidateSize(true), 1000);
+}
+
+// Auth handler
 document.getElementById('signin-btn').onclick = async () => {
   document.getElementById('signin-btn').style.display='none';
   document.getElementById('auth-loading').style.display='block';
@@ -398,7 +462,13 @@ onAuthStateChanged(auth, user => {
     document.getElementById('auth-overlay').style.display='none';
     document.getElementById('app').style.display='block';
     document.getElementById('user-avatar').src = user.photoURL || '';
-    startSync();
+
+    // Initialize map AFTER app is visible
+    setTimeout(() => {
+      initMap();
+      startSync();
+    }, 100);
+
     showToast('✅ Signed in: ' + (user.displayName||'User').split(' ')[0]);
   } else {
     uid = null;
@@ -408,20 +478,16 @@ onAuthStateChanged(auth, user => {
     document.getElementById('auth-loading').style.display='none';
     unsubs.forEach(u => u());
     unsubs = [];
-    trees=[]; strata=[]; patches=[];
-    tMkrs.forEach(m=>map.removeLayer(m)); tMkrs=[];
-    sLayers.forEach(l=>map.removeLayer(l)); sLayers=[];
-    pLayers.forEach(l=>map.removeLayer(l)); pLayers=[];
   }
 });
 
 window.confirmSignOut = async () => {
   if (confirm('Sign out? Your data stays in cloud.')) {
     await signOut(auth);
+    location.reload();
   }
 };
 
-// ═══════ FIRESTORE SYNC ═══════
 function startSync() {
   unsubs.forEach(u => u());
   unsubs = [];
@@ -439,7 +505,7 @@ function startSync() {
     });
     updateUI();
     flashSaved();
-  }, err => console.error('strata sync:', err)));
+  }, err => console.error('strata:', err)));
 
   unsubs.push(onSnapshot(collection(db, 'users', uid, 'patches'), snap => {
     pLayers.forEach(l => map.removeLayer(l));
@@ -454,7 +520,7 @@ function startSync() {
     });
     updateUI();
     flashSaved();
-  }, err => console.error('patches sync:', err)));
+  }, err => console.error('patches:', err)));
 
   unsubs.push(onSnapshot(collection(db, 'users', uid, 'trees'), snap => {
     tMkrs.forEach(m => map.removeLayer(m));
@@ -472,16 +538,16 @@ function startSync() {
     });
     updateUI();
     flashSaved();
-  }, err => console.error('trees sync:', err)));
+  }, err => console.error('trees:', err)));
 }
 
 function buildTreePopup(t) {
   const col = tColor(t.cnt);
-  return `<div style="font-family:sans-serif;width:240px;padding:12px">
-    <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:10px">
-      <div><div style="font-size:15px;font-weight:700">🌳 ${t.id}</div><div style="font-size:11px;color:#666;font-style:italic">${t.sp}</div></div>
-      <div style="background:rgba(${rgb(col)},0.15);border:1.5px solid ${col};border-radius:10px;padding:5px 10px;text-align:center">
-        <div style="font-size:18px;font-weight:800;color:${col};line-height:1">${t.cnt}</div>
+  return `<div style="font-family:sans-serif;width:230px;padding:11px">
+    <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:9px">
+      <div><div style="font-size:14px;font-weight:700">🌳 ${t.id}</div><div style="font-size:11px;color:#666;font-style:italic">${t.sp}</div></div>
+      <div style="background:rgba(${rgb(col)},0.15);border:1.5px solid ${col};border-radius:10px;padding:4px 9px;text-align:center">
+        <div style="font-size:17px;font-weight:800;color:${col};line-height:1">${t.cnt}</div>
         <div style="font-size:8px;color:#666;text-transform:uppercase">spiders</div>
       </div>
     </div>
@@ -491,12 +557,11 @@ function buildTreePopup(t) {
       ${t.bark?`<tr><td style="color:#666;padding:3px 0">Bark</td><td style="font-weight:600">${t.bark}</td></tr>`:''}
       ${t.web&&t.web!=='None'?`<tr><td style="color:#666;padding:3px 0">Web</td><td style="font-weight:600">${t.web}</td></tr>`:''}
     </table>
-    ${t.nts?`<div style="margin-top:8px;padding:7px 9px;background:#f1f5f9;border-radius:7px;font-size:11px;color:#475569;font-style:italic">"${t.nts}"</div>`:''}
-    <div style="margin-top:8px;font-size:9px;color:#999;text-align:center;font-family:monospace">📍 ${t.lat.toFixed(5)}, ${t.lon.toFixed(5)}</div>
+    ${t.nts?`<div style="margin-top:7px;padding:6px 8px;background:#f1f5f9;border-radius:6px;font-size:11px;color:#475569;font-style:italic">"${t.nts}"</div>`:''}
+    <div style="margin-top:7px;font-size:9px;color:#999;text-align:center;font-family:monospace">📍 ${t.lat.toFixed(5)}, ${t.lon.toFixed(5)}</div>
   </div>`;
 }
 
-// ═══════ HELPERS ═══════
 function tColor(n){if(n===0)return'#9e9e9e';if(n===1)return'#ffb300';if(n===2)return'#ef6c00';if(n<=4)return'#d32f2f';return'#7b1fa2';}
 function tRad(n){return n===0?7:n===1?9:n===2?11:n<=4?13:15;}
 function rgb(h){return[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)].join(',');}
@@ -516,8 +581,7 @@ function make8x8(lat, lon) {
   return [[lat+d/2, lon-dl/2], [lat+d/2, lon+dl/2], [lat-d/2, lon+dl/2], [lat-d/2, lon-dl/2]];
 }
 
-// ═══════ MAP CLICK ═══════
-map.on('click', e => {
+function mapClickHandler(e) {
   const lat = e.latlng.lat, lon = e.latlng.lng;
   if (mode === 'tree') {
     if (selectedTreePatch) {
@@ -554,9 +618,8 @@ map.on('click', e => {
     cancelMode(); openSheet();
     showToast('✅ 8×8m patch placed');
   }
-});
+}
 
-// ═══════ GPS ═══════
 window.captureGPS = () => {
   if (!navigator.geolocation) { showToast('GPS not supported', 'err'); return; }
   const el = document.getElementById('gps-result');
@@ -567,7 +630,7 @@ window.captureGPS = () => {
   const take = () => {
     navigator.geolocation.getCurrentPosition(p => {
       reads.push({lat:p.coords.latitude, lon:p.coords.longitude, acc:p.coords.accuracy});
-      el.textContent = `Reading ${reads.length}/5 — current ±${Math.round(p.coords.accuracy)}m`;
+      el.textContent = `Reading ${reads.length}/5 — ±${Math.round(p.coords.accuracy)}m`;
       if (reads.length < 5 && c++ < 8) setTimeout(take, 1000);
       else {
         const best = reads.reduce((a,b) => a.acc < b.acc ? a : b);
@@ -585,16 +648,12 @@ window.captureGPS = () => {
         const ac = best.acc < 10 ? '#10b981' : best.acc < 30 ? '#fbbf24' : '#ef4444';
         const lbl = best.acc < 10 ? 'Excellent' : best.acc < 30 ? 'Good' : 'Move outdoors';
         el.style.color = ac;
-        el.innerHTML = `✅ Best of 5: <b>±${Math.round(best.acc)}m (${lbl})</b>`;
-        document.getElementById('tree-warn').classList.remove('show');
-        showToast(`📍 GPS captured ±${Math.round(best.acc)}m`);
+        el.innerHTML = `✅ Best: <b>±${Math.round(best.acc)}m (${lbl})</b>`;
+        showToast(`📍 GPS ±${Math.round(best.acc)}m`);
       }
     }, err => {
       if (c++ < 3) setTimeout(take, 1500);
-      else {
-        el.textContent = '❌ GPS failed — try outdoors';
-        showToast('GPS failed', 'err');
-      }
+      else { el.textContent = '❌ GPS failed'; showToast('GPS failed', 'err'); }
     }, {enableHighAccuracy:true, timeout:8000, maximumAge:0});
   };
   take();
@@ -606,7 +665,7 @@ window.addGPSCorner = () => {
   navigator.geolocation.getCurrentPosition(p => {
     if (mode !== 'strat') startMode('strat');
     addCorner(p.coords.latitude, p.coords.longitude);
-    showToast(`📍 Corner ${stratCorners.length} added ±${Math.round(p.coords.accuracy)}m`);
+    showToast(`📍 Corner ${stratCorners.length} ±${Math.round(p.coords.accuracy)}m`);
   }, () => showToast('GPS failed', 'err'), {enableHighAccuracy:true, timeout:15000, maximumAge:0});
 };
 
@@ -639,7 +698,7 @@ window.jumpGPS = () => {
   navigator.geolocation.getCurrentPosition(p => {
     map.flyTo([p.coords.latitude, p.coords.longitude], 18);
     L.circleMarker([p.coords.latitude, p.coords.longitude], {radius:8, color:'white', fillColor:'#3b82f6', fillOpacity:1, weight:2}).addTo(map).bindTooltip('You', {permanent:true}).openTooltip();
-    showToast(`📍 You are here ±${Math.round(p.coords.accuracy)}m`);
+    showToast(`📍 ±${Math.round(p.coords.accuracy)}m`);
   });
 };
 
@@ -657,7 +716,6 @@ function addCorner(lat, lon) {
   document.getElementById('corner-info').textContent = `${stratCorners.length} corners added (need 3+)`;
 }
 
-// ═══════ MODES ═══════
 window.startMode = m => {
   cancelMode();
   mode = m;
@@ -673,16 +731,15 @@ window.startMode = m => {
 window.cancelMode = () => {
   mode = null;
   document.getElementById('mode-banner').className = 'mode-banner';
-  map.getContainer().style.cursor = '';
+  if (map) map.getContainer().style.cursor = '';
 };
 
-// ═══════ SAVE ═══════
 window.saveStrat = async () => {
   const id = document.getElementById('s-id').value.trim();
   const num = document.getElementById('s-num').value;
   const name = document.getElementById('s-name').value.trim();
   if (!id || !name || stratCorners.length < 3) {
-    showToast('Fill ID, name, draw 3+ corners', 'err'); return;
+    showToast('Fill ID, name, 3+ corners', 'err'); return;
   }
   try {
     await setDoc(doc(db, 'users', uid, 'strata', id), {
@@ -694,8 +751,8 @@ window.saveStrat = async () => {
     document.getElementById('s-id').value = '';
     document.getElementById('s-name').value = '';
     document.getElementById('corner-info').textContent = '';
-    showToast('✅ Stratum saved to cloud');
-  } catch(e) { showToast('Save failed: ' + e.message, 'err'); console.error(e); }
+    showToast('✅ Stratum saved');
+  } catch(e) { showToast('Save failed', 'err'); console.error(e); }
 };
 
 window.savePatch = async () => {
@@ -714,8 +771,8 @@ window.savePatch = async () => {
     document.getElementById('p-id').value = '';
     document.getElementById('p-name').value = '';
     document.getElementById('patch-ready').style.display = 'none';
-    showToast('✅ Patch saved to cloud');
-  } catch(e) { showToast('Save failed: ' + e.message, 'err'); console.error(e); }
+    showToast('✅ Patch saved');
+  } catch(e) { showToast('Save failed', 'err'); console.error(e); }
 };
 
 window.saveTree = async () => {
@@ -744,20 +801,18 @@ window.saveTree = async () => {
     ['t-id','t-sp','t-lat','t-lon','t-notes'].forEach(i => document.getElementById(i).value = '');
     document.getElementById('t-cnt').value = '0';
     document.getElementById('gps-result').style.display = 'none';
-    showToast('✅ Tree saved to cloud');
-  } catch(e) { showToast('Save failed: ' + e.message, 'err'); console.error(e); }
+    showToast('✅ Tree saved');
+  } catch(e) { showToast('Save failed', 'err'); console.error(e); }
 };
 
-// ═══════ DELETE ═══════
 window.delItem = async (type, id) => {
-  if (!confirm('Delete this ' + type + '?')) return;
+  if (!confirm('Delete this ' + (type==='s'?'stratum':type==='p'?'patch':'tree') + '?')) return;
   try {
     await deleteDoc(doc(db, 'users', uid, type === 's' ? 'strata' : type === 'p' ? 'patches' : 'trees', id));
     showToast('Deleted');
   } catch(e) { showToast('Delete failed', 'err'); }
 };
 
-// ═══════ UI ═══════
 function updateUI() {
   document.getElementById('h-trees').textContent = trees.length;
   document.getElementById('h-sp').textContent = trees.reduce((s,t) => s+(t.cnt||0), 0);
@@ -766,12 +821,11 @@ function updateUI() {
   document.getElementById('sc-n').textContent = strata.length;
   document.getElementById('pc-n').textContent = patches.length;
 
-  // Parent selectors
   const pps = document.getElementById('patch-parent-opts');
   pps.innerHTML = strata.length ? strata.map(s => `
     <div class="parent-opt ${selectedPatchStratum===s.id?'on':''}" onclick="selectPS('${s.id}')">
       <div class="parent-opt-dot" style="background:${s.color}"></div>
-      <div class="parent-opt-title">Stratum ${s.num}: ${s.name}</div>
+      <div class="parent-opt-title">S${s.num}: ${s.name}</div>
       <div class="parent-opt-check">${selectedPatchStratum===s.id?'✓':''}</div>
     </div>`).join('') : '<p style="padding:10px;color:var(--muted);font-size:11px">Create a stratum first</p>';
 
@@ -783,25 +837,24 @@ function updateUI() {
       <div class="parent-opt-check">${selectedTreePatch===p.id?'✓':''}</div>
     </div>`).join('') : '<p style="padding:10px;color:var(--muted);font-size:11px">Create a patch first</p>';
 
-  // Data lists
   document.getElementById('strat-list').innerHTML = strata.length ? strata.map(s => `
     <div class="list-item" onclick="focusZone('s','${s.id}')">
       <div class="list-sq" style="background:${s.color}"></div>
-      <div class="list-body"><div class="list-title">Stratum ${s.num}: ${s.name}</div><div class="list-sub">ID: ${s.id} · ${patches.filter(p=>p.str===s.id).length} patches</div></div>
+      <div class="list-body"><div class="list-title">S${s.num}: ${s.name}</div><div class="list-sub">${s.id} · ${patches.filter(p=>p.str===s.id).length} patches</div></div>
       <button class="del-btn" onclick="event.stopPropagation();delItem('s','${s.id}')">✕</button>
     </div>`).join('') : '<div class="empty-state">No strata yet</div>';
 
   document.getElementById('patch-list').innerHTML = patches.length ? patches.map(p => `
     <div class="list-item" onclick="focusZone('p','${p.id}')">
       <div class="list-sq" style="background:${p.color}"></div>
-      <div class="list-body"><div class="list-title">⬛ ${p.id} · 8×8m</div><div class="list-sub">Stratum ${p.str} · ${trees.filter(t=>t.pt===p.id).length} trees</div></div>
+      <div class="list-body"><div class="list-title">⬛ ${p.id} · 8×8m</div><div class="list-sub">Str ${p.str} · ${trees.filter(t=>t.pt===p.id).length} trees</div></div>
       <button class="del-btn" onclick="event.stopPropagation();delItem('p','${p.id}')">✕</button>
     </div>`).join('') : '<div class="empty-state">No patches yet</div>';
 
   document.getElementById('tree-list').innerHTML = trees.length ? trees.map(t => `
     <div class="list-item" onclick="focusTree('${t.id}')">
       <div class="list-dot" style="background:${tColor(t.cnt)}"></div>
-      <div class="list-body"><div class="list-title">${t.id} — ${t.sp}</div><div class="list-sub">${t.cnt} spider(s) · Patch ${t.pt}</div></div>
+      <div class="list-body"><div class="list-title">${t.id} — ${t.sp}</div><div class="list-sub">${t.cnt} spider · P${t.pt}</div></div>
       <button class="del-btn" onclick="event.stopPropagation();delItem('t','${t.id}')">✕</button>
     </div>`).join('') : '<div class="empty-state">No trees yet</div>';
 }
@@ -811,14 +864,13 @@ window.selectTP = id => { selectedTreePatch = id; updateUI(); const p = patches.
 window.focusTree = id => { const i=trees.findIndex(t=>t.id===id); if(i>=0){closeSheet(); map.flyTo([trees[i].lat,trees[i].lon],20); setTimeout(()=>tMkrs[i].openPopup(),900);} };
 window.focusZone = (type,id) => { closeSheet(); if(type==='s'){const i=strata.findIndex(s=>s.id===id); if(i>=0)map.flyToBounds(sLayers[i].getBounds(),{padding:[30,30]});} else{const i=patches.findIndex(p=>p.id===id); if(i>=0)map.flyToBounds(pLayers[i].getBounds(),{padding:[30,30]});} };
 
-window.cycleTile = () => { map.removeLayer(tiles[tileIdx]); tileIdx = (tileIdx+1) % 3; tiles[tileIdx].addTo(map); document.getElementById('tile-btn').textContent = tileNames[(tileIdx+1)%3]; };
-window.fitAll = () => { const all = [...tMkrs,...sLayers,...pLayers]; if(all.length) map.fitBounds(L.featureGroup(all).getBounds(),{padding:[50,50]}); else showToast('Nothing on map','err'); };
+window.cycleTile = () => { if(!map)return; map.removeLayer(tiles[tileIdx]); tileIdx = (tileIdx+1) % 3; tiles[tileIdx].addTo(map); document.getElementById('tile-btn').textContent = tileNames[(tileIdx+1)%3]; };
+window.fitAll = () => { if(!map)return; const all = [...tMkrs,...sLayers,...pLayers]; if(all.length) map.fitBounds(L.featureGroup(all).getBounds(),{padding:[50,50]}); else showToast('Nothing on map','err'); };
 window.pickC = (el,t) => { document.querySelectorAll('#'+(t==='s'?'s-sw':'p-sw')+' .swatch').forEach(s=>s.classList.remove('on')); el.classList.add('on'); if(t==='s')sColor=el.dataset.c; else pColor=el.dataset.c; };
 window.swTab = (id,btn) => { document.querySelectorAll('.stab').forEach(b=>b.classList.remove('on')); document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('on')); document.getElementById('tab-'+id).classList.add('on'); btn.classList.add('on'); };
 window.openSheet = () => { document.getElementById('bottom-sheet').classList.add('open'); document.getElementById('sheet-overlay').classList.add('show'); };
 window.closeSheet = () => { document.getElementById('bottom-sheet').classList.remove('open'); document.getElementById('sheet-overlay').classList.remove('show'); };
 
-// ═══════ EXPORT ═══════
 window.exportCSV = () => {
   if (!trees.length) { showToast('No data', 'err'); return; }
   const csv = ['tree_id,stratum,patch,lat,lon,species,spiders,bark,web,notes']
@@ -841,13 +893,13 @@ window.exportHTML = () => {
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"><\/script>
-<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,sans-serif;background:#050810;color:#f8fafc;overflow:hidden;height:100vh;display:flex;flex-direction:column}
+<style>*{margin:0;padding:0;box-sizing:border-box}html,body{width:100vw;height:100vh;overflow:hidden}body{font-family:-apple-system,sans-serif;background:#050810;color:#f8fafc;display:flex;flex-direction:column}
 .h{padding:14px 20px;background:linear-gradient(135deg,#0d1424,#1e293b);border-bottom:1px solid #1f293b;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
 .hl{display:flex;align-items:center;gap:12px}.logo{width:42px;height:42px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px}
 h1{font-size:17px;font-weight:800}.h p{font-size:11px;color:#94a3b8;margin-top:2px}
 .stats{display:flex;gap:8px;flex-wrap:wrap}.sp{background:#1e293b;border:1px solid #334155;border-radius:9px;padding:5px 11px;text-align:center}
 .sp b{display:block;font-size:15px;color:#3b82f6}.sp span{font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.4px}
-#map{flex:1}.leaflet-popup-content-wrapper{background:#0d1424!important;color:#f8fafc!important;border-radius:14px!important;border:1px solid #1f293b!important}
+#map{flex:1;width:100%;height:100%}.leaflet-popup-content-wrapper{background:#0d1424!important;color:#f8fafc!important;border-radius:14px!important;border:1px solid #1f293b!important}
 .leaflet-popup-content{margin:0!important}.leaflet-popup-tip{background:#0d1424!important}</style>
 </head><body>
 <div class="h"><div class="hl"><div class="logo">🕷️</div><div><h1>${title}</h1><p>${author}${inst?' · '+inst:''} · ${new Date().toLocaleDateString()}</p></div></div>
@@ -856,23 +908,24 @@ h1{font-size:17px;font-weight:800}.h p{font-size:11px;color:#94a3b8;margin-top:2
 <script>
 const data=${data};
 const map=L.map('map').setView([28.9456,77.1015],17);
-L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',{maxZoom:22}).addTo(map);
-L.control.layers({'Street':L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'),'Satellite':L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'),'Hybrid':L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}').addTo(map)},{}).addTo(map);
+const hybrid=L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',{maxZoom:22});
+hybrid.addTo(map);
+L.control.layers({'Street':L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'),'Satellite':L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'),'Hybrid':hybrid},{}).addTo(map);
 function tC(n){if(n===0)return'#9e9e9e';if(n===1)return'#ffb300';if(n===2)return'#ef6c00';if(n<=4)return'#d32f2f';return'#7b1fa2';}
 data.strata.forEach(s=>L.polygon(s.corners,{color:s.color,fillColor:s.color,fillOpacity:0.12,weight:3,dashArray:'10,5'}).addTo(map).bindPopup('<div style="padding:10px"><b>Stratum '+s.num+': '+s.name+'</b><br><span style="font-size:11px;color:#94a3b8">ID: '+s.id+'</span></div>'));
 data.patches.forEach(p=>L.polygon(p.corners,{color:p.color,fillColor:p.color,fillOpacity:0.35,weight:2.5}).addTo(map).bindPopup('<div style="padding:10px"><b>Patch '+p.id+'</b><br><span style="font-size:11px;color:#94a3b8">8×8m · Stratum '+p.str+'</span></div>'));
 const layers=[];data.trees.forEach(t=>{const c=tC(t.cnt);const m=L.circleMarker([t.lat,t.lon],{radius:t.cnt?8+t.cnt:7,color:c,fillColor:c,fillOpacity:0.9,weight:2.5}).addTo(map);m.bindPopup('<div style="padding:12px;width:230px"><div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px"><div><b>🌳 '+t.id+'</b><br><span style="font-size:11px;color:#94a3b8;font-style:italic">'+t.sp+'</span></div><div style="background:rgba(0,0,0,0.3);border:1.5px solid '+c+';border-radius:10px;padding:5px 10px;text-align:center"><div style="font-size:18px;font-weight:800;color:'+c+'">'+t.cnt+'</div><div style="font-size:8px;color:#94a3b8;text-transform:uppercase">spiders</div></div></div><table style="width:100%;font-size:11px"><tr><td style="color:#94a3b8;padding:2px 0">Stratum</td><td>'+t.str+'</td></tr><tr><td style="color:#94a3b8;padding:2px 0">Patch</td><td>'+t.pt+'</td></tr>'+(t.bark?'<tr><td style="color:#94a3b8;padding:2px 0">Bark</td><td>'+t.bark+'</td></tr>':'')+(t.web&&t.web!=="None"?'<tr><td style="color:#94a3b8;padding:2px 0">Web</td><td>'+t.web+'</td></tr>':'')+'</table>'+(t.nts?'<div style="margin-top:8px;padding:6px 8px;background:rgba(59,130,246,0.08);border-radius:6px;font-size:11px;font-style:italic;color:#94a3b8">"'+t.nts+'"</div>':'')+'</div>');layers.push(m);});
 data.strata.forEach(s=>layers.push(L.polygon(s.corners)));data.patches.forEach(p=>layers.push(L.polygon(p.corners)));
 if(layers.length)setTimeout(()=>map.fitBounds(L.featureGroup(layers).getBounds(),{padding:[50,50]}),300);
+setTimeout(()=>map.invalidateSize(true),200);
 <\/script></body></html>`;
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([html], {type:'text/html'}));
   a.download = title.replace(/\W+/g,'_') + '.html';
   a.click();
-  showToast('📄 HTML map downloaded!');
+  showToast('📄 HTML downloaded!');
 };
 
-// ═══════ HELPERS ═══════
 let toastT = null;
 function showToast(msg, type='ok') {
   const el = document.getElementById('toast');
@@ -888,6 +941,10 @@ function flashSaved() {
   setTimeout(() => el.classList.remove('show'), 1500);
 }
 window.showToast = showToast;
+
+// Force map resize on window resize and orientation change
+window.addEventListener('resize', () => { if(map) setTimeout(() => map.invalidateSize(true), 100); });
+window.addEventListener('orientationchange', () => { if(map) setTimeout(() => map.invalidateSize(true), 300); });
 </script>
 </body>
 </html>
