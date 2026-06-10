@@ -129,9 +129,6 @@ input:disabled{opacity:0.5;cursor:not-allowed}
 .parent-opt-check{width:19px;height:19px;border-radius:50%;border:1.5px solid var(--bdr2);display:flex;align-items:center;justify-content:center;font-size:11px;color:white;flex-shrink:0}
 .parent-opt.on .parent-opt-check{background:var(--acc);border-color:var(--acc)}
 
-.boundary-warning{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:10px;padding:10px;font-size:11px;color:#fca5a5;margin-top:8px;display:none}
-.boundary-warning.show{display:block}
-
 .swatches{display:flex;gap:9px;flex-wrap:wrap;padding:3px 0}
 .swatch{width:30px;height:30px;border-radius:50%;border:2.5px solid transparent;cursor:pointer;transition:all 0.15s;box-shadow:0 2px 6px rgba(0,0,0,0.3)}
 .swatch.on{border-color:white;transform:scale(1.15);box-shadow:0 0 10px rgba(255,255,255,0.5)}
@@ -165,17 +162,95 @@ input:disabled{opacity:0.5;cursor:not-allowed}
 .leaflet-control-attribution a{color:var(--txt2)!important}
 
 /* ═══════════════════════════════
-   PHOTO UPLOAD IN FORM
+   BEAUTIFUL TREE MARKERS
 ═══════════════════════════════ */
-.photo-upload-zone{
-  border:2px dashed var(--bdr2);
-  border-radius:11px;
-  padding:18px;
-  text-align:center;
+.tree-marker-wrap{
+  position:relative;
+  width:36px;
+  height:46px;
   cursor:pointer;
-  transition:all 0.2s;
-  background:rgba(0,0,0,0.2);
+  transition:transform 0.2s;
 }
+.tree-marker-wrap:hover{transform:scale(1.15)}
+
+.tree-marker-pin{
+  position:absolute;
+  top:0;
+  left:50%;
+  transform:translateX(-50%);
+  width:36px;
+  height:36px;
+  border-radius:50% 50% 50% 0;
+  transform-origin:50% 100%;
+  transform:translateX(-50%) rotate(-45deg);
+  box-shadow:0 4px 12px rgba(0,0,0,0.5),inset 0 2px 4px rgba(255,255,255,0.3);
+  border:2.5px solid white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.tree-marker-pin::after{
+  content:attr(data-count);
+  position:absolute;
+  font-size:13px;
+  font-weight:800;
+  color:white;
+  transform:rotate(45deg);
+  text-shadow:0 1px 2px rgba(0,0,0,0.5);
+}
+
+.tree-marker-shadow{
+  position:absolute;
+  bottom:0;
+  left:50%;
+  transform:translateX(-50%);
+  width:14px;
+  height:5px;
+  background:rgba(0,0,0,0.4);
+  border-radius:50%;
+  filter:blur(2px);
+}
+
+.tree-marker-photo-badge{
+  position:absolute;
+  top:-2px;
+  right:-2px;
+  width:18px;
+  height:18px;
+  background:linear-gradient(135deg,#8b5cf6,#7c3aed);
+  border:2px solid white;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:10px;
+  color:white;
+  font-weight:700;
+  z-index:2;
+  box-shadow:0 2px 6px rgba(0,0,0,0.4);
+}
+
+.tree-pulse-ring{
+  position:absolute;
+  top:4px;
+  left:50%;
+  transform:translateX(-50%);
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  border:2px solid currentColor;
+  opacity:0;
+  animation:treePulse 2s infinite;
+  pointer-events:none;
+}
+@keyframes treePulse{
+  0%{transform:translateX(-50%) scale(0.5);opacity:1}
+  100%{transform:translateX(-50%) scale(2.2);opacity:0}
+}
+
+/* PHOTO UPLOAD */
+.photo-upload-zone{border:2px dashed var(--bdr2);border-radius:11px;padding:18px;text-align:center;cursor:pointer;transition:all 0.2s;background:rgba(0,0,0,0.2)}
 .photo-upload-zone:active{border-color:var(--acc);background:rgba(59,130,246,0.05)}
 .photo-upload-zone input{display:none}
 .photo-upload-zone .icon{font-size:28px;margin-bottom:6px}
@@ -187,316 +262,61 @@ input:disabled{opacity:0.5;cursor:not-allowed}
 .photo-thumb img{width:100%;height:100%;object-fit:cover;display:block}
 .photo-thumb .remove-x{position:absolute;top:-5px;right:-5px;width:22px;height:22px;background:var(--red);color:white;border:none;border-radius:50%;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.5)}
 
-/* ═══════════════════════════════
-   ANIMATED POPUP MODAL
-═══════════════════════════════ */
-#popup-overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0);
-  z-index:5000;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
-  transition:background 0.3s ease;
-  backdrop-filter:blur(0px);
-}
-#popup-overlay.show{
-  display:flex;
-  background:rgba(0,0,0,0.7);
-  backdrop-filter:blur(8px);
-}
+/* ANIMATED POPUP */
+#popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,0);z-index:5000;display:none;align-items:center;justify-content:center;padding:20px;transition:background 0.3s ease;backdrop-filter:blur(0px)}
+#popup-overlay.show{display:flex;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px)}
+#popup-modal{background:linear-gradient(145deg,#0d1424,#172033);border:1px solid var(--bdr2);border-radius:24px;width:100%;max-width:420px;max-height:90vh;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,0.8),0 0 40px rgba(59,130,246,0.15);transform:scale(0.7) translateY(40px);opacity:0;transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease;position:relative;display:flex;flex-direction:column}
+#popup-overlay.show #popup-modal{transform:scale(1) translateY(0);opacity:1}
 
-#popup-modal{
-  background:linear-gradient(145deg,#0d1424,#172033);
-  border:1px solid var(--bdr2);
-  border-radius:24px;
-  width:100%;
-  max-width:420px;
-  max-height:90vh;
-  overflow:hidden;
-  box-shadow:0 30px 80px rgba(0,0,0,0.8),0 0 40px rgba(59,130,246,0.15);
-  transform:scale(0.7) translateY(40px);
-  opacity:0;
-  transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease;
-  position:relative;
-  display:flex;
-  flex-direction:column;
-}
-#popup-overlay.show #popup-modal{
-  transform:scale(1) translateY(0);
-  opacity:1;
-}
-
-.popup-close-btn{
-  position:absolute;
-  top:12px;
-  right:12px;
-  width:36px;
-  height:36px;
-  background:rgba(0,0,0,0.6);
-  border:1px solid rgba(255,255,255,0.15);
-  border-radius:50%;
-  color:white;
-  font-size:18px;
-  cursor:pointer;
-  z-index:10;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  backdrop-filter:blur(10px);
-  transition:transform 0.15s;
-}
+.popup-close-btn{position:absolute;top:12px;right:12px;width:36px;height:36px;background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.15);border-radius:50%;color:white;font-size:18px;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px);transition:transform 0.15s}
 .popup-close-btn:active{transform:scale(0.88)}
 
-.popup-gallery{
-  width:100%;
-  height:240px;
-  background:#000;
-  position:relative;
-  overflow:hidden;
-  flex-shrink:0;
-}
-.popup-gallery.empty{
-  height:100px;
-  background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(139,92,246,0.15));
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
+.popup-gallery{width:100%;height:240px;background:#000;position:relative;overflow:hidden;flex-shrink:0}
+.popup-gallery.empty{height:100px;background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(139,92,246,0.15));display:flex;align-items:center;justify-content:center}
 .popup-gallery.empty .empty-emoji{font-size:48px;opacity:0.3}
-
-.gallery-img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  cursor:pointer;
-  display:block;
-  animation:imgFadeIn 0.5s ease;
-}
+.gallery-img{width:100%;height:100%;object-fit:cover;cursor:pointer;display:block;animation:imgFadeIn 0.5s ease}
 @keyframes imgFadeIn{from{opacity:0;transform:scale(1.05)}to{opacity:1;transform:scale(1)}}
-
-.gallery-counter{
-  position:absolute;
-  bottom:12px;
-  left:50%;
-  transform:translateX(-50%);
-  background:rgba(0,0,0,0.75);
-  color:white;
-  padding:4px 12px;
-  border-radius:14px;
-  font-size:11px;
-  font-weight:700;
-  backdrop-filter:blur(8px);
-  z-index:2;
-}
-
-.gallery-nav-btn{
-  position:absolute;
-  top:50%;
-  transform:translateY(-50%);
-  width:40px;
-  height:40px;
-  background:rgba(0,0,0,0.6);
-  border:1px solid rgba(255,255,255,0.15);
-  color:white;
-  border-radius:50%;
-  font-size:20px;
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  backdrop-filter:blur(10px);
-  transition:transform 0.15s;
-  z-index:2;
-}
+.gallery-counter{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.75);color:white;padding:4px 12px;border-radius:14px;font-size:11px;font-weight:700;backdrop-filter:blur(8px);z-index:2}
+.gallery-nav-btn{position:absolute;top:50%;transform:translateY(-50%);width:40px;height:40px;background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.15);color:white;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px);transition:transform 0.15s;z-index:2}
 .gallery-nav-btn:active{transform:translateY(-50%) scale(0.85)}
 .gallery-nav-btn.prev{left:10px}
 .gallery-nav-btn.next{right:10px}
 
-.popup-body{
-  padding:18px 20px;
-  overflow-y:auto;
-  flex:1;
-}
+.popup-body{padding:18px 20px;overflow-y:auto;flex:1}
 .popup-body::-webkit-scrollbar{width:4px}
 .popup-body::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:2px}
 
-.popup-header-row{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-  gap:12px;
-  margin-bottom:14px;
-  animation:slideUp 0.5s ease 0.1s both;
-}
+.popup-header-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px;animation:slideUp 0.5s ease 0.1s both}
 @keyframes slideUp{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
-
-.popup-title-block .popup-tree-id{
-  font-size:20px;
-  font-weight:800;
-  color:#f8fafc;
-  line-height:1.1;
-  margin-bottom:4px;
-}
-.popup-title-block .popup-species{
-  font-size:12px;
-  color:#94a3b8;
-  font-style:italic;
-}
-
-.popup-spider-badge{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  border-radius:14px;
-  padding:8px 14px;
-  border:2px solid;
-  flex-shrink:0;
-  min-width:62px;
-  animation:badgeBounce 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.2s both;
-}
+.popup-title-block .popup-tree-id{font-size:20px;font-weight:800;color:#f8fafc;line-height:1.1;margin-bottom:4px}
+.popup-title-block .popup-species{font-size:12px;color:#94a3b8;font-style:italic}
+.popup-spider-badge{display:flex;flex-direction:column;align-items:center;border-radius:14px;padding:8px 14px;border:2px solid;flex-shrink:0;min-width:62px;animation:badgeBounce 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.2s both}
 @keyframes badgeBounce{from{opacity:0;transform:scale(0.5)}to{opacity:1;transform:scale(1)}}
+.popup-spider-badge .num{font-size:26px;font-weight:800;line-height:1}
+.popup-spider-badge .lbl{font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.6px;margin-top:3px}
 
-.popup-spider-badge .num{
-  font-size:26px;
-  font-weight:800;
-  line-height:1;
-}
-.popup-spider-badge .lbl{
-  font-size:9px;
-  color:#94a3b8;
-  text-transform:uppercase;
-  letter-spacing:0.6px;
-  margin-top:3px;
-}
+.popup-fields-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;animation:slideUp 0.5s ease 0.2s both}
+.popup-field-card{background:rgba(255,255,255,0.04);border:1px solid var(--bdr);border-radius:10px;padding:9px 11px}
+.popup-field-card .label{font-size:9px;color:#475569;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;font-weight:700}
+.popup-field-card .value{font-size:13px;font-weight:600;color:#e2e8f0}
 
-.popup-fields-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-  margin-bottom:14px;
-  animation:slideUp 0.5s ease 0.2s both;
-}
-.popup-field-card{
-  background:rgba(255,255,255,0.04);
-  border:1px solid var(--bdr);
-  border-radius:10px;
-  padding:9px 11px;
-}
-.popup-field-card .label{
-  font-size:9px;
-  color:#475569;
-  text-transform:uppercase;
-  letter-spacing:0.5px;
-  margin-bottom:4px;
-  font-weight:700;
-}
-.popup-field-card .value{
-  font-size:13px;
-  font-weight:600;
-  color:#e2e8f0;
-}
+.popup-notes-box{background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:10px;padding:10px 12px;font-size:12px;color:#cbd5e1;line-height:1.5;font-style:italic;margin-bottom:12px;animation:slideUp 0.5s ease 0.3s both}
+.popup-gps-bar{background:rgba(0,0,0,0.4);border-radius:8px;padding:7px 10px;font-size:10px;color:#64748b;text-align:center;font-family:'Courier New',monospace;display:flex;align-items:center;justify-content:center;gap:6px;animation:slideUp 0.5s ease 0.35s both}
 
-.popup-notes-box{
-  background:rgba(59,130,246,0.08);
-  border:1px solid rgba(59,130,246,0.2);
-  border-radius:10px;
-  padding:10px 12px;
-  font-size:12px;
-  color:#cbd5e1;
-  line-height:1.5;
-  font-style:italic;
-  margin-bottom:12px;
-  animation:slideUp 0.5s ease 0.3s both;
-}
-
-.popup-gps-bar{
-  background:rgba(0,0,0,0.4);
-  border-radius:8px;
-  padding:7px 10px;
-  font-size:10px;
-  color:#64748b;
-  text-align:center;
-  font-family:'Courier New',monospace;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:6px;
-  animation:slideUp 0.5s ease 0.35s both;
-}
-
-.popup-thumbs{
-  display:flex;
-  gap:6px;
-  padding:14px 20px;
-  overflow-x:auto;
-  border-top:1px solid var(--bdr);
-  background:rgba(0,0,0,0.2);
-  flex-shrink:0;
-}
+.popup-thumbs{display:flex;gap:6px;padding:14px 20px;overflow-x:auto;border-top:1px solid var(--bdr);background:rgba(0,0,0,0.2);flex-shrink:0}
 .popup-thumbs::-webkit-scrollbar{display:none}
-.popup-thumb{
-  width:52px;
-  height:52px;
-  border-radius:8px;
-  object-fit:cover;
-  flex-shrink:0;
-  border:2px solid transparent;
-  cursor:pointer;
-  transition:all 0.2s;
-  opacity:0.5;
-}
-.popup-thumb.active{
-  border-color:var(--acc);
-  opacity:1;
-  transform:scale(1.05);
-  box-shadow:0 4px 12px rgba(59,130,246,0.4);
-}
+.popup-thumb{width:52px;height:52px;border-radius:8px;object-fit:cover;flex-shrink:0;border:2px solid transparent;cursor:pointer;transition:all 0.2s;opacity:0.5}
+.popup-thumb.active{border-color:var(--acc);opacity:1;transform:scale(1.05);box-shadow:0 4px 12px rgba(59,130,246,0.4)}
 .popup-thumb:active{transform:scale(0.92)}
 
-.popup-actions{
-  padding:14px 20px;
-  display:flex;
-  gap:8px;
-  border-top:1px solid var(--bdr);
-  background:rgba(0,0,0,0.2);
-  flex-shrink:0;
-  animation:slideUp 0.5s ease 0.4s both;
-}
-.popup-action-btn{
-  flex:1;
-  padding:11px;
-  border:none;
-  border-radius:9px;
-  font-size:12px;
-  font-weight:700;
-  cursor:pointer;
-  font-family:inherit;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:5px;
-  transition:transform 0.15s;
-}
+.popup-actions{padding:14px 20px;display:flex;gap:8px;border-top:1px solid var(--bdr);background:rgba(0,0,0,0.2);flex-shrink:0;animation:slideUp 0.5s ease 0.4s both}
+.popup-action-btn{flex:1;padding:11px;border:none;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:5px;transition:transform 0.15s}
 .popup-action-btn:active{transform:scale(0.96)}
 .popup-action-edit{background:linear-gradient(135deg,#3b82f6,#2563eb);color:white}
 .popup-action-photo{background:linear-gradient(135deg,#7c3aed,#6d28d9);color:white}
 .popup-action-close{background:rgba(255,255,255,0.08);border:1px solid var(--bdr2);color:var(--txt)}
 
-/* Full-screen image viewer */
-#img-viewer{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.95);
-  z-index:9999;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
-  cursor:pointer;
-}
+#img-viewer{position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;cursor:pointer}
 #img-viewer.show{display:flex;animation:fadeIn 0.3s}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 #img-viewer img{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px}
@@ -508,7 +328,7 @@ input:disabled{opacity:0.5;cursor:not-allowed}
 <div id="auth-overlay">
   <div class="auth-logo">🕷️</div>
   <div class="auth-title">Spider Map Pro</div>
-  <div class="auth-sub">Sign in to sync your field data across phone, laptop, and tablet.</div>
+  <div class="auth-sub">Sign in to sync your field data across devices.</div>
   <button class="auth-btn" id="signin-btn">
     <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
     Continue with Google
@@ -534,9 +354,7 @@ input:disabled{opacity:0.5;cursor:not-allowed}
 </div>
 
 <div id="save-ind"><div class="dot"></div>Synced</div>
-
 <div id="mode-banner"><span id="banner-txt"></span><button class="cancel-x" onclick="cancelMode()">✕</button></div>
-
 <button id="tile-btn" onclick="cycleTile()">🛰️ Satellite</button>
 
 <div id="gps-live-info">
@@ -557,14 +375,10 @@ input:disabled{opacity:0.5;cursor:not-allowed}
 
 <div id="sheet-overlay" onclick="closeSheet()"></div>
 
-<!-- ANIMATED POPUP MODAL -->
 <div id="popup-overlay" onclick="closePopup(event)">
-  <div id="popup-modal" onclick="event.stopPropagation()">
-    <!-- filled dynamically -->
-  </div>
+  <div id="popup-modal" onclick="event.stopPropagation()"></div>
 </div>
 
-<!-- Full screen image viewer -->
 <div id="img-viewer" onclick="this.classList.remove('show')">
   <button class="close-viewer">✕</button>
   <img id="viewer-img" src="" alt="">
@@ -591,7 +405,7 @@ input:disabled{opacity:0.5;cursor:not-allowed}
       <div class="card">
         <div class="card-title">📋 Stratum Info</div>
         <div class="row">
-          <div class="fg"><label>ID</label><input id="s-id" placeholder="S1, S2, etc"></div>
+          <div class="fg"><label>ID</label><input id="s-id" placeholder="S1"></div>
           <div class="fg"><label>Number</label><input id="s-num" type="number" placeholder="1" min="1"></div>
         </div>
         <div class="fg"><label>Description</label><input id="s-name" placeholder="Academic Block"></div>
@@ -605,8 +419,6 @@ input:disabled{opacity:0.5;cursor:not-allowed}
           <div class="swatch" style="background:#ef4444" data-c="#ef4444" onclick="pickC(this,'s')"></div>
           <div class="swatch" style="background:#8b5cf6" data-c="#8b5cf6" onclick="pickC(this,'s')"></div>
           <div class="swatch" style="background:#06b6d4" data-c="#06b6d4" onclick="pickC(this,'s')"></div>
-          <div class="swatch" style="background:#f97316" data-c="#f97316" onclick="pickC(this,'s')"></div>
-          <div class="swatch" style="background:#ec4899" data-c="#ec4899" onclick="pickC(this,'s')"></div>
         </div>
       </div>
       <div class="card">
@@ -700,7 +512,6 @@ input:disabled{opacity:0.5;cursor:not-allowed}
         <div class="fg"><label>Notes</label><textarea id="t-notes" placeholder="Observations..."></textarea></div>
       </div>
 
-      <!-- NEW PHOTO UPLOAD -->
       <div class="card">
         <div class="card-title">📷 Photos (Tree & Spider)</div>
         <label class="photo-upload-zone" for="t-photo">
@@ -718,7 +529,7 @@ input:disabled{opacity:0.5;cursor:not-allowed}
     </div>
 
     <div class="tab-pane" id="tab-data">
-      <div class="info-box info-yellow">💡 Tap any item to view in popup. Tap ✏️ to edit.</div>
+      <div class="info-box info-yellow">💡 Tap any item to view in beautiful popup.</div>
       <div class="card">
         <div class="card-title">📐 Strata (<span id="sc-n">0</span>)</div>
         <div id="strat-list"><div class="empty-state">No strata yet</div></div>
@@ -735,7 +546,7 @@ input:disabled{opacity:0.5;cursor:not-allowed}
     </div>
 
     <div class="tab-pane" id="tab-export">
-      <div class="info-box info-blue">📤 Generate standalone HTML map.</div>
+      <div class="info-box info-blue">📤 Generate standalone HTML map with photos.</div>
       <div class="card">
         <div class="card-title">📝 Project Info</div>
         <div class="fg" style="margin-bottom:7px"><label>Title</label><input id="exp-title" placeholder="Spider Distribution"></div>
@@ -785,7 +596,7 @@ let map=null, tiles=null;
 let trackingWatchId=null, myLocMarker=null, myLocCircle=null;
 let editingStrat=null, editingPatch=null, editingTree=null;
 let originalStratCorners=null, originalPatchCorners=null;
-let currentPhotos=[]; // base64 photos for current tree
+let currentPhotos=[];
 let popupGalleryIdx={};
 
 const tileNames = ['🗺️ Street','🛰️ Satellite','🌍 Hybrid'];
@@ -795,9 +606,9 @@ function initMap() {
   if (map) return;
   map = L.map('map', {center:[28.9456,77.1015], zoom:16, zoomControl:true, tap:true, tapTolerance:20});
   tiles = [
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:22,attribution:'© OSM'}),
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:22,attribution:'© Esri'}),
-    L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',{maxZoom:22,attribution:'© Google'})
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:22}),
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:22}),
+    L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',{maxZoom:22})
   ];
   tiles[tileIdx].addTo(map);
   map.on('click', mapClickHandler);
@@ -807,7 +618,6 @@ function initMap() {
     setTimeout(() => document.getElementById('map-loading').style.display='none', 500);
   }, 100);
   setTimeout(() => map.invalidateSize(true), 500);
-  setTimeout(() => map.invalidateSize(true), 1000);
   setTimeout(() => toggleTracking(), 1500);
 }
 
@@ -843,6 +653,61 @@ onAuthStateChanged(auth, user => {
 window.confirmSignOut = async () => {
   if (confirm('Sign out?')) { stopTracking(); await signOut(auth); location.reload(); }
 };
+
+function cornersToObj(arr) {
+  const obj = {};
+  for (let i = 0; i < arr.length; i++) obj['c' + i] = { lat: Number(arr[i][0]), lon: Number(arr[i][1]) };
+  return obj;
+}
+
+function objToCorners(obj) {
+  if (!obj) return [];
+  if (Array.isArray(obj)) return obj.map(c => Array.isArray(c) ? [Number(c[0]), Number(c[1])] : [Number(c.lat), Number(c.lon)]);
+  const arr = [];
+  const keys = Object.keys(obj).sort((a,b) => (parseInt(a.replace(/\D/g,''))||0) - (parseInt(b.replace(/\D/g,''))||0));
+  keys.forEach(k => {
+    if (obj[k] && typeof obj[k] === 'object' && 'lat' in obj[k]) arr.push([Number(obj[k].lat), Number(obj[k].lon)]);
+  });
+  return arr;
+}
+
+function tColor(n){if(n===0)return'#9e9e9e';if(n===1)return'#ffb300';if(n===2)return'#ef6c00';if(n<=4)return'#d32f2f';return'#7b1fa2';}
+function rgb(h){return[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)].join(',');}
+function emoji(sp){const s=(sp||'').toLowerCase();if(s.includes('neem'))return'🌿';if(s.includes('mango'))return'🥭';if(s.includes('peepal'))return'🍃';if(s.includes('banyan'))return'🌳';if(s.includes('ashoka'))return'🌲';if(s.includes('bamboo'))return'🎋';return'🌳';}
+
+// ═══════════════════════════════════════
+// BEAUTIFUL TREE MARKER
+// ═══════════════════════════════════════
+function createTreeMarker(t) {
+  const col = tColor(t.cnt);
+  const photoCount = loadPhotos(t.id).length;
+  const hasSpiders = t.cnt > 0;
+  
+  const html = `
+    <div class="tree-marker-wrap">
+      ${hasSpiders ? `<div class="tree-pulse-ring" style="color:${col}"></div>` : ''}
+      <div class="tree-marker-pin" style="background:linear-gradient(135deg,${col},${col}dd)" data-count="${t.cnt}"></div>
+      <div class="tree-marker-shadow"></div>
+      ${photoCount > 0 ? `<div class="tree-marker-photo-badge">${photoCount > 9 ? '9+' : photoCount}</div>` : ''}
+    </div>
+  `;
+  
+  const icon = L.divIcon({
+    html: html,
+    iconSize: [36, 46],
+    iconAnchor: [18, 46],
+    popupAnchor: [0, -46],
+    className: 'tree-marker-icon'
+  });
+  
+  const marker = L.marker([t.lat, t.lon], { icon: icon, riseOnHover: true });
+  marker.bindTooltip(`<b>${t.id}</b> · ${t.sp} · ${t.cnt} spider${t.cnt!==1?'s':''}${photoCount?' · 📷'+photoCount:''}`, { sticky: true, direction: 'top', offset: [0, -40] });
+  marker.on('click', () => {
+    console.log('Tree clicked:', t.id);
+    showTreePopup(t.id);
+  });
+  return marker;
+}
 
 function startSync() {
   if (!uid) return;
@@ -886,40 +751,13 @@ function startSync() {
     snap.forEach(d => {
       const t = {id:d.id, ...d.data()};
       trees.push(t);
-      const col = tColor(t.cnt);
-      const m = L.circleMarker([t.lat, t.lon], {radius: tRad(t.cnt), color:col, fillColor:col, fillOpacity:0.9, weight:2.5})
-        .addTo(map)
-        .bindTooltip(`<b>${t.sp}</b> · ${t.cnt} spider${t.cnt!==1?'s':''}`, {sticky:true})
-        .on('click', () => showTreePopup(t.id));
-      tMkrs.push(m);
+      const marker = createTreeMarker(t);
+      marker.addTo(map);
+      tMkrs.push(marker);
     });
     updateUI(); flashSaved();
   }));
 }
-
-function cornersToObj(arr) {
-  const obj = {};
-  for (let i = 0; i < arr.length; i++) {
-    obj['c' + i] = { lat: Number(arr[i][0]), lon: Number(arr[i][1]) };
-  }
-  return obj;
-}
-
-function objToCorners(obj) {
-  if (!obj) return [];
-  if (Array.isArray(obj)) return obj.map(c => Array.isArray(c) ? [Number(c[0]), Number(c[1])] : [Number(c.lat), Number(c.lon)]);
-  const arr = [];
-  const keys = Object.keys(obj).sort((a,b) => (parseInt(a.replace(/\D/g,''))||0) - (parseInt(b.replace(/\D/g,''))||0));
-  keys.forEach(k => {
-    if (obj[k] && typeof obj[k] === 'object' && 'lat' in obj[k]) arr.push([Number(obj[k].lat), Number(obj[k].lon)]);
-  });
-  return arr;
-}
-
-function tColor(n){if(n===0)return'#9e9e9e';if(n===1)return'#ffb300';if(n===2)return'#ef6c00';if(n<=4)return'#d32f2f';return'#7b1fa2';}
-function tRad(n){return n===0?7:n===1?9:n===2?11:n<=4?13:15;}
-function rgb(h){return[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)].join(',');}
-function emoji(sp){const s=(sp||'').toLowerCase();if(s.includes('neem'))return'🌿';if(s.includes('mango'))return'🥭';if(s.includes('peepal'))return'🍃';if(s.includes('banyan'))return'🌳';if(s.includes('ashoka'))return'🌲';if(s.includes('bamboo'))return'🎋';return'🌳';}
 
 function pointInPoly(pt, poly) {
   const x=pt[1], y=pt[0]; let inside=false;
@@ -963,33 +801,41 @@ function mapClickHandler(e) {
   }
 }
 
-// ═══════════════════════════════
-// ANIMATED POPUP FUNCTIONS
-// ═══════════════════════════════
-window.showTreePopup = (treeId) => {
+// ═══════════════════════════════════════
+// POPUP FUNCTIONS
+// ═══════════════════════════════════════
+window.showTreePopup = function(treeId) {
+  console.log('showTreePopup called for:', treeId);
   const t = trees.find(x => x.id === treeId);
-  if (!t) return;
+  if (!t) { console.log('Tree not found'); return; }
+  
   const photos = loadPhotos(t.id);
+  console.log('Photos found:', photos.length);
   popupGalleryIdx[t.id] = 0;
   
   const col = tColor(t.cnt);
   const sp = t.sp || 'Unknown';
   const e = emoji(sp);
   
-  const photoSection = photos.length > 0 ? `
-    <div class="popup-gallery">
-      <img class="gallery-img" id="gallery-main" src="${photos[0]}" onclick="openImageViewer('${photos[0]}')">
-      ${photos.length > 1 ? `
-        <div class="gallery-counter" id="gallery-counter">1 / ${photos.length}</div>
-        <button class="gallery-nav-btn prev" onclick="changeGalleryImg('${t.id}', -1)">‹</button>
-        <button class="gallery-nav-btn next" onclick="changeGalleryImg('${t.id}', 1)">›</button>
-      ` : ''}
-    </div>
-  ` : `
-    <div class="popup-gallery empty">
-      <div class="empty-emoji">${e}</div>
-    </div>
-  `;
+  let photoSection;
+  if (photos.length > 0) {
+    photoSection = `
+      <div class="popup-gallery">
+        <img class="gallery-img" id="gallery-main-img" src="${photos[0]}" alt="Tree photo" onclick="openImageViewer(this.src)">
+        ${photos.length > 1 ? `
+          <div class="gallery-counter" id="gallery-counter">1 / ${photos.length}</div>
+          <button class="gallery-nav-btn prev" onclick="changeGalleryImg('${t.id}', -1)">‹</button>
+          <button class="gallery-nav-btn next" onclick="changeGalleryImg('${t.id}', 1)">›</button>
+        ` : ''}
+      </div>
+    `;
+  } else {
+    photoSection = `
+      <div class="popup-gallery empty">
+        <div class="empty-emoji">${e}</div>
+      </div>
+    `;
+  }
   
   const fields = [];
   if (t.str) fields.push({l:'Stratum', v:t.str});
@@ -1008,14 +854,17 @@ window.showTreePopup = (treeId) => {
     </div>
   ` : '';
   
-  const thumbsHTML = photos.length > 1 ? `
-    <div class="popup-thumbs">
-      ${photos.map((p, i) => `
-        <img class="popup-thumb ${i === 0 ? 'active' : ''}" src="${p}" 
-          onclick="setGalleryImg('${t.id}', ${i})">
-      `).join('')}
-    </div>
-  ` : '';
+  let thumbsHTML = '';
+  if (photos.length > 1) {
+    thumbsHTML = `
+      <div class="popup-thumbs">
+        ${photos.map((p, i) => `
+          <img class="popup-thumb ${i === 0 ? 'active' : ''}" src="${p}" 
+            onclick="setGalleryImg('${t.id}', ${i})" data-idx="${i}">
+        `).join('')}
+      </div>
+    `;
+  }
   
   document.getElementById('popup-modal').innerHTML = `
     <button class="popup-close-btn" onclick="closePopup()">✕</button>
@@ -1033,24 +882,21 @@ window.showTreePopup = (treeId) => {
       </div>
       ${fieldsHTML}
       ${t.nts ? `<div class="popup-notes-box">"${t.nts}"</div>` : ''}
-      <div class="popup-gps-bar">
-        📍 ${t.lat.toFixed(5)}, ${t.lon.toFixed(5)}
-      </div>
+      <div class="popup-gps-bar">📍 ${t.lat.toFixed(5)}, ${t.lon.toFixed(5)}</div>
     </div>
     ${thumbsHTML}
     <div class="popup-actions">
       <button class="popup-action-btn popup-action-edit" onclick="closePopup();editTree('${t.id}')">✏️ Edit</button>
-      <button class="popup-action-btn popup-action-photo" onclick="addPhotosToTree('${t.id}')">📷 Add Photo</button>
+      <button class="popup-action-btn popup-action-photo" onclick="addPhotosToTree('${t.id}')">📷 Add</button>
       <button class="popup-action-btn popup-action-close" onclick="closePopup()">Close</button>
     </div>
   `;
   
   document.getElementById('popup-overlay').classList.add('show');
-  // Center map on tree
   map.flyTo([t.lat, t.lon], 20, {duration: 0.8});
 };
 
-window.showZonePopup = (type, id) => {
+window.showZonePopup = function(type, id) {
   const item = type === 's' ? strata.find(x => x.id === id) : patches.find(x => x.id === id);
   if (!item) return;
   
@@ -1106,23 +952,23 @@ window.showZonePopup = (type, id) => {
   document.getElementById('popup-overlay').classList.add('show');
 };
 
-window.closePopup = (e) => {
+window.closePopup = function(e) {
   if (e && e.target.id !== 'popup-overlay') return;
   document.getElementById('popup-overlay').classList.remove('show');
 };
 
-window.changeGalleryImg = (treeId, dir) => {
+window.changeGalleryImg = function(treeId, dir) {
   const photos = loadPhotos(treeId);
   if (photos.length < 2) return;
   popupGalleryIdx[treeId] = ((popupGalleryIdx[treeId] || 0) + dir + photos.length) % photos.length;
   setGalleryImg(treeId, popupGalleryIdx[treeId]);
 };
 
-window.setGalleryImg = (treeId, idx) => {
+window.setGalleryImg = function(treeId, idx) {
   const photos = loadPhotos(treeId);
   if (!photos[idx]) return;
   popupGalleryIdx[treeId] = idx;
-  const main = document.getElementById('gallery-main');
+  const main = document.getElementById('gallery-main-img');
   if (main) {
     main.style.animation = 'none';
     main.offsetHeight;
@@ -1137,30 +983,37 @@ window.setGalleryImg = (treeId, idx) => {
   });
 };
 
-window.openImageViewer = (src) => {
+window.openImageViewer = function(src) {
   document.getElementById('viewer-img').src = src;
   document.getElementById('img-viewer').classList.add('show');
 };
 
-window.addPhotosToTree = (treeId) => {
+window.addPhotosToTree = function(treeId) {
   const input = document.createElement('input');
   input.type = 'file';
   input.accept = 'image/*';
   input.multiple = true;
-  input.onchange = (e) => {
+  input.onchange = function(e) {
     const files = Array.from(e.target.files);
     if (!files.length) return;
     const existing = loadPhotos(treeId);
     let loaded = 0;
     files.forEach(f => {
       const reader = new FileReader();
-      reader.onload = (ev) => {
+      reader.onload = function(ev) {
         existing.push(ev.target.result);
         loaded++;
         if (loaded === files.length) {
           savePhotos(treeId, existing);
           showToast(`✅ ${files.length} photo(s) added`);
-          showTreePopup(treeId); // refresh popup
+          // Refresh marker on map to show photo badge
+          const tIdx = trees.findIndex(t => t.id === treeId);
+          if (tIdx >= 0 && tMkrs[tIdx]) {
+            map.removeLayer(tMkrs[tIdx]);
+            tMkrs[tIdx] = createTreeMarker(trees[tIdx]);
+            tMkrs[tIdx].addTo(map);
+          }
+          showTreePopup(treeId);
         }
       };
       reader.readAsDataURL(f);
@@ -1184,12 +1037,11 @@ function savePhotos(treeId, photos) {
   }
 }
 
-// PHOTO HANDLING in form
-window.handlePhotos = (input) => {
+window.handlePhotos = function(input) {
   const files = Array.from(input.files);
   files.forEach(f => {
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = function(e) {
       currentPhotos.push(e.target.result);
       renderPhotoGrid();
     };
@@ -1201,48 +1053,46 @@ window.handlePhotos = (input) => {
 function renderPhotoGrid() {
   document.getElementById('photo-grid').innerHTML = currentPhotos.map((p, i) => `
     <div class="photo-thumb">
-      <img src="${p}" onclick="openImageViewer('${p}')">
+      <img src="${p}" onclick="openImageViewer('${p.replace(/'/g, "\\'")}')">
       <button class="remove-x" onclick="removePhoto(${i})">✕</button>
     </div>
   `).join('');
   document.getElementById('photo-count').textContent = currentPhotos.length ? `${currentPhotos.length} photo(s)` : '';
 }
 
-window.removePhoto = (i) => {
+window.removePhoto = function(i) {
   currentPhotos.splice(i, 1);
   renderPhotoGrid();
 };
 
-// GPS & TRACKING
-window.toggleTracking = () => {
+// GPS
+window.toggleTracking = function() {
   const btn = document.getElementById('track-fab');
   const info = document.getElementById('gps-live-info');
-  if (trackingWatchId) { stopTracking(); }
-  else {
-    if (!navigator.geolocation) { showToast('GPS not supported', 'err'); return; }
-    btn.classList.add('on');
-    info.classList.add('show');
-    document.getElementById('gps-acc-text').textContent = 'Searching...';
-    showToast('📡 Live tracking ON');
-    trackingWatchId = navigator.geolocation.watchPosition(
-      pos => {
-        const lat = pos.coords.latitude, lon = pos.coords.longitude, acc = pos.coords.accuracy;
-        const accEl = document.getElementById('gps-acc-text');
-        accEl.textContent = `±${Math.round(acc)}m`;
-        accEl.className = 'gps-acc-val ' + (acc < 10 ? 'good' : acc < 30 ? 'med' : 'bad');
-        if (myLocMarker) map.removeLayer(myLocMarker);
-        if (myLocCircle) map.removeLayer(myLocCircle);
-        myLocCircle = L.circle([lat,lon], {radius: acc, color:'#3b82f6', fillColor:'#3b82f6', fillOpacity:0.1, weight:1.5}).addTo(map);
-        const icon = L.divIcon({
-          html: `<div style="position:relative;width:18px;height:18px"><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:14px;height:14px;background:#3b82f6;border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.5)"></div></div>`,
-          iconSize: [18,18], iconAnchor: [9,9], className: ''
-        });
-        myLocMarker = L.marker([lat,lon], {icon, zIndexOffset: 1000}).addTo(map);
-      },
-      err => { document.getElementById('gps-acc-text').textContent = 'Failed'; },
-      {enableHighAccuracy:true, maximumAge:1000, timeout:10000}
-    );
-  }
+  if (trackingWatchId) { stopTracking(); return; }
+  if (!navigator.geolocation) { showToast('GPS not supported', 'err'); return; }
+  btn.classList.add('on');
+  info.classList.add('show');
+  document.getElementById('gps-acc-text').textContent = 'Searching...';
+  showToast('📡 Live tracking ON');
+  trackingWatchId = navigator.geolocation.watchPosition(
+    pos => {
+      const lat = pos.coords.latitude, lon = pos.coords.longitude, acc = pos.coords.accuracy;
+      const accEl = document.getElementById('gps-acc-text');
+      accEl.textContent = `±${Math.round(acc)}m`;
+      accEl.className = 'gps-acc-val ' + (acc < 10 ? 'good' : acc < 30 ? 'med' : 'bad');
+      if (myLocMarker) map.removeLayer(myLocMarker);
+      if (myLocCircle) map.removeLayer(myLocCircle);
+      myLocCircle = L.circle([lat,lon], {radius: acc, color:'#3b82f6', fillColor:'#3b82f6', fillOpacity:0.1, weight:1.5}).addTo(map);
+      const icon = L.divIcon({
+        html: `<div style="position:relative;width:18px;height:18px"><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:14px;height:14px;background:#3b82f6;border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.5)"></div></div>`,
+        iconSize: [18,18], iconAnchor: [9,9], className: ''
+      });
+      myLocMarker = L.marker([lat,lon], {icon, zIndexOffset: 1000}).addTo(map);
+    },
+    err => { document.getElementById('gps-acc-text').textContent = 'Failed'; },
+    {enableHighAccuracy:true, maximumAge:1000, timeout:10000}
+  );
 };
 
 function stopTracking() {
@@ -1253,7 +1103,7 @@ function stopTracking() {
   if (myLocCircle) { map.removeLayer(myLocCircle); myLocCircle = null; }
 }
 
-window.captureGPS = () => {
+window.captureGPS = function() {
   if (!navigator.geolocation) { showToast('GPS not supported', 'err'); return; }
   const el = document.getElementById('gps-result');
   el.style.display = 'block';
@@ -1281,9 +1131,8 @@ window.captureGPS = () => {
   take();
 };
 
-window.addGPSCorner = () => {
-  if (!navigator.geolocation) { showToast('GPS not supported', 'err'); return; }
-  showToast('📡 Getting GPS...');
+window.addGPSCorner = function() {
+  if (!navigator.geolocation) return;
   navigator.geolocation.getCurrentPosition(p => {
     if (mode !== 'strat') startMode('strat');
     addCorner(p.coords.latitude, p.coords.longitude);
@@ -1291,9 +1140,8 @@ window.addGPSCorner = () => {
   }, () => showToast('GPS failed', 'err'), {enableHighAccuracy:true, timeout:15000, maximumAge:0});
 };
 
-window.patchAtGPS = () => {
-  if (!navigator.geolocation) { showToast('GPS not supported', 'err'); return; }
-  showToast('📡 Getting GPS...');
+window.patchAtGPS = function() {
+  if (!navigator.geolocation) return;
   navigator.geolocation.getCurrentPosition(p => {
     const c = make8x8(p.coords.latitude, p.coords.longitude);
     pendingPatch = c;
@@ -1301,12 +1149,12 @@ window.patchAtGPS = () => {
     previewPoly = L.polygon(c, {color:pColor, fillColor:pColor, fillOpacity:0.4, weight:3, dashArray:'6,3'}).addTo(map);
     map.flyToBounds(previewPoly.getBounds(), {padding:[50,50]});
     document.getElementById('patch-ready').style.display = 'block';
-    showToast(`📍 Placed`);
+    showToast('📍 Placed');
   }, () => showToast('GPS failed', 'err'), {enableHighAccuracy:true, timeout:15000, maximumAge:0});
 };
 
-window.jumpGPS = () => {
-  if (!navigator.geolocation) { showToast('GPS not supported', 'err'); return; }
+window.jumpGPS = function() {
+  if (!navigator.geolocation) return;
   navigator.geolocation.getCurrentPosition(p => {
     map.flyTo([p.coords.latitude, p.coords.longitude], 19);
     if (!trackingWatchId) toggleTracking();
@@ -1327,7 +1175,7 @@ function addCorner(lat, lon) {
   document.getElementById('corner-info').textContent = `${stratCorners.length} corners (need 3+)`;
 }
 
-window.startMode = m => {
+window.startMode = function(m) {
   cancelMode(); mode = m; closeSheet();
   const b = document.getElementById('mode-banner');
   b.className = 'mode-banner show ' + m;
@@ -1335,14 +1183,14 @@ window.startMode = m => {
   if (m === 'strat') { stratCorners = []; tempMkrs.forEach(t=>map.removeLayer(t)); tempMkrs=[]; if(previewPoly){map.removeLayer(previewPoly);previewPoly=null;} document.getElementById('corner-info').textContent='0 corners (need 3+)'; }
   map.getContainer().style.cursor = 'crosshair';
 };
-window.cancelMode = () => {
+
+window.cancelMode = function() {
   mode = null;
   document.getElementById('mode-banner').className = 'mode-banner';
   if (map) map.getContainer().style.cursor = '';
 };
 
-// EDIT
-window.editStratum = (id) => {
+window.editStratum = function(id) {
   const s = strata.find(x => x.id === id);
   if (!s) return;
   editingStrat = id;
@@ -1356,12 +1204,12 @@ window.editStratum = (id) => {
   document.querySelectorAll('#s-sw .swatch').forEach(sw => sw.classList.toggle('on', sw.dataset.c === s.color));
   document.getElementById('edit-s-banner').classList.add('show');
   document.getElementById('edit-s-id').textContent = s.id;
-  document.getElementById('save-s-btn').textContent = '💾 Update Stratum';
+  document.getElementById('save-s-btn').textContent = '💾 Update';
   swTab('strata', document.querySelector('.stab[onclick*="strata"]'));
   openSheet();
 };
 
-window.editPatch = (id) => {
+window.editPatch = function(id) {
   const p = patches.find(x => x.id === id);
   if (!p) return;
   editingPatch = id;
@@ -1375,12 +1223,12 @@ window.editPatch = (id) => {
   selectedPatchStratum = p.str;
   document.getElementById('edit-p-banner').classList.add('show');
   document.getElementById('edit-p-id').textContent = p.id;
-  document.getElementById('save-p-btn').textContent = '💾 Update Patch';
+  document.getElementById('save-p-btn').textContent = '💾 Update';
   swTab('patch', document.querySelector('.stab[onclick*="patch"]'));
   openSheet();
 };
 
-window.editTree = (id) => {
+window.editTree = function(id) {
   const t = trees.find(x => x.id === id);
   if (!t) return;
   editingTree = id;
@@ -1398,12 +1246,12 @@ window.editTree = (id) => {
   renderPhotoGrid();
   document.getElementById('edit-t-banner').classList.add('show');
   document.getElementById('edit-t-id').textContent = t.id;
-  document.getElementById('save-t-btn').textContent = '💾 Update Tree';
+  document.getElementById('save-t-btn').textContent = '💾 Update';
   swTab('tree', document.querySelector('.stab[onclick*="tree"]'));
   openSheet();
 };
 
-window.cancelEdit = (type) => {
+window.cancelEdit = function(type) {
   if (type === 's') { editingStrat = null; originalStratCorners = null; document.getElementById('s-id').disabled = false; document.getElementById('edit-s-banner').classList.remove('show'); document.getElementById('save-s-btn').textContent = '💾 Save Stratum'; clearStratForm(); }
   else if (type === 'p') { editingPatch = null; originalPatchCorners = null; document.getElementById('p-id').disabled = false; document.getElementById('edit-p-banner').classList.remove('show'); document.getElementById('save-p-btn').textContent = '💾 Save Patch'; clearPatchForm(); }
   else if (type === 't') { editingTree = null; document.getElementById('t-id').disabled = false; document.getElementById('edit-t-banner').classList.remove('show'); document.getElementById('save-t-btn').textContent = '＋ Save Tree'; clearTreeForm(); }
@@ -1435,8 +1283,7 @@ function clearTreeForm() {
   renderPhotoGrid();
 }
 
-// SAVE
-window.saveStrat = async () => {
+window.saveStrat = async function() {
   if (!uid) { showToast('Not signed in', 'err'); return; }
   const id = document.getElementById('s-id').value.trim();
   const num = document.getElementById('s-num').value.trim() || '1';
@@ -1446,11 +1293,9 @@ window.saveStrat = async () => {
   if (cornersToSave.length < 3) { showToast('Need 3+ corners', 'err'); return; }
 
   try {
-    const cornersObj = {};
-    for (let i = 0; i < cornersToSave.length; i++) cornersObj['c' + i] = { lat: Number(cornersToSave[i][0]), lon: Number(cornersToSave[i][1]) };
     await setDoc(doc(db, 'users', uid, 'strata', id), {
       num: String(num), name: String(name), color: String(sColor),
-      cornerCount: cornersToSave.length, corners: cornersObj, ts: serverTimestamp()
+      cornerCount: cornersToSave.length, corners: cornersToObj(cornersToSave), ts: serverTimestamp()
     });
     tempMkrs.forEach(m => map.removeLayer(m)); tempMkrs = [];
     if (previewPoly) { map.removeLayer(previewPoly); previewPoly = null; }
@@ -1460,7 +1305,7 @@ window.saveStrat = async () => {
   } catch(e) { showToast('Save failed: ' + e.code, 'err'); }
 };
 
-window.savePatch = async () => {
+window.savePatch = async function() {
   if (!uid) { showToast('Not signed in', 'err'); return; }
   const id = document.getElementById('p-id').value.trim();
   if (!id || !selectedPatchStratum) { showToast('Fill ID + select stratum', 'err'); return; }
@@ -1468,11 +1313,9 @@ window.savePatch = async () => {
   if (!cornersToSave) { showToast('Place patch first', 'err'); return; }
 
   try {
-    const cornersObj = {};
-    for (let i = 0; i < cornersToSave.length; i++) cornersObj['c' + i] = { lat: Number(cornersToSave[i][0]), lon: Number(cornersToSave[i][1]) };
     await setDoc(doc(db, 'users', uid, 'patches', id), {
       str: String(selectedPatchStratum), name: String(document.getElementById('p-name').value.trim() || ''),
-      color: String(pColor), cornerCount: 4, corners: cornersObj, ts: serverTimestamp()
+      color: String(pColor), cornerCount: 4, corners: cornersToObj(cornersToSave), ts: serverTimestamp()
     });
     if (previewPoly) { map.removeLayer(previewPoly); previewPoly = null; }
     pendingPatch = null;
@@ -1481,7 +1324,7 @@ window.savePatch = async () => {
   } catch(e) { showToast('Save failed', 'err'); }
 };
 
-window.saveTree = async () => {
+window.saveTree = async function() {
   if (!uid) { showToast('Not signed in', 'err'); return; }
   const id = document.getElementById('t-id').value.trim();
   const sp = document.getElementById('t-sp').value.trim();
@@ -1500,14 +1343,13 @@ window.saveTree = async () => {
       pt: String(selectedTreePatch), str: String(patch ? patch.str : ''),
       ts: serverTimestamp()
     });
-    // Save photos to localStorage
     if (currentPhotos.length > 0) savePhotos(id, currentPhotos);
     if (editingTree) { cancelEdit('t'); showToast('✅ Updated'); }
     else { clearTreeForm(); showToast('✅ Saved'); }
   } catch(e) { showToast('Save failed', 'err'); }
 };
 
-window.delItem = async (type, id) => {
+window.delItem = async function(type, id) {
   if (!confirm('Delete?')) return;
   try {
     await deleteDoc(doc(db, 'users', uid, type === 's' ? 'strata' : type === 'p' ? 'patches' : 'trees', id));
@@ -1573,16 +1415,16 @@ function updateUI() {
   }).join('') : '<div class="empty-state">No trees yet</div>';
 }
 
-window.selectPS = id => { selectedPatchStratum = id; updateUI(); const s = strata.find(x=>x.id===id); if(s){const idx=strata.indexOf(s); map.flyToBounds(sLayers[idx].getBounds(),{padding:[40,40]});} };
-window.selectTP = id => { selectedTreePatch = id; updateUI(); const p = patches.find(x=>x.id===id); if(p){const idx=patches.indexOf(p); map.flyToBounds(pLayers[idx].getBounds(),{padding:[60,60]});} };
-window.cycleTile = () => { if(!map)return; map.removeLayer(tiles[tileIdx]); tileIdx = (tileIdx+1) % 3; tiles[tileIdx].addTo(map); document.getElementById('tile-btn').textContent = tileNames[(tileIdx+1)%3]; };
-window.fitAll = () => { if(!map)return; const all = [...tMkrs,...sLayers,...pLayers]; if(all.length) map.fitBounds(L.featureGroup(all).getBounds(),{padding:[50,50]}); };
-window.pickC = (el,t) => { document.querySelectorAll('#'+(t==='s'?'s-sw':'p-sw')+' .swatch').forEach(s=>s.classList.remove('on')); el.classList.add('on'); if(t==='s')sColor=el.dataset.c; else pColor=el.dataset.c; };
-window.swTab = (id,btn) => { document.querySelectorAll('.stab').forEach(b=>b.classList.remove('on')); document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('on')); document.getElementById('tab-'+id).classList.add('on'); btn.classList.add('on'); };
-window.openSheet = () => { document.getElementById('bottom-sheet').classList.add('open'); document.getElementById('sheet-overlay').classList.add('show'); };
-window.closeSheet = () => { document.getElementById('bottom-sheet').classList.remove('open'); document.getElementById('sheet-overlay').classList.remove('show'); };
+window.selectPS = function(id) { selectedPatchStratum = id; updateUI(); const s = strata.find(x=>x.id===id); if(s){const idx=strata.indexOf(s); map.flyToBounds(sLayers[idx].getBounds(),{padding:[40,40]});} };
+window.selectTP = function(id) { selectedTreePatch = id; updateUI(); const p = patches.find(x=>x.id===id); if(p){const idx=patches.indexOf(p); map.flyToBounds(pLayers[idx].getBounds(),{padding:[60,60]});} };
+window.cycleTile = function() { if(!map)return; map.removeLayer(tiles[tileIdx]); tileIdx = (tileIdx+1) % 3; tiles[tileIdx].addTo(map); document.getElementById('tile-btn').textContent = tileNames[(tileIdx+1)%3]; };
+window.fitAll = function() { if(!map)return; const all = [...tMkrs,...sLayers,...pLayers]; if(all.length) map.fitBounds(L.featureGroup(all).getBounds(),{padding:[50,50]}); };
+window.pickC = function(el,t) { document.querySelectorAll('#'+(t==='s'?'s-sw':'p-sw')+' .swatch').forEach(s=>s.classList.remove('on')); el.classList.add('on'); if(t==='s')sColor=el.dataset.c; else pColor=el.dataset.c; };
+window.swTab = function(id,btn) { document.querySelectorAll('.stab').forEach(b=>b.classList.remove('on')); document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('on')); document.getElementById('tab-'+id).classList.add('on'); btn.classList.add('on'); };
+window.openSheet = function() { document.getElementById('bottom-sheet').classList.add('open'); document.getElementById('sheet-overlay').classList.add('show'); };
+window.closeSheet = function() { document.getElementById('bottom-sheet').classList.remove('open'); document.getElementById('sheet-overlay').classList.remove('show'); };
 
-window.exportCSV = () => {
+window.exportCSV = function() {
   if (!trees.length) { showToast('No data', 'err'); return; }
   const csv = ['tree_id,stratum,patch,lat,lon,species,spiders,bark,web,notes,photos']
     .concat(trees.map(t => [t.id,t.str,t.pt,t.lat,t.lon,t.sp,t.cnt,t.bark||'',t.web||'',`"${(t.nts||'').replace(/"/g,'""')}"`,loadPhotos(t.id).length].join(',')))
@@ -1594,12 +1436,11 @@ window.exportCSV = () => {
   showToast('📊 Downloaded');
 };
 
-window.exportHTML = () => {
+window.exportHTML = function() {
   if (!trees.length && !strata.length) { showToast('Add data first', 'err'); return; }
   const title = document.getElementById('exp-title').value.trim() || 'Spider Distribution Map';
   const author = document.getElementById('exp-author').value.trim() || '';
   const inst = document.getElementById('exp-inst').value.trim() || '';
-  // Embed photos in export
   const treesWithPhotos = trees.map(t => ({...t, ph: loadPhotos(t.id)}));
   const stats = {tot:trees.length, sp:trees.reduce((s,t)=>s+(t.cnt||0),0), inf:trees.filter(t=>t.cnt>0).length};
   const data = JSON.stringify({strata,patches,trees:treesWithPhotos}).replace(/<\/script>/g,'<\\/script>');
@@ -1614,7 +1455,10 @@ h1{font-size:17px;font-weight:800}.h p{font-size:11px;color:#94a3b8;margin-top:2
 .sp b{display:block;font-size:15px;color:#3b82f6}.sp span{font-size:9px;color:#94a3b8;text-transform:uppercase}
 #map{flex:1}.leaflet-popup-content-wrapper{background:#0d1424!important;color:#f8fafc!important;border-radius:14px!important}
 .leaflet-popup-content{margin:0!important;width:auto!important}.leaflet-popup-tip{background:#0d1424!important}
-.pop-img{width:100%;height:160px;object-fit:cover;display:block}</style>
+.pop-img{width:100%;height:160px;object-fit:cover;display:block}
+.tmw{position:relative;width:36px;height:46px;cursor:pointer}
+.tmp{position:absolute;top:0;left:50%;width:36px;height:36px;border-radius:50% 50% 50% 0;transform:translateX(-50%) rotate(-45deg);box-shadow:0 4px 12px rgba(0,0,0,0.5);border:2.5px solid white;display:flex;align-items:center;justify-content:center}
+.tmp::after{content:attr(data-c);position:absolute;font-size:13px;font-weight:800;color:white;transform:rotate(45deg)}</style>
 </head><body>
 <div class="h"><div class="hl"><div class="logo">🕷️</div><div><h1>${title}</h1><p>${author}${inst?' · '+inst:''}</p></div></div>
 <div class="stats"><div class="sp"><b>${stats.tot}</b><span>Trees</span></div><div class="sp"><b>${stats.sp}</b><span>Spiders</span></div><div class="sp"><b>${stats.inf}</b><span>Infested</span></div></div></div>
@@ -1626,7 +1470,9 @@ L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',{maxZoom:22}).a
 function tC(n){if(n===0)return'#9e9e9e';if(n===1)return'#ffb300';if(n===2)return'#ef6c00';if(n<=4)return'#d32f2f';return'#7b1fa2';}
 data.strata.forEach(s=>L.polygon(s.corners,{color:s.color,fillColor:s.color,fillOpacity:0.12,weight:3,dashArray:'10,5'}).addTo(map).bindPopup('<div style="padding:10px"><b>Stratum '+s.num+': '+s.name+'</b></div>'));
 data.patches.forEach(p=>L.polygon(p.corners,{color:p.color,fillColor:p.color,fillOpacity:0.35,weight:2.5}).addTo(map).bindPopup('<div style="padding:10px"><b>Patch '+p.id+'</b><br>8×8m</div>'));
-const layers=[];data.trees.forEach(t=>{const c=tC(t.cnt);const m=L.circleMarker([t.lat,t.lon],{radius:t.cnt?8+t.cnt:7,color:c,fillColor:c,fillOpacity:0.9}).addTo(map);
+const layers=[];data.trees.forEach(t=>{const c=tC(t.cnt);
+const icon=L.divIcon({html:'<div class="tmw"><div class="tmp" style="background:'+c+'" data-c="'+t.cnt+'"></div></div>',iconSize:[36,46],iconAnchor:[18,46],className:''});
+const m=L.marker([t.lat,t.lon],{icon}).addTo(map);
 const ph=(t.ph&&t.ph.length)?'<img class="pop-img" src="'+t.ph[0]+'">':'';
 m.bindPopup(ph+'<div style="padding:12px;width:230px"><div style="display:flex;justify-content:space-between;margin-bottom:8px"><div><b>'+t.id+'</b><br><span style="font-size:11px;color:#94a3b8">'+t.sp+'</span></div><div style="background:rgba(0,0,0,0.3);border:1.5px solid '+c+';border-radius:10px;padding:5px 10px;text-align:center"><div style="font-size:18px;font-weight:800;color:'+c+'">'+t.cnt+'</div><div style="font-size:8px;color:#94a3b8">SPIDERS</div></div></div>'+(t.bark?'<p style="font-size:11px;margin:3px 0"><span style="color:#94a3b8">Bark:</span> '+t.bark+'</p>':'')+(t.nts?'<p style="font-size:11px;color:#cbd5e1;font-style:italic;margin-top:8px">"'+t.nts+'"</p>':'')+'</div>');layers.push(m);});
 data.strata.forEach(s=>layers.push(L.polygon(s.corners)));data.patches.forEach(p=>layers.push(L.polygon(p.corners)));
@@ -1640,7 +1486,8 @@ if(layers.length)setTimeout(()=>map.fitBounds(L.featureGroup(layers).getBounds()
 };
 
 let toastT = null;
-function showToast(msg, type='ok') {
+function showToast(msg, type) {
+  if (!type) type = 'ok';
   const el = document.getElementById('toast');
   document.getElementById('t-msg').textContent = msg;
   document.getElementById('t-icon').textContent = type === 'ok' ? '✅' : '❌';
