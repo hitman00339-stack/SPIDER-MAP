@@ -156,12 +156,6 @@ textarea{resize:none;min-height:60px}
 .leaflet-control-zoom a{background:rgba(13,20,36,0.95)!important;color:var(--txt)!important;border:1px solid var(--bdr2)!important}
 .leaflet-control-attribution{background:rgba(5,8,16,0.7)!important;color:var(--muted)!important;font-size:9px!important}
 .leaflet-control-attribution a{color:var(--txt2)!important}
-
-.my-location-marker{position:relative}
-.my-location-marker::before{content:'';position:absolute;top:50%;left:50%;width:30px;height:30px;transform:translate(-50%,-50%);background:rgba(59,130,246,0.3);border-radius:50%;animation:locationPulse 2s infinite}
-@keyframes locationPulse{0%{transform:translate(-50%,-50%) scale(0.5);opacity:1}100%{transform:translate(-50%,-50%) scale(2.5);opacity:0}}
-
-#stratum-num{min-height:50px}
 </style>
 </head>
 <body>
@@ -412,6 +406,33 @@ let trackingWatchId=null, myLocMarker=null, myLocCircle=null;
 
 const tileNames = ['🗺️ Street','🛰️ Satellite','🌍 Hybrid'];
 
+// Convert array of corners [[lat,lon],...] to Firestore-safe object {c0:{lat,lon},...}
+function cornersToObj(arr) {
+  const obj = {};
+  arr.forEach((c, i) => {
+    obj['c' + i] = { lat: c[0], lon: c[1] };
+  });
+  return obj;
+}
+
+// Convert Firestore object back to array
+function objToCorners(obj) {
+  if (Array.isArray(obj)) return obj; // backward compat
+  if (!obj || typeof obj !== 'object') return [];
+  const arr = [];
+  const keys = Object.keys(obj).sort((a,b) => {
+    const na = parseInt(a.replace(/\D/g,'')) || 0;
+    const nb = parseInt(b.replace(/\D/g,'')) || 0;
+    return na - nb;
+  });
+  keys.forEach(k => {
+    if (obj[k] && typeof obj[k] === 'object' && 'lat' in obj[k]) {
+      arr.push([obj[k].lat, obj[k].lon]);
+    }
+  });
+  return arr;
+}
+
 function initMap() {
   if (map) return;
   map = L.map('map', {
@@ -438,7 +459,6 @@ function initMap() {
   setTimeout(() => map.invalidateSize(true), 500);
   setTimeout(() => map.invalidateSize(true), 1000);
 
-  // Auto-start GPS tracking
   setTimeout(() => toggleTracking(), 1500);
 }
 
@@ -458,7 +478,7 @@ document.getElementById('signin-btn').onclick = async () => {
 onAuthStateChanged(auth, user => {
   if (user) {
     uid = user.uid;
-    console.log('User signed in:', uid, user.email);
+    console.log('User signed in:', uid);
     document.getElementById('auth-overlay').style.display='none';
     document.getElementById('app').style.display='block';
     document.getElementById('user-avatar').src = user.photoURL || '';
@@ -487,11 +507,7 @@ window.confirmSignOut = async () => {
 };
 
 function startSync() {
-  if (!uid) {
-    console.error('No UID for sync');
-    showToast('Not signed in', 'err');
-    return;
-  }
+  if (!uid) { console.error('No UID for sync'); return; }
   console.log('Starting sync for:', uid);
   unsubs.forEach(u => u());
   unsubs = [];
@@ -501,9 +517,12 @@ function startSync() {
       sLayers.forEach(l => map.removeLayer(l));
       sLayers = []; strata = [];
       snap.forEach(d => {
-        const s = {id:d.id, ...d.data()};
+        const data = d.data();
+        const corners = objToCorners(data.corners);
+        if (corners.length < 3) return;
+        const s = {id:d.id, ...data, corners};
         strata.push(s);
-        const poly = L.polygon(s.corners, {color:s.color, fillColor:s.color, fillOpacity:0.12, weight:3, dashArray:'10,5'})
+        const poly = L.polygon(corners, {color:s.color, fillColor:s.color, fillOpacity:0.12, weight:3, dashArray:'10,5'})
           .addTo(map)
           .bindPopup(`<div style="padding:8px"><b style="color:${s.color}">Stratum ${s.num}</b><br>${s.name}<br><span style="font-size:11px;color:#666">ID: ${s.id}</span></div>`);
         sLayers.push(poly);
@@ -520,9 +539,12 @@ function startSync() {
       pLayers.forEach(l => map.removeLayer(l));
       pLayers = []; patches = [];
       snap.forEach(d => {
-        const p = {id:d.id, ...d.data()};
+        const data = d.data();
+        const corners = objToCorners(data.corners);
+        if (corners.length < 3) return;
+        const p = {id:d.id, ...data, corners};
         patches.push(p);
-        const poly = L.polygon(p.corners, {color:p.color, fillColor:p.color, fillOpacity:0.35, weight:2.5})
+        const poly = L.polygon(corners, {color:p.color, fillColor:p.color, fillOpacity:0.35, weight:2.5})
           .addTo(map)
           .bindPopup(`<div style="padding:8px"><b style="color:${p.color}">Patch ${p.id}</b><br>8×8m · Stratum ${p.str}${p.name?'<br>'+p.name:''}</div>`);
         pLayers.push(poly);
@@ -641,7 +663,6 @@ function mapClickHandler(e) {
   }
 }
 
-// LIVE GPS TRACKING
 window.toggleTracking = () => {
   const btn = document.getElementById('track-fab');
   const info = document.getElementById('gps-live-info');
@@ -659,17 +680,11 @@ window.toggleTracking = () => {
         const accEl = document.getElementById('gps-acc-text');
         accEl.textContent = `±${Math.round(acc)}m`;
         accEl.className = 'gps-acc-val ' + (acc < 10 ? 'good' : acc < 30 ? 'med' : 'bad');
-
         if (myLocMarker) map.removeLayer(myLocMarker);
         if (myLocCircle) map.removeLayer(myLocCircle);
-
-        myLocCircle = L.circle([lat,lon], {
-          radius: acc, color: '#3b82f6', fillColor: '#3b82f6',
-          fillOpacity: 0.1, weight: 1.5
-        }).addTo(map);
-
+        myLocCircle = L.circle([lat,lon], {radius: acc, color:'#3b82f6', fillColor:'#3b82f6', fillOpacity:0.1, weight:1.5}).addTo(map);
         const pulseIcon = L.divIcon({
-          html: `<div class="my-location-marker" style="position:relative;width:18px;height:18px"><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:14px;height:14px;background:#3b82f6;border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.5);z-index:2"></div></div>`,
+          html: `<div style="position:relative;width:18px;height:18px"><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:14px;height:14px;background:#3b82f6;border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.5)"></div></div>`,
           iconSize: [18,18], iconAnchor: [9,9], className: ''
         });
         myLocMarker = L.marker([lat,lon], {icon: pulseIcon, zIndexOffset: 1000}).addTo(map);
@@ -772,7 +787,6 @@ window.jumpGPS = () => {
   navigator.geolocation.getCurrentPosition(p => {
     map.flyTo([p.coords.latitude, p.coords.longitude], 19);
     showToast(`📍 ±${Math.round(p.coords.accuracy)}m`);
-    // Auto-enable tracking if off
     if (!trackingWatchId) toggleTracking();
   });
 };
@@ -811,36 +825,26 @@ window.cancelMode = () => {
 
 window.saveStrat = async () => {
   console.log('=== SAVE STRAT ===');
-  console.log('UID:', uid);
-
-  if (!uid) {
-    showToast('❌ Not signed in! Please sign in again.', 'err');
-    return;
-  }
-
+  if (!uid) { showToast('❌ Not signed in!', 'err'); return; }
   const id = document.getElementById('s-id').value.trim();
   const num = document.getElementById('s-num').value.trim() || '1';
   const name = document.getElementById('s-name').value.trim();
-
-  console.log('Data:', {id, num, name, corners: stratCorners.length});
-
   if (!id) { showToast('Enter Stratum ID', 'err'); return; }
   if (!name) { showToast('Enter description', 'err'); return; }
-  if (stratCorners.length < 3) { showToast('Need 3+ corners (draw on map)', 'err'); return; }
+  if (stratCorners.length < 3) { showToast('Need 3+ corners', 'err'); return; }
 
   try {
     const data = {
       num: String(num),
       name: name,
       color: sColor,
-      corners: stratCorners.map(c => [c[0], c[1]]),
+      cornerCount: stratCorners.length,
+      corners: cornersToObj(stratCorners),
       ts: serverTimestamp()
     };
-    console.log('Saving to: users/' + uid + '/strata/' + id);
-    console.log('Data being saved:', data);
-
+    console.log('Saving stratum:', id, data);
     await setDoc(doc(db, 'users', uid, 'strata', id), data);
-    console.log('✅ SAVED!');
+    console.log('✅ SAVED');
 
     tempMkrs.forEach(m => map.removeLayer(m)); tempMkrs = [];
     if (previewPoly) { map.removeLayer(previewPoly); previewPoly = null; }
@@ -849,11 +853,9 @@ window.saveStrat = async () => {
     document.getElementById('s-name').value = '';
     document.getElementById('s-num').value = '';
     document.getElementById('corner-info').textContent = '';
-    showToast('✅ Stratum saved');
+    showToast('✅ Stratum saved to cloud');
   } catch(e) {
-    console.error('SAVE ERROR FULL:', e);
-    console.error('Error code:', e.code);
-    console.error('Error message:', e.message);
+    console.error('SAVE ERROR:', e);
     showToast('Save failed: ' + (e.code || e.message), 'err');
   }
 };
@@ -861,7 +863,6 @@ window.saveStrat = async () => {
 window.savePatch = async () => {
   console.log('=== SAVE PATCH ===');
   if (!uid) { showToast('❌ Not signed in!', 'err'); return; }
-
   const id = document.getElementById('p-id').value.trim();
   if (!id) { showToast('Enter Patch ID', 'err'); return; }
   if (!selectedPatchStratum) { showToast('Select parent stratum!', 'err'); return; }
@@ -872,10 +873,11 @@ window.savePatch = async () => {
       str: selectedPatchStratum,
       name: document.getElementById('p-name').value.trim() || '',
       color: pColor,
-      corners: pendingPatch.map(c => [c[0], c[1]]),
+      cornerCount: 4,
+      corners: cornersToObj(pendingPatch),
       ts: serverTimestamp()
     };
-    console.log('Saving patch:', data);
+    console.log('Saving patch:', id, data);
     await setDoc(doc(db, 'users', uid, 'patches', id), data);
     console.log('✅ Patch saved');
 
@@ -894,7 +896,6 @@ window.savePatch = async () => {
 window.saveTree = async () => {
   console.log('=== SAVE TREE ===');
   if (!uid) { showToast('❌ Not signed in!', 'err'); return; }
-
   const id = document.getElementById('t-id').value.trim();
   const sp = document.getElementById('t-sp').value.trim();
   const lat = parseFloat(document.getElementById('t-lat').value);
@@ -920,7 +921,7 @@ window.saveTree = async () => {
       str: patch ? patch.str : '',
       ts: serverTimestamp()
     };
-    console.log('Saving tree:', data);
+    console.log('Saving tree:', id, data);
     await setDoc(doc(db, 'users', uid, 'trees', id), data);
     console.log('✅ Tree saved');
 
@@ -956,7 +957,6 @@ function updateUI() {
   document.getElementById('patch-parent-count').textContent = strata.length + ' available';
   document.getElementById('tree-parent-count').textContent = patches.length + ' available';
 
-  // Show ALL strata (no limit)
   const pps = document.getElementById('patch-parent-opts');
   pps.innerHTML = strata.length ? strata.map(s => `
     <div class="parent-opt ${selectedPatchStratum===s.id?'on':''}" onclick="selectPS('${s.id}')">
@@ -965,7 +965,6 @@ function updateUI() {
       <div class="parent-opt-check">${selectedPatchStratum===s.id?'✓':''}</div>
     </div>`).join('') : '<p style="padding:10px;color:var(--muted);font-size:11px">Create a stratum first</p>';
 
-  // Show ALL patches (no limit)
   const tps = document.getElementById('tree-parent-opts');
   tps.innerHTML = patches.length ? patches.map(p => `
     <div class="parent-opt ${selectedTreePatch===p.id?'on':''}" onclick="selectTP('${p.id}')">
@@ -996,8 +995,8 @@ function updateUI() {
     </div>`).join('') : '<div class="empty-state">No trees yet</div>';
 }
 
-window.selectPS = id => { selectedPatchStratum = id; updateUI(); const s = strata.find(x=>x.id===id); if(s){const idx=strata.indexOf(s); map.flyToBounds(sLayers[idx].getBounds(),{padding:[40,40]});} showToast('Selected: '+s.name); };
-window.selectTP = id => { selectedTreePatch = id; updateUI(); const p = patches.find(x=>x.id===id); if(p){const idx=patches.indexOf(p); map.flyToBounds(pLayers[idx].getBounds(),{padding:[60,60]});} showToast('Selected: '+p.id); };
+window.selectPS = id => { selectedPatchStratum = id; updateUI(); const s = strata.find(x=>x.id===id); if(s){const idx=strata.indexOf(s); map.flyToBounds(sLayers[idx].getBounds(),{padding:[40,40]}); showToast('Selected: '+s.name);} };
+window.selectTP = id => { selectedTreePatch = id; updateUI(); const p = patches.find(x=>x.id===id); if(p){const idx=patches.indexOf(p); map.flyToBounds(pLayers[idx].getBounds(),{padding:[60,60]}); showToast('Selected: '+p.id);} };
 window.focusTree = id => { const i=trees.findIndex(t=>t.id===id); if(i>=0){closeSheet(); map.flyTo([trees[i].lat,trees[i].lon],20); setTimeout(()=>tMkrs[i].openPopup(),900);} };
 window.focusZone = (type,id) => { closeSheet(); if(type==='s'){const i=strata.findIndex(s=>s.id===id); if(i>=0)map.flyToBounds(sLayers[i].getBounds(),{padding:[30,30]});} else{const i=patches.findIndex(p=>p.id===id); if(i>=0)map.flyToBounds(pLayers[i].getBounds(),{padding:[30,30]});} };
 
