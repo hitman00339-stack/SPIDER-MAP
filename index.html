@@ -41,7 +41,7 @@ html,body{width:100vw;height:100vh;height:100dvh;font-family:-apple-system,Blink
 #save-ind .dot{width:6px;height:6px;border-radius:50%;background:#10b981;animation:pulse 1s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
 
-#upload-progress{position:fixed;top:60px;left:50%;transform:translateX(-50%);z-index:851;background:rgba(13,20,36,0.97);border:1.5px solid var(--acc);color:var(--txt);font-size:12px;font-weight:600;padding:8px 16px;border-radius:20px;display:none;align-items:center;gap:10px;min-width:200px;box-shadow:0 4px 20px rgba(59,130,246,0.4)}
+#upload-progress{position:fixed;top:60px;left:50%;transform:translateX(-50%);z-index:851;background:rgba(13,20,36,0.97);border:1.5px solid var(--acc);color:var(--txt);font-size:12px;font-weight:600;padding:10px 18px;border-radius:20px;display:none;align-items:center;gap:10px;min-width:240px;box-shadow:0 4px 20px rgba(59,130,246,0.4)}
 #upload-progress.show{display:flex}
 .upload-bar{flex:1;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden}
 .upload-fill{height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));width:0%;transition:width 0.3s;border-radius:2px}
@@ -121,6 +121,7 @@ input:disabled{opacity:0.5;cursor:not-allowed}
 .info-blue{background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.25);color:#93c5fd}
 .info-green{background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);color:#6ee7b7}
 .info-yellow{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);color:#fde68a}
+.info-purple{background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.25);color:#c4b5fd}
 
 .parent-sel{background:rgba(59,130,246,0.06);border:1.5px solid rgba(59,130,246,0.3);border-radius:11px;padding:11px;margin-bottom:10px}
 .parent-sel-title{font-size:10px;font-weight:700;color:#60a5fa;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
@@ -194,13 +195,11 @@ input:disabled{opacity:0.5;cursor:not-allowed}
 .popup-close-btn{position:absolute;top:12px;right:12px;width:36px;height:36px;background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.15);border-radius:50%;color:white;font-size:18px;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px)}
 
 .popup-gallery{width:100%;height:240px;background:#000;position:relative;overflow:hidden;flex-shrink:0}
-.popup-gallery.empty{height:100px;background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(139,92,246,0.15));display:flex;align-items:center;justify-content:center}
+.popup-gallery.empty{height:100px;background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(139,92,246,0.15));display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px}
 .popup-gallery.empty .empty-emoji{font-size:48px;opacity:0.3}
-.popup-gallery.loading{background:#000;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px}
-.popup-gallery.loading .loader{width:32px;height:32px}
-.popup-gallery.loading .load-text{color:var(--txt2);font-size:11px}
+.popup-gallery.empty .empty-text{font-size:11px;color:var(--muted)}
 
-.gallery-img{width:100%;height:100%;object-fit:cover;cursor:pointer;display:block;animation:imgFadeIn 0.5s ease}
+.gallery-img{width:100%;height:100%;object-fit:cover;cursor:pointer;display:block;animation:imgFadeIn 0.5s ease;background:#000}
 @keyframes imgFadeIn{from{opacity:0;transform:scale(1.05)}to{opacity:1;transform:scale(1)}}
 .gallery-counter{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.75);color:white;padding:4px 12px;border-radius:14px;font-size:11px;font-weight:700;backdrop-filter:blur(8px);z-index:2}
 .gallery-nav-btn{position:absolute;top:50%;transform:translateY(-50%);width:40px;height:40px;background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.15);color:white;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px);z-index:2}
@@ -239,6 +238,10 @@ input:disabled{opacity:0.5;cursor:not-allowed}
 #img-viewer.show{display:flex}
 #img-viewer img{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px}
 #img-viewer .close-viewer{position:absolute;top:20px;right:20px;background:rgba(255,255,255,0.15);border:none;color:white;width:44px;height:44px;border-radius:50%;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+.migrate-banner{background:linear-gradient(135deg,rgba(139,92,246,0.15),rgba(124,58,237,0.15));border:1.5px solid rgba(139,92,246,0.4);border-radius:11px;padding:12px;font-size:12px;color:#c4b5fd;display:none;flex-direction:column;gap:8px;margin-bottom:10px}
+.migrate-banner.show{display:flex}
+.migrate-banner button{background:linear-gradient(135deg,#8b5cf6,#7c3aed);border:none;color:white;padding:8px 14px;border-radius:8px;font-weight:700;cursor:pointer;font-family:inherit;font-size:12px}
 </style>
 </head>
 <body>
@@ -274,7 +277,7 @@ input:disabled{opacity:0.5;cursor:not-allowed}
 <div id="save-ind"><div class="dot"></div>Synced</div>
 
 <div id="upload-progress">
-  <span id="upload-text">📤 Uploading 1/3...</span>
+  <span id="upload-text">📤 Uploading...</span>
   <div class="upload-bar"><div class="upload-fill" id="upload-fill"></div></div>
 </div>
 
@@ -388,6 +391,12 @@ input:disabled{opacity:0.5;cursor:not-allowed}
 
     <div class="tab-pane on" id="tab-tree">
       <div class="edit-banner" id="edit-t-banner"><span><b>✏️ Editing:</b> <span id="edit-t-id"></span></span><button class="edit-cancel-btn" onclick="cancelEdit('t')">Cancel</button></div>
+      
+      <div class="migrate-banner" id="migrate-banner">
+        <div><b>📦 Old photos found!</b> You have photos saved on this device. Upload them to cloud so they sync everywhere?</div>
+        <button onclick="migrateOldPhotos()">☁️ Upload Old Photos to Cloud</button>
+      </div>
+
       <div class="info-box info-blue"><b>Step 3:</b> Stand at tree. Photos sync to cloud!</div>
       <div class="card">
         <div class="parent-sel">
@@ -431,7 +440,7 @@ input:disabled{opacity:0.5;cursor:not-allowed}
           <input type="file" id="t-photo" accept="image/*" multiple onchange="handlePhotos(this)">
           <div class="icon">📸</div>
           <div class="text">Tap to Add Photos</div>
-          <div class="sub">Saves to cloud · Syncs everywhere</div>
+          <div class="sub">Uploads to cloud · Syncs everywhere</div>
         </label>
         <div class="photo-grid" id="photo-grid"></div>
         <div id="photo-count" style="font-size:10px;color:var(--muted);text-align:center;margin-top:6px"></div>
@@ -474,8 +483,8 @@ input:disabled{opacity:0.5;cursor:not-allowed}
 <script type="module">
 import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import {getAuth,onAuthStateChanged,signInWithPopup,GoogleAuthProvider,signOut} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-import {getFirestore,collection,doc,setDoc,deleteDoc,onSnapshot,enableIndexedDbPersistence,serverTimestamp} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-import {getStorage,ref,uploadBytes,getDownloadURL,deleteObject,listAll} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js';
+import {getFirestore,collection,doc,setDoc,deleteDoc,onSnapshot,enableIndexedDbPersistence,serverTimestamp,getDoc,updateDoc} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import {getStorage,ref,uploadBytes,getDownloadURL,deleteObject} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyBCowRMjoU5dfep_OGKKIyxuE-WxdhEfho",
@@ -502,7 +511,7 @@ let map=null, tiles=null;
 let trackingWatchId=null, myLocMarker=null, myLocCircle=null;
 let editingStrat=null, editingPatch=null, editingTree=null;
 let originalStratCorners=null, originalPatchCorners=null;
-let currentPhotoUrls=[]; // Array of cloud URLs
+let currentPhotoUrls=[];
 let popupGalleryIdx={};
 let isUploading = false;
 
@@ -544,7 +553,7 @@ onAuthStateChanged(auth, user => {
     document.getElementById('auth-overlay').style.display='none';
     document.getElementById('app').style.display='block';
     document.getElementById('user-avatar').src = user.photoURL || '';
-    setTimeout(() => { initMap(); startSync(); }, 100);
+    setTimeout(() => { initMap(); startSync(); checkOldPhotos(); }, 100);
     showToast('✅ ' + (user.displayName||'User').split(' ')[0]);
   } else {
     uid = null;
@@ -559,6 +568,159 @@ onAuthStateChanged(auth, user => {
 window.confirmSignOut = async () => {
   if (confirm('Sign out?')) { stopTracking(); await signOut(auth); location.reload(); }
 };
+
+// CHECK FOR OLD LOCALSTORAGE PHOTOS
+function checkOldPhotos() {
+  const keys = Object.keys(localStorage).filter(k => k.startsWith('spider_photos_'));
+  if (keys.length > 0) {
+    let totalPhotos = 0;
+    keys.forEach(k => {
+      try {
+        const photos = JSON.parse(localStorage.getItem(k));
+        if (Array.isArray(photos)) totalPhotos += photos.length;
+      } catch(e) {}
+    });
+    if (totalPhotos > 0) {
+      const banner = document.getElementById('migrate-banner');
+      banner.classList.add('show');
+      banner.querySelector('div').innerHTML = `<b>📦 Found ${totalPhotos} old photos on this device!</b> Upload them to cloud so they sync to laptop too?`;
+    }
+  }
+}
+
+// MIGRATE OLD PHOTOS TO CLOUD
+window.migrateOldPhotos = async () => {
+  if (isUploading) { showToast('Wait for upload to finish', 'err'); return; }
+  if (!confirm('Upload all old photos to cloud? This may take a few minutes.')) return;
+  
+  const keys = Object.keys(localStorage).filter(k => k.startsWith('spider_photos_'));
+  isUploading = true;
+  
+  let totalUploaded = 0;
+  let totalFailed = 0;
+  let totalCount = 0;
+  
+  // Count total
+  for (const k of keys) {
+    try {
+      const photos = JSON.parse(localStorage.getItem(k));
+      if (Array.isArray(photos)) totalCount += photos.length;
+    } catch(e) {}
+  }
+  
+  let currentNum = 0;
+  
+  for (const k of keys) {
+    const treeId = k.replace('spider_photos_', '');
+    try {
+      const photos = JSON.parse(localStorage.getItem(k));
+      if (!Array.isArray(photos) || photos.length === 0) continue;
+      
+      // Get existing tree
+      const treeRef = doc(db, 'users', uid, 'trees', treeId);
+      const treeSnap = await getDoc(treeRef);
+      if (!treeSnap.exists()) {
+        console.warn('Tree not found in cloud:', treeId);
+        continue;
+      }
+      
+      const treeData = treeSnap.data();
+      const existingPhotos = treeData.photos || {};
+      const newUrls = [];
+      
+      for (let i = 0; i < photos.length; i++) {
+        currentNum++;
+        showUploadProgress(currentNum, totalCount);
+        
+        try {
+          // Convert base64 to blob
+          const base64 = photos[i];
+          const res = await fetch(base64);
+          const blob = await res.blob();
+          
+          // Compress
+          const compressedBlob = await compressBlob(blob);
+          
+          // Upload
+          const timestamp = Date.now();
+          const filename = `migrated_${timestamp}_${i}.jpg`;
+          const path = `users/${uid}/trees/${treeId}/${filename}`;
+          const storageRef = ref(storage, path);
+          await uploadBytes(storageRef, compressedBlob);
+          const url = await getDownloadURL(storageRef);
+          newUrls.push(url);
+          totalUploaded++;
+        } catch(err) {
+          console.error('Failed to upload photo:', err);
+          totalFailed++;
+        }
+      }
+      
+      // Update tree with merged photos
+      const photosObj = {...existingPhotos};
+      const existingCount = Object.keys(existingPhotos).length;
+      newUrls.forEach((url, i) => {
+        photosObj['p' + (existingCount + i)] = url;
+      });
+      
+      await updateDoc(treeRef, { photos: photosObj });
+      
+      // Remove from localStorage after successful upload
+      localStorage.removeItem(k);
+    } catch(err) {
+      console.error('Error migrating tree:', treeId, err);
+    }
+  }
+  
+  hideUploadProgress();
+  isUploading = false;
+  document.getElementById('migrate-banner').classList.remove('show');
+  
+  if (totalUploaded > 0) {
+    showToast(`✅ Uploaded ${totalUploaded} photos to cloud!`);
+  }
+  if (totalFailed > 0) {
+    setTimeout(() => showToast(`⚠️ ${totalFailed} photos failed`, 'err'), 3500);
+  }
+};
+
+async function compressBlob(blob, maxWidth=1200, quality=0.8) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.width, h = img.height;
+        if (w > maxWidth) { h = (h * maxWidth) / w; w = maxWidth; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        canvas.toBlob(resolve, 'image/jpeg', quality);
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function compressImage(file, maxWidth=1200, quality=0.8) {
+  return compressBlob(file, maxWidth, quality);
+}
+
+async function uploadPhotoToCloud(file, treeId) {
+  const compressed = await compressImage(file);
+  const timestamp = Date.now();
+  const random = Math.random().toString(36).substring(7);
+  const filename = `${timestamp}_${random}.jpg`;
+  const path = `users/${uid}/trees/${treeId}/${filename}`;
+  const storageRef = ref(storage, path);
+  await uploadBytes(storageRef, compressed);
+  const url = await getDownloadURL(storageRef);
+  return { url, path };
+}
 
 function cornersToObj(arr) {
   const obj = {};
@@ -577,64 +739,21 @@ function objToCorners(obj) {
   return arr;
 }
 
+// CONVERT PHOTOS OBJECT TO ARRAY (handles both cloud and old base64)
+function photosObjToArray(photosObj) {
+  if (!photosObj) return [];
+  if (Array.isArray(photosObj)) return photosObj.filter(p => p);
+  if (typeof photosObj === 'object') {
+    const keys = Object.keys(photosObj).sort((a,b) => (parseInt(a.replace(/\D/g,''))||0) - (parseInt(b.replace(/\D/g,''))||0));
+    return keys.map(k => photosObj[k]).filter(p => p);
+  }
+  return [];
+}
+
 function tColor(n){if(n===0)return'#9e9e9e';if(n===1)return'#ffb300';if(n===2)return'#ef6c00';if(n<=4)return'#d32f2f';return'#7b1fa2';}
 function rgb(h){return[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)].join(',');}
 function emoji(sp){const s=(sp||'').toLowerCase();if(s.includes('neem'))return'🌿';if(s.includes('mango'))return'🥭';if(s.includes('peepal'))return'🍃';if(s.includes('banyan'))return'🌳';if(s.includes('ashoka'))return'🌲';return'🌳';}
 
-// ═══════════════════════════════════
-// COMPRESS IMAGE BEFORE UPLOAD
-// ═══════════════════════════════════
-async function compressImage(file, maxWidth=1200, quality=0.8) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        let w = img.width, h = img.height;
-        if (w > maxWidth) {
-          h = (h * maxWidth) / w;
-          w = maxWidth;
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = w;
-        canvas.height = h;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, w, h);
-        canvas.toBlob(resolve, 'image/jpeg', quality);
-      };
-      img.onerror = reject;
-      img.src = e.target.result;
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
-// ═══════════════════════════════════
-// UPLOAD PHOTO TO FIREBASE STORAGE
-// ═══════════════════════════════════
-async function uploadPhotoToCloud(file, treeId) {
-  try {
-    const compressed = await compressImage(file);
-    const timestamp = Date.now();
-    const random = Math.random().toString(36).substring(7);
-    const filename = `${timestamp}_${random}.jpg`;
-    const path = `users/${uid}/trees/${treeId}/${filename}`;
-    const storageRef = ref(storage, path);
-    
-    await uploadBytes(storageRef, compressed);
-    const url = await getDownloadURL(storageRef);
-    console.log('✅ Uploaded:', url);
-    return { url, path };
-  } catch(e) {
-    console.error('Upload error:', e);
-    throw e;
-  }
-}
-
-// ═══════════════════════════════════
-// MARKER
-// ═══════════════════════════════════
 function createTreeMarker(t) {
   const col = tColor(t.cnt);
   const photoCount = (t.photos || []).length;
@@ -703,15 +822,8 @@ function startSync() {
     tMkrs = []; trees = [];
     snap.forEach(d => {
       const data = d.data();
-      // Convert photos object to array
-      let photos = [];
-      if (data.photos) {
-        if (Array.isArray(data.photos)) photos = data.photos;
-        else {
-          const keys = Object.keys(data.photos).sort();
-          photos = keys.map(k => data.photos[k]).filter(p => p);
-        }
-      }
+      const photos = photosObjToArray(data.photos);
+      console.log('Tree', d.id, 'has', photos.length, 'photos');
       const t = {id:d.id, ...data, photos};
       trees.push(t);
       const marker = createTreeMarker(t);
@@ -764,14 +876,12 @@ function mapClickHandler(e) {
   }
 }
 
-// ═══════════════════════════════════
-// POPUP WITH CLOUD PHOTOS
-// ═══════════════════════════════════
 window.showTreePopup = function(treeId) {
   const t = trees.find(x => x.id === treeId);
-  if (!t) return;
+  if (!t) { console.log('Tree not found:', treeId); return; }
   
   const photos = t.photos || [];
+  console.log('Showing popup for', treeId, 'with', photos.length, 'photos');
   popupGalleryIdx[t.id] = 0;
   
   const col = tColor(t.cnt);
@@ -782,7 +892,7 @@ window.showTreePopup = function(treeId) {
   if (photos.length > 0) {
     photoSection = `
       <div class="popup-gallery">
-        <img class="gallery-img" id="gallery-main-img" src="${photos[0]}" onclick="openImageViewer(this.src)" onerror="this.parentElement.innerHTML='<div class=\\'empty-emoji\\'>❌</div><p style=color:white;font-size:11px;margin-top:8px>Image failed to load</p>'">
+        <img class="gallery-img" id="gallery-main-img" src="${photos[0]}" onclick="openImageViewer(this.src)" onerror="this.parentElement.innerHTML='<div style=color:white;padding:20px;text-align:center;font-size:12px>❌ Image failed to load</div>'">
         ${photos.length > 1 ? `
           <div class="gallery-counter" id="gallery-counter">1 / ${photos.length}</div>
           <button class="gallery-nav-btn prev" onclick="changeGalleryImg('${t.id}', -1)">‹</button>
@@ -791,7 +901,7 @@ window.showTreePopup = function(treeId) {
       </div>
     `;
   } else {
-    photoSection = `<div class="popup-gallery empty"><div class="empty-emoji">${e}</div></div>`;
+    photoSection = `<div class="popup-gallery empty"><div class="empty-emoji">${e}</div><div class="empty-text">No photos yet</div></div>`;
   }
   
   const fields = [];
@@ -845,91 +955,52 @@ window.showTreePopup = function(treeId) {
 window.showZonePopup = function(type, id) {
   const item = type === 's' ? strata.find(x => x.id === id) : patches.find(x => x.id === id);
   if (!item) return;
-  
   const isStrat = type === 's';
   const title = isStrat ? `Stratum ${item.num}` : `Patch ${item.id}`;
   const subtitle = isStrat ? item.name : `8×8 meters · Stratum ${item.str}`;
-  
   let extraInfo = '';
   if (isStrat) {
     const childPatches = patches.filter(p => p.str === item.id);
     const allTrees = trees.filter(t => t.str === item.id);
     const totalSp = allTrees.reduce((s,t) => s + (t.cnt||0), 0);
-    extraInfo = `
-      <div class="popup-fields-grid">
-        <div class="popup-field-card"><div class="label">Patches</div><div class="value">${childPatches.length}</div></div>
-        <div class="popup-field-card"><div class="label">Trees</div><div class="value">${allTrees.length}</div></div>
-        <div class="popup-field-card"><div class="label">Spiders</div><div class="value">${totalSp}</div></div>
-        <div class="popup-field-card"><div class="label">Corners</div><div class="value">${item.corners.length}</div></div>
-      </div>
-    `;
+    extraInfo = `<div class="popup-fields-grid"><div class="popup-field-card"><div class="label">Patches</div><div class="value">${childPatches.length}</div></div><div class="popup-field-card"><div class="label">Trees</div><div class="value">${allTrees.length}</div></div><div class="popup-field-card"><div class="label">Spiders</div><div class="value">${totalSp}</div></div><div class="popup-field-card"><div class="label">Corners</div><div class="value">${item.corners.length}</div></div></div>`;
   } else {
     const childTrees = trees.filter(t => t.pt === item.id);
     const totalSp = childTrees.reduce((s,t) => s + (t.cnt||0), 0);
-    extraInfo = `
-      <div class="popup-fields-grid">
-        <div class="popup-field-card"><div class="label">Trees</div><div class="value">${childTrees.length}</div></div>
-        <div class="popup-field-card"><div class="label">Spiders</div><div class="value">${totalSp}</div></div>
-        ${item.name ? `<div class="popup-field-card" style="grid-column:span 2"><div class="label">Notes</div><div class="value">${item.name}</div></div>` : ''}
-      </div>
-    `;
+    extraInfo = `<div class="popup-fields-grid"><div class="popup-field-card"><div class="label">Trees</div><div class="value">${childTrees.length}</div></div><div class="popup-field-card"><div class="label">Spiders</div><div class="value">${totalSp}</div></div>${item.name ? `<div class="popup-field-card" style="grid-column:span 2"><div class="label">Notes</div><div class="value">${item.name}</div></div>` : ''}</div>`;
   }
-  
   document.getElementById('popup-modal').innerHTML = `
     <button class="popup-close-btn" onclick="closePopup()">✕</button>
-    <div class="popup-gallery empty" style="height:80px;background:linear-gradient(135deg,${item.color}33,${item.color}11)">
-      <div style="font-size:38px">${isStrat ? '📐' : '⬛'}</div>
-    </div>
-    <div class="popup-body">
-      <div class="popup-header-row">
-        <div class="popup-title-block">
-          <div class="popup-tree-id" style="color:${item.color}">${title}</div>
-          <div class="popup-species">${subtitle}</div>
-        </div>
-      </div>
-      ${extraInfo}
-    </div>
-    <div class="popup-actions">
-      <button class="popup-action-btn popup-action-edit" onclick="closePopup();${isStrat?'editStratum':'editPatch'}('${item.id}')">✏️ Edit</button>
-      <button class="popup-action-btn popup-action-close" onclick="closePopup()">Close</button>
-    </div>
+    <div class="popup-gallery empty" style="height:80px;background:linear-gradient(135deg,${item.color}33,${item.color}11)"><div style="font-size:38px">${isStrat ? '📐' : '⬛'}</div></div>
+    <div class="popup-body"><div class="popup-header-row"><div class="popup-title-block"><div class="popup-tree-id" style="color:${item.color}">${title}</div><div class="popup-species">${subtitle}</div></div></div>${extraInfo}</div>
+    <div class="popup-actions"><button class="popup-action-btn popup-action-edit" onclick="closePopup();${isStrat?'editStratum':'editPatch'}('${item.id}')">✏️ Edit</button><button class="popup-action-btn popup-action-close" onclick="closePopup()">Close</button></div>
   `;
-  
   document.getElementById('popup-overlay').classList.add('show');
 };
 
-window.closePopup = function(e) {
-  if (e && e.target.id !== 'popup-overlay') return;
-  document.getElementById('popup-overlay').classList.remove('show');
-};
+window.closePopup = function(e) { if (e && e.target.id !== 'popup-overlay') return; document.getElementById('popup-overlay').classList.remove('show'); };
 
 window.changeGalleryImg = function(treeId, dir) {
   const t = trees.find(x => x.id === treeId);
   if (!t || !t.photos || t.photos.length < 2) return;
-  const photos = t.photos;
-  popupGalleryIdx[treeId] = ((popupGalleryIdx[treeId] || 0) + dir + photos.length) % photos.length;
+  popupGalleryIdx[treeId] = ((popupGalleryIdx[treeId] || 0) + dir + t.photos.length) % t.photos.length;
   setGalleryImg(treeId, popupGalleryIdx[treeId]);
 };
 
 window.setGalleryImg = function(treeId, idx) {
   const t = trees.find(x => x.id === treeId);
-  if (!t || !t.photos) return;
-  const photos = t.photos;
-  if (!photos[idx]) return;
+  if (!t || !t.photos || !t.photos[idx]) return;
   popupGalleryIdx[treeId] = idx;
   const main = document.getElementById('gallery-main-img');
   if (main) {
-    main.style.animation = 'none';
-    main.offsetHeight;
+    main.style.animation = 'none'; main.offsetHeight;
     main.style.animation = 'imgFadeIn 0.4s ease';
-    main.src = photos[idx];
-    main.onclick = () => openImageViewer(photos[idx]);
+    main.src = t.photos[idx];
+    main.onclick = () => openImageViewer(t.photos[idx]);
   }
   const counter = document.getElementById('gallery-counter');
-  if (counter) counter.textContent = `${idx + 1} / ${photos.length}`;
-  document.querySelectorAll('.popup-thumb-mini').forEach((t, i) => {
-    t.classList.toggle('active', i === idx);
-  });
+  if (counter) counter.textContent = `${idx + 1} / ${t.photos.length}`;
+  document.querySelectorAll('.popup-thumb-mini').forEach((tb, i) => tb.classList.toggle('active', i === idx));
 };
 
 window.openImageViewer = function(src) {
@@ -937,12 +1008,8 @@ window.openImageViewer = function(src) {
   document.getElementById('img-viewer').classList.add('show');
 };
 
-// ═══════════════════════════════════
-// ADD PHOTOS TO EXISTING TREE
-// ═══════════════════════════════════
 window.addPhotosToTree = function(treeId) {
-  if (isUploading) { showToast('Already uploading...', 'err'); return; }
-  
+  if (isUploading) { showToast('Already uploading', 'err'); return; }
   const input = document.createElement('input');
   input.type = 'file';
   input.accept = 'image/*';
@@ -950,38 +1017,26 @@ window.addPhotosToTree = function(treeId) {
   input.onchange = async function(e) {
     const files = Array.from(e.target.files);
     if (!files.length) return;
-    
     const t = trees.find(x => x.id === treeId);
     if (!t) return;
-    
     isUploading = true;
     showUploadProgress(0, files.length);
-    
     const existingPhotos = t.photos || [];
     const newUrls = [];
-    
     try {
       for (let i = 0; i < files.length; i++) {
-        showUploadProgress(i, files.length);
+        showUploadProgress(i+1, files.length);
         const { url } = await uploadPhotoToCloud(files[i], treeId);
         newUrls.push(url);
       }
-      
-      // Update tree document with new photos
       const allPhotos = [...existingPhotos, ...newUrls];
       const photosObj = {};
       allPhotos.forEach((url, i) => photosObj['p' + i] = url);
-      
-      await setDoc(doc(db, 'users', uid, 'trees', treeId), {
-        ...t,
-        photos: photosObj
-      }, { merge: true });
-      
+      await updateDoc(doc(db, 'users', uid, 'trees', treeId), { photos: photosObj });
       hideUploadProgress();
       isUploading = false;
       showToast(`✅ ${files.length} photo(s) uploaded!`);
-      
-      setTimeout(() => showTreePopup(treeId), 500);
+      setTimeout(() => showTreePopup(treeId), 800);
     } catch(err) {
       hideUploadProgress();
       isUploading = false;
@@ -995,8 +1050,8 @@ function showUploadProgress(current, total) {
   const el = document.getElementById('upload-progress');
   const text = document.getElementById('upload-text');
   const fill = document.getElementById('upload-fill');
-  text.textContent = `📤 Uploading ${current + 1}/${total}...`;
-  fill.style.width = `${((current + 1) / total) * 100}%`;
+  text.textContent = `📤 Uploading ${current}/${total}...`;
+  fill.style.width = `${(current / total) * 100}%`;
   el.classList.add('show');
 }
 
@@ -1004,29 +1059,23 @@ function hideUploadProgress() {
   document.getElementById('upload-progress').classList.remove('show');
 }
 
-// ═══════════════════════════════════
-// PHOTO UPLOAD IN FORM
-// ═══════════════════════════════════
 window.handlePhotos = async function(input) {
   const files = Array.from(input.files);
   if (!files.length) return;
   input.value = '';
-  
   if (!uid) { showToast('Sign in first', 'err'); return; }
   
-  // Use temporary tree ID for upload (or current editing tree)
   const treeId = editingTree || document.getElementById('t-id').value.trim() || 'temp_' + Date.now();
   
-  if (isUploading) { showToast('Already uploading...', 'err'); return; }
+  if (isUploading) { showToast('Already uploading', 'err'); return; }
   isUploading = true;
   
-  // Show loading thumbnails
   files.forEach((f, i) => {
     const reader = new FileReader();
     reader.onload = (e) => {
       const placeholder = document.createElement('div');
       placeholder.className = 'photo-thumb';
-      placeholder.innerHTML = `<img src="${e.target.result}"><div class="uploading-overlay">⏳ Uploading...</div>`;
+      placeholder.innerHTML = `<img src="${e.target.result}"><div class="uploading-overlay">⏳</div>`;
       placeholder.id = 'temp-thumb-' + i;
       document.getElementById('photo-grid').appendChild(placeholder);
     };
@@ -1035,17 +1084,16 @@ window.handlePhotos = async function(input) {
   
   try {
     for (let i = 0; i < files.length; i++) {
-      showUploadProgress(i, files.length);
+      showUploadProgress(i+1, files.length);
       const { url } = await uploadPhotoToCloud(files[i], treeId);
       currentPhotoUrls.push(url);
       const tempEl = document.getElementById('temp-thumb-' + i);
       if (tempEl) tempEl.remove();
     }
-    
     renderPhotoGrid();
     hideUploadProgress();
     isUploading = false;
-    showToast(`✅ ${files.length} photo(s) uploaded to cloud!`);
+    showToast(`✅ ${files.length} photo(s) in cloud!`);
   } catch(err) {
     hideUploadProgress();
     isUploading = false;
@@ -1066,22 +1114,16 @@ function renderPhotoGrid() {
 }
 
 window.removePhoto = async function(i) {
-  if (!confirm('Remove this photo? (Will be deleted from cloud)')) return;
+  if (!confirm('Remove this photo?')) return;
   const url = currentPhotoUrls[i];
   try {
-    // Try to delete from storage
     const path = url.split('/o/')[1]?.split('?')[0];
-    if (path) {
-      const decoded = decodeURIComponent(path);
-      await deleteObject(ref(storage, decoded));
-    }
-  } catch(e) { console.warn('Could not delete:', e); }
+    if (path) await deleteObject(ref(storage, decodeURIComponent(path)));
+  } catch(e) {}
   currentPhotoUrls.splice(i, 1);
   renderPhotoGrid();
-  showToast('Photo removed');
 };
 
-// GPS
 window.toggleTracking = function() {
   const btn = document.getElementById('track-fab');
   const info = document.getElementById('gps-live-info');
@@ -1099,12 +1141,9 @@ window.toggleTracking = function() {
       if (myLocMarker) map.removeLayer(myLocMarker);
       if (myLocCircle) map.removeLayer(myLocCircle);
       myLocCircle = L.circle([lat,lon], {radius: acc, color:'#3b82f6', fillColor:'#3b82f6', fillOpacity:0.1, weight:1.5}).addTo(map);
-      myLocMarker = L.marker([lat,lon], {icon: L.divIcon({
-        html: `<div style="width:14px;height:14px;background:#3b82f6;border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.5)"></div>`,
-        iconSize: [14,14], iconAnchor: [7,7], className: ''
-      }), zIndexOffset: 1000}).addTo(map);
+      myLocMarker = L.marker([lat,lon], {icon: L.divIcon({html: `<div style="width:14px;height:14px;background:#3b82f6;border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.5)"></div>`,iconSize: [14,14], iconAnchor: [7,7], className: ''}), zIndexOffset: 1000}).addTo(map);
     },
-    err => { document.getElementById('gps-acc-text').textContent = 'Failed'; },
+    () => { document.getElementById('gps-acc-text').textContent = 'Failed'; },
     {enableHighAccuracy:true, maximumAge:1000, timeout:10000}
   );
 };
@@ -1174,10 +1213,7 @@ window.jumpGPS = function() {
 
 function addCorner(lat, lon) {
   stratCorners.push([Number(lat), Number(lon)]);
-  const m = L.marker([lat,lon], {icon: L.divIcon({
-    html: `<div style="background:#3b82f6;color:white;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:2.5px solid white">${stratCorners.length}</div>`,
-    iconSize:[24,24], iconAnchor:[12,12], className:''
-  })}).addTo(map);
+  const m = L.marker([lat,lon], {icon: L.divIcon({html: `<div style="background:#3b82f6;color:white;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:2.5px solid white">${stratCorners.length}</div>`,iconSize:[24,24], iconAnchor:[12,12], className:''})}).addTo(map);
   tempMkrs.push(m);
   if (previewPoly) map.removeLayer(previewPoly);
   if (stratCorners.length > 1) {
@@ -1340,11 +1376,9 @@ window.saveTree = async function() {
   const lat = parseFloat(document.getElementById('t-lat').value);
   const lon = parseFloat(document.getElementById('t-lon').value);
   if (!id || !sp || !selectedTreePatch || isNaN(lat) || isNaN(lon)) { showToast('Fill all fields', 'err'); return; }
-
   const patch = patches.find(p => p.id === selectedTreePatch);
   const photosObj = {};
   currentPhotoUrls.forEach((url, i) => photosObj['p' + i] = url);
-  
   try {
     await setDoc(doc(db, 'users', uid, 'trees', id), {
       sp: String(sp), lat: Number(lat), lon: Number(lon),
@@ -1365,7 +1399,6 @@ window.delItem = async function(type, id) {
   if (!confirm('Delete?')) return;
   try {
     if (type === 't') {
-      // Try to delete photos from storage
       const t = trees.find(x => x.id === id);
       if (t && t.photos) {
         for (const url of t.photos) {
@@ -1439,7 +1472,7 @@ window.openSheet = function() { document.getElementById('bottom-sheet').classLis
 window.closeSheet = function() { document.getElementById('bottom-sheet').classList.remove('open'); document.getElementById('sheet-overlay').classList.remove('show'); };
 
 window.exportCSV = function() {
-  if (!trees.length) { showToast('No data', 'err'); return; }
+  if (!trees.length) return;
   const csv = ['tree_id,stratum,patch,lat,lon,species,spiders,bark,web,notes,photo_count']
     .concat(trees.map(t => [t.id,t.str,t.pt,t.lat,t.lon,t.sp,t.cnt,t.bark||'',t.web||'',`"${(t.nts||'').replace(/"/g,'""')}"`,(t.photos||[]).length].join(',')))
     .join('\n');
@@ -1447,42 +1480,20 @@ window.exportCSV = function() {
   a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'}));
   a.download = 'spider_data.csv';
   a.click();
-  showToast('📊 Downloaded');
 };
 
 window.exportHTML = function() {
-  if (!trees.length && !strata.length) { showToast('Add data first', 'err'); return; }
+  if (!trees.length && !strata.length) return;
   const title = document.getElementById('exp-title').value.trim() || 'Spider Map';
   const author = document.getElementById('exp-author').value.trim() || '';
   const inst = document.getElementById('exp-inst').value.trim() || '';
-  const stats = {tot:trees.length, sp:trees.reduce((s,t)=>s+(t.cnt||0),0), inf:trees.filter(t=>t.cnt>0).length};
+  const stats = {tot:trees.length, sp:trees.reduce((s,t)=>s+(t.cnt||0),0)};
   const data = JSON.stringify({strata,patches,trees}).replace(/<\/script>/g,'<\\/script>');
-  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"><\/script>
-<style>*{margin:0;padding:0;box-sizing:border-box}html,body{width:100vw;height:100vh;overflow:hidden}body{font-family:sans-serif;background:#050810;color:#f8fafc;display:flex;flex-direction:column}.h{padding:14px 20px;background:linear-gradient(135deg,#0d1424,#1e293b);border-bottom:1px solid #1f293b;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}.hl{display:flex;align-items:center;gap:12px}.logo{width:42px;height:42px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px}h1{font-size:17px;font-weight:800}.h p{font-size:11px;color:#94a3b8;margin-top:2px}.stats{display:flex;gap:8px}.sp{background:#1e293b;border:1px solid #334155;border-radius:9px;padding:5px 11px;text-align:center}.sp b{display:block;font-size:15px;color:#3b82f6}.sp span{font-size:9px;color:#94a3b8}#map{flex:1}.leaflet-popup-content-wrapper{background:#0d1424!important;color:#f8fafc!important;border-radius:14px!important}.pop-img{width:100%;height:160px;object-fit:cover}</style>
-</head><body>
-<div class="h"><div class="hl"><div class="logo">🕷️</div><div><h1>${title}</h1><p>${author}${inst?' · '+inst:''}</p></div></div>
-<div class="stats"><div class="sp"><b>${stats.tot}</b><span>Trees</span></div><div class="sp"><b>${stats.sp}</b><span>Spiders</span></div></div></div>
-<div id="map"></div>
-<script>
-const data=${data};
-const map=L.map('map').setView([28.9456,77.1015],17);
-L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',{maxZoom:22}).addTo(map);
-function tC(n){if(n===0)return'#9e9e9e';if(n===1)return'#ffb300';if(n===2)return'#ef6c00';if(n<=4)return'#d32f2f';return'#7b1fa2';}
-data.strata.forEach(s=>L.polygon(s.corners,{color:s.color,fillColor:s.color,fillOpacity:0.12,weight:3}).addTo(map).bindPopup('<b>Stratum '+s.num+': '+s.name+'</b>'));
-data.patches.forEach(p=>L.polygon(p.corners,{color:p.color,fillColor:p.color,fillOpacity:0.35,weight:2.5}).addTo(map).bindPopup('<b>Patch '+p.id+'</b>'));
-const layers=[];data.trees.forEach(t=>{const c=tC(t.cnt);const m=L.circleMarker([t.lat,t.lon],{radius:8,color:c,fillColor:c,fillOpacity:0.9}).addTo(map);
-const ph=(t.photos&&t.photos.length)?'<img class="pop-img" src="'+t.photos[0]+'">':'';
-m.bindPopup(ph+'<div style="padding:12px;width:230px"><b>'+t.id+'</b> · '+t.sp+'<br>Spiders: '+t.cnt+(t.nts?'<br><i>"'+t.nts+'"</i>':'')+'</div>');layers.push(m);});
-data.strata.forEach(s=>layers.push(L.polygon(s.corners)));
-if(layers.length)setTimeout(()=>map.fitBounds(L.featureGroup(layers).getBounds(),{padding:[50,50]}),300);
-<\/script></body></html>`;
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"><\/script><style>*{margin:0;padding:0;box-sizing:border-box}html,body{width:100vw;height:100vh;overflow:hidden}body{font-family:sans-serif;background:#050810;color:#f8fafc;display:flex;flex-direction:column}.h{padding:14px 20px;background:#0d1424;border-bottom:1px solid #1f293b;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}.logo{width:42px;height:42px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px}#map{flex:1}.leaflet-popup-content-wrapper{background:#0d1424!important;color:#f8fafc!important;border-radius:14px!important}.pop-img{width:100%;height:160px;object-fit:cover}</style></head><body><div class="h"><div style="display:flex;align-items:center;gap:12px"><div class="logo">🕷️</div><div><h1 style="font-size:17px;font-weight:800">${title}</h1><p style="font-size:11px;color:#94a3b8;margin-top:2px">${author}${inst?' · '+inst:''}</p></div></div><div style="display:flex;gap:8px"><div style="background:#1e293b;border:1px solid #334155;border-radius:9px;padding:5px 11px;text-align:center"><b style="display:block;font-size:15px;color:#3b82f6">${stats.tot}</b><span style="font-size:9px;color:#94a3b8">Trees</span></div><div style="background:#1e293b;border:1px solid #334155;border-radius:9px;padding:5px 11px;text-align:center"><b style="display:block;font-size:15px;color:#3b82f6">${stats.sp}</b><span style="font-size:9px;color:#94a3b8">Spiders</span></div></div></div><div id="map"></div><script>const data=${data};const map=L.map('map').setView([28.9456,77.1015],17);L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',{maxZoom:22}).addTo(map);function tC(n){if(n===0)return'#9e9e9e';if(n===1)return'#ffb300';if(n===2)return'#ef6c00';if(n<=4)return'#d32f2f';return'#7b1fa2';}data.strata.forEach(s=>L.polygon(s.corners,{color:s.color,fillColor:s.color,fillOpacity:0.12,weight:3}).addTo(map).bindPopup('<b>Stratum '+s.num+': '+s.name+'</b>'));data.patches.forEach(p=>L.polygon(p.corners,{color:p.color,fillColor:p.color,fillOpacity:0.35,weight:2.5}).addTo(map).bindPopup('<b>Patch '+p.id+'</b>'));const layers=[];data.trees.forEach(t=>{const c=tC(t.cnt);const m=L.circleMarker([t.lat,t.lon],{radius:8,color:c,fillColor:c,fillOpacity:0.9}).addTo(map);const ph=(t.photos&&t.photos.length)?'<img class="pop-img" src="'+t.photos[0]+'">':'';m.bindPopup(ph+'<div style="padding:12px;width:230px"><b>'+t.id+'</b> · '+t.sp+'<br>Spiders: '+t.cnt+(t.nts?'<br><i>"'+t.nts+'"</i>':'')+'</div>');layers.push(m);});data.strata.forEach(s=>layers.push(L.polygon(s.corners)));if(layers.length)setTimeout(()=>map.fitBounds(L.featureGroup(layers).getBounds(),{padding:[50,50]}),300);<\/script></body></html>`;
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([html], {type:'text/html'}));
   a.download = title.replace(/\W+/g,'_') + '.html';
   a.click();
-  showToast('📄 Downloaded');
 };
 
 let toastT = null;
