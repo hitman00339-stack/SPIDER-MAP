@@ -53,7 +53,7 @@ html,body{width:100vw;height:100vh;height:100dvh;font-family:-apple-system,Blink
 .fab:active{transform:scale(0.88)}
 .fab-gps{background:linear-gradient(135deg,#10b981,#059669);color:white}
 .fab-fit{background:rgba(13,20,36,0.96);border:1.5px solid var(--bdr2);color:var(--txt2);font-size:17px}
-.fab-track{background:linear-gradient(135deg,#7c3aed,#6d28d9);color:white;font-size:16px;position:relative}
+.fab-track{background:linear-gradient(135deg,#7c3aed,#6d28d9);color:white;font-size:16px}
 .fab-track.on{animation:trackPulse 1.5s infinite;box-shadow:0 0 20px rgba(124,58,237,0.7)}
 @keyframes trackPulse{0%,100%{box-shadow:0 0 18px rgba(124,58,237,0.6)}50%{box-shadow:0 0 28px rgba(124,58,237,0.95)}}
 
@@ -105,11 +105,15 @@ textarea{resize:none;min-height:60px}
 .btn-half{flex:1}
 .btn-row{display:flex;gap:7px}
 
+.edit-banner{background:linear-gradient(135deg,rgba(245,158,11,0.15),rgba(217,119,6,0.15));border:1.5px solid rgba(245,158,11,0.4);border-radius:11px;padding:10px 13px;font-size:12px;color:#fbbf24;display:none;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.edit-banner.show{display:flex}
+.edit-banner b{color:#fde68a}
+.edit-cancel-btn{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);color:white;border-radius:6px;padding:4px 10px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit}
+
 .info-box{border-radius:10px;padding:11px 13px;font-size:12px;line-height:1.6}
 .info-blue{background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.25);color:#93c5fd}
 .info-green{background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);color:#6ee7b7}
 .info-yellow{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);color:#fde68a}
-.info-red{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);color:#fca5a5}
 
 .parent-sel{background:rgba(59,130,246,0.06);border:1.5px solid rgba(59,130,246,0.3);border-radius:11px;padding:11px;margin-bottom:10px}
 .parent-sel-title{font-size:10px;font-weight:700;color:#60a5fa;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
@@ -131,13 +135,15 @@ textarea{resize:none;min-height:60px}
 .swatch{width:30px;height:30px;border-radius:50%;border:2.5px solid transparent;cursor:pointer;transition:all 0.15s;box-shadow:0 2px 6px rgba(0,0,0,0.3)}
 .swatch.on{border-color:white;transform:scale(1.15);box-shadow:0 0 10px rgba(255,255,255,0.5)}
 
-.list-item{background:var(--card2);border:1px solid var(--bdr);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:9px;cursor:pointer;margin-bottom:5px}
+.list-item{background:var(--card2);border:1px solid var(--bdr);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:9px;margin-bottom:5px;cursor:pointer}
 .list-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
 .list-sq{width:11px;height:11px;border-radius:3px;flex-shrink:0}
 .list-body{flex:1;min-width:0}
 .list-title{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .list-sub{font-size:10px;color:var(--muted);margin-top:1px}
-.del-btn{background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.25);color:var(--red);border-radius:7px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0;min-height:32px}
+.list-actions{display:flex;gap:5px;flex-shrink:0}
+.edit-btn{background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);color:#60a5fa;border-radius:7px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;min-height:32px}
+.del-btn{background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.25);color:var(--red);border-radius:7px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;min-height:32px}
 
 #toast{position:fixed;bottom:72px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--card);border:1px solid var(--bdr2);border-radius:12px;padding:11px 18px;font-size:12px;font-weight:600;color:var(--txt);z-index:9999;opacity:0;pointer-events:none;transition:all 0.3s;display:flex;align-items:center;gap:8px;max-width:calc(100vw - 32px);box-shadow:0 10px 30px rgba(0,0,0,0.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -225,6 +231,10 @@ textarea{resize:none;min-height:60px}
   <div class="sheet-content">
 
     <div class="tab-pane" id="tab-strata">
+      <div class="edit-banner" id="edit-s-banner">
+        <span><b>✏️ Editing:</b> <span id="edit-s-id"></span></span>
+        <button class="edit-cancel-btn" onclick="cancelEdit('s')">Cancel</button>
+      </div>
       <div class="info-box info-blue"><b>Step 1:</b> Walk to corners → tap "📍 Add GPS Corner" → Save after 3+ corners.</div>
       <div class="card">
         <div class="card-title">📋 Stratum Info</div>
@@ -250,16 +260,20 @@ textarea{resize:none;min-height:60px}
         </div>
       </div>
       <div class="card">
-        <div class="card-title">🗺️ Draw Boundary</div>
+        <div class="card-title">🗺️ Draw Boundary <span id="redraw-note" style="font-size:9px;color:var(--yellow);margin-left:6px;display:none">(Optional — keep old corners)</span></div>
         <button class="btn btn-green" style="margin-bottom:8px" onclick="addGPSCorner()">📍 Add Corner at My GPS</button>
         <button class="btn btn-primary" onclick="startMode('strat')">🗺️ Tap Map Corners</button>
         <div id="corner-info" style="font-size:11px;color:var(--muted);margin-top:8px;text-align:center"></div>
       </div>
-      <button class="btn btn-primary" onclick="saveStrat()">💾 Save Stratum</button>
+      <button class="btn btn-primary" onclick="saveStrat()" id="save-s-btn">💾 Save Stratum</button>
       <div class="scroll-end"></div>
     </div>
 
     <div class="tab-pane" id="tab-patch">
+      <div class="edit-banner" id="edit-p-banner">
+        <span><b>✏️ Editing:</b> <span id="edit-p-id"></span></span>
+        <button class="edit-cancel-btn" onclick="cancelEdit('p')">Cancel</button>
+      </div>
       <div class="info-box info-green"><b>Step 2:</b> Patches inside stratum. 8×8m auto-sized.</div>
       <div class="card">
         <div class="parent-sel">
@@ -284,16 +298,20 @@ textarea{resize:none;min-height:60px}
         </div>
       </div>
       <div class="card">
-        <div class="card-title">📍 Place 8×8m Patch</div>
+        <div class="card-title">📍 Place 8×8m Patch <span id="redraw-p-note" style="font-size:9px;color:var(--yellow);margin-left:6px;display:none">(Optional)</span></div>
         <button class="btn btn-green" style="margin-bottom:8px" onclick="patchAtGPS()">📍 Place at My GPS</button>
         <button class="btn btn-yellow" onclick="startMode('patch')">🗺️ Tap Map to Place</button>
         <div class="info-box info-green" id="patch-ready" style="display:none;margin-top:8px;font-size:11px">✅ Placed! Fill ID and Save.</div>
       </div>
-      <button class="btn btn-primary" onclick="savePatch()">💾 Save Patch</button>
+      <button class="btn btn-primary" onclick="savePatch()" id="save-p-btn">💾 Save Patch</button>
       <div class="scroll-end"></div>
     </div>
 
     <div class="tab-pane on" id="tab-tree">
+      <div class="edit-banner" id="edit-t-banner">
+        <span><b>✏️ Editing:</b> <span id="edit-t-id"></span></span>
+        <button class="edit-cancel-btn" onclick="cancelEdit('t')">Cancel</button>
+      </div>
       <div class="info-box info-blue"><b>Step 3:</b> Stand at tree. GPS takes 5 readings for accuracy.</div>
       <div class="card">
         <div class="parent-sel">
@@ -333,12 +351,12 @@ textarea{resize:none;min-height:60px}
         </div>
         <div class="fg"><label>Notes</label><textarea id="t-notes" placeholder="Observations..."></textarea></div>
       </div>
-      <button class="btn btn-primary" onclick="saveTree()">＋ Save Tree</button>
+      <button class="btn btn-primary" onclick="saveTree()" id="save-t-btn">＋ Save Tree</button>
       <div class="scroll-end"></div>
     </div>
 
     <div class="tab-pane" id="tab-data">
-      <div class="info-box info-yellow">💾 Auto-syncs to cloud across all devices.</div>
+      <div class="info-box info-yellow">💡 Tap ✏️ Edit on any item to modify it. All changes sync to cloud.</div>
       <div class="card">
         <div class="card-title">📐 Strata (<span id="sc-n">0</span>)</div>
         <div id="strat-list"><div class="empty-state">No strata yet</div></div>
@@ -404,21 +422,27 @@ let tileIdx=2, unsubs=[];
 let map=null, tiles=null;
 let trackingWatchId=null, myLocMarker=null, myLocCircle=null;
 
+// EDIT MODE state
+let editingStrat=null, editingPatch=null, editingTree=null;
+let originalStratCorners=null, originalPatchCorners=null;
+
 const tileNames = ['🗺️ Street','🛰️ Satellite','🌍 Hybrid'];
 
-// Convert array of corners [[lat,lon],...] to Firestore-safe object {c0:{lat,lon},...}
+// CRITICAL: Convert array to Firestore-safe object
 function cornersToObj(arr) {
   const obj = {};
-  arr.forEach((c, i) => {
-    obj['c' + i] = { lat: c[0], lon: c[1] };
-  });
+  for (let i = 0; i < arr.length; i++) {
+    obj['c' + i] = { lat: Number(arr[i][0]), lon: Number(arr[i][1]) };
+  }
   return obj;
 }
 
-// Convert Firestore object back to array
 function objToCorners(obj) {
-  if (Array.isArray(obj)) return obj; // backward compat
-  if (!obj || typeof obj !== 'object') return [];
+  if (!obj) return [];
+  if (Array.isArray(obj)) {
+    // backward compat - convert old array format
+    return obj.map(c => Array.isArray(c) ? [Number(c[0]), Number(c[1])] : [Number(c.lat), Number(c.lon)]);
+  }
   const arr = [];
   const keys = Object.keys(obj).sort((a,b) => {
     const na = parseInt(a.replace(/\D/g,'')) || 0;
@@ -427,7 +451,7 @@ function objToCorners(obj) {
   });
   keys.forEach(k => {
     if (obj[k] && typeof obj[k] === 'object' && 'lat' in obj[k]) {
-      arr.push([obj[k].lat, obj[k].lon]);
+      arr.push([Number(obj[k].lat), Number(obj[k].lon)]);
     }
   });
   return arr;
@@ -435,14 +459,7 @@ function objToCorners(obj) {
 
 function initMap() {
   if (map) return;
-  map = L.map('map', {
-    center:[28.9456,77.1015],
-    zoom:16,
-    zoomControl:true,
-    tap:true,
-    tapTolerance:20
-  });
-
+  map = L.map('map', {center:[28.9456,77.1015], zoom:16, zoomControl:true, tap:true, tapTolerance:20});
   tiles = [
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:22,attribution:'© OSM'}),
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:22,attribution:'© Esri'}),
@@ -450,7 +467,6 @@ function initMap() {
   ];
   tiles[tileIdx].addTo(map);
   map.on('click', mapClickHandler);
-
   setTimeout(() => {
     map.invalidateSize(true);
     document.getElementById('map-loading').classList.add('hide');
@@ -458,7 +474,6 @@ function initMap() {
   }, 100);
   setTimeout(() => map.invalidateSize(true), 500);
   setTimeout(() => map.invalidateSize(true), 1000);
-
   setTimeout(() => toggleTracking(), 1500);
 }
 
@@ -478,14 +493,10 @@ document.getElementById('signin-btn').onclick = async () => {
 onAuthStateChanged(auth, user => {
   if (user) {
     uid = user.uid;
-    console.log('User signed in:', uid);
     document.getElementById('auth-overlay').style.display='none';
     document.getElementById('app').style.display='block';
     document.getElementById('user-avatar').src = user.photoURL || '';
-    setTimeout(() => {
-      initMap();
-      startSync();
-    }, 100);
+    setTimeout(() => { initMap(); startSync(); }, 100);
     showToast('✅ ' + (user.displayName||'User').split(' ')[0]);
   } else {
     uid = null;
@@ -507,81 +518,62 @@ window.confirmSignOut = async () => {
 };
 
 function startSync() {
-  if (!uid) { console.error('No UID for sync'); return; }
-  console.log('Starting sync for:', uid);
+  if (!uid) return;
   unsubs.forEach(u => u());
   unsubs = [];
 
-  try {
-    unsubs.push(onSnapshot(collection(db, 'users', uid, 'strata'), snap => {
-      sLayers.forEach(l => map.removeLayer(l));
-      sLayers = []; strata = [];
-      snap.forEach(d => {
-        const data = d.data();
-        const corners = objToCorners(data.corners);
-        if (corners.length < 3) return;
-        const s = {id:d.id, ...data, corners};
-        strata.push(s);
-        const poly = L.polygon(corners, {color:s.color, fillColor:s.color, fillOpacity:0.12, weight:3, dashArray:'10,5'})
-          .addTo(map)
-          .bindPopup(`<div style="padding:8px"><b style="color:${s.color}">Stratum ${s.num}</b><br>${s.name}<br><span style="font-size:11px;color:#666">ID: ${s.id}</span></div>`);
-        sLayers.push(poly);
-      });
-      console.log('Loaded strata:', strata.length);
-      updateUI();
-      flashSaved();
-    }, err => {
-      console.error('STRATA SYNC ERROR:', err);
-      showToast('Sync error: ' + err.code, 'err');
-    }));
+  unsubs.push(onSnapshot(collection(db, 'users', uid, 'strata'), snap => {
+    sLayers.forEach(l => map.removeLayer(l));
+    sLayers = []; strata = [];
+    snap.forEach(d => {
+      const data = d.data();
+      const corners = objToCorners(data.corners);
+      if (corners.length < 3) return;
+      const s = {id:d.id, num:data.num, name:data.name, color:data.color, corners};
+      strata.push(s);
+      const poly = L.polygon(corners, {color:s.color, fillColor:s.color, fillOpacity:0.12, weight:3, dashArray:'10,5'})
+        .addTo(map)
+        .bindPopup(`<div style="padding:8px"><b style="color:${s.color}">Stratum ${s.num}</b><br>${s.name}<br><span style="font-size:11px;color:#666">ID: ${s.id}</span></div>`);
+      sLayers.push(poly);
+    });
+    updateUI();
+    flashSaved();
+  }, err => { console.error('STRATA SYNC:', err); showToast('Sync: '+err.code, 'err'); }));
 
-    unsubs.push(onSnapshot(collection(db, 'users', uid, 'patches'), snap => {
-      pLayers.forEach(l => map.removeLayer(l));
-      pLayers = []; patches = [];
-      snap.forEach(d => {
-        const data = d.data();
-        const corners = objToCorners(data.corners);
-        if (corners.length < 3) return;
-        const p = {id:d.id, ...data, corners};
-        patches.push(p);
-        const poly = L.polygon(corners, {color:p.color, fillColor:p.color, fillOpacity:0.35, weight:2.5})
-          .addTo(map)
-          .bindPopup(`<div style="padding:8px"><b style="color:${p.color}">Patch ${p.id}</b><br>8×8m · Stratum ${p.str}${p.name?'<br>'+p.name:''}</div>`);
-        pLayers.push(poly);
-      });
-      console.log('Loaded patches:', patches.length);
-      updateUI();
-      flashSaved();
-    }, err => {
-      console.error('PATCHES SYNC ERROR:', err);
-      showToast('Sync error: ' + err.code, 'err');
-    }));
+  unsubs.push(onSnapshot(collection(db, 'users', uid, 'patches'), snap => {
+    pLayers.forEach(l => map.removeLayer(l));
+    pLayers = []; patches = [];
+    snap.forEach(d => {
+      const data = d.data();
+      const corners = objToCorners(data.corners);
+      if (corners.length < 3) return;
+      const p = {id:d.id, str:data.str, name:data.name, color:data.color, corners};
+      patches.push(p);
+      const poly = L.polygon(corners, {color:p.color, fillColor:p.color, fillOpacity:0.35, weight:2.5})
+        .addTo(map)
+        .bindPopup(`<div style="padding:8px"><b style="color:${p.color}">Patch ${p.id}</b><br>8×8m · Stratum ${p.str}${p.name?'<br>'+p.name:''}</div>`);
+      pLayers.push(poly);
+    });
+    updateUI();
+    flashSaved();
+  }, err => { console.error('PATCHES SYNC:', err); }));
 
-    unsubs.push(onSnapshot(collection(db, 'users', uid, 'trees'), snap => {
-      tMkrs.forEach(m => map.removeLayer(m));
-      tMkrs = []; trees = [];
-      snap.forEach(d => {
-        const t = {id:d.id, ...d.data()};
-        trees.push(t);
-        const col = tColor(t.cnt);
-        const m = L.circleMarker([t.lat, t.lon], {
-          radius: tRad(t.cnt), color:col, fillColor:col, fillOpacity:0.9, weight:2.5
-        }).addTo(map)
-          .bindTooltip(`<b>${t.sp}</b> · ${t.cnt} spider${t.cnt!==1?'s':''}`, {sticky:true})
-          .bindPopup(buildTreePopup(t));
-        tMkrs.push(m);
-      });
-      console.log('Loaded trees:', trees.length);
-      updateUI();
-      flashSaved();
-    }, err => {
-      console.error('TREES SYNC ERROR:', err);
-      showToast('Sync error: ' + err.code, 'err');
-    }));
-  } catch(e) {
-    console.error('Sync setup error:', e);
-    showToast('Sync setup failed: ' + e.message, 'err');
-  }
+  unsubs.push(onSnapshot(collection(db, 'users', uid, 'trees'), snap => {
+    tMkrs.forEach(m => map.removeLayer(m));
+    tMkrs = []; trees = [];
+    snap.forEach(d => {
+      const t = {id:d.id, ...d.data()};
+      trees.push(t);
+      const col = tColor(t.cnt);
+      const m = L.circleMarker([t.lat, t.lon], {radius: tRad(t.cnt), color:col, fillColor:col, fillOpacity:0.9, weight:2.5})
+        .addTo(map)
+        .bindTooltip(`<b>${t.sp}</b> · ${t.cnt} spider${t.cnt!==1?'s':''}`, {sticky:true})
+        .bindPopup(buildTreePopup(t));
+      tMkrs.push(m);
+    });
+    updateUI();
+    flashSaved();
+  }, err => { console.error('TREES SYNC:', err); }));
 }
 
 function buildTreePopup(t) {
@@ -666,9 +658,8 @@ function mapClickHandler(e) {
 window.toggleTracking = () => {
   const btn = document.getElementById('track-fab');
   const info = document.getElementById('gps-live-info');
-  if (trackingWatchId) {
-    stopTracking();
-  } else {
+  if (trackingWatchId) { stopTracking(); }
+  else {
     if (!navigator.geolocation) { showToast('GPS not supported', 'err'); return; }
     btn.classList.add('on');
     info.classList.add('show');
@@ -683,26 +674,20 @@ window.toggleTracking = () => {
         if (myLocMarker) map.removeLayer(myLocMarker);
         if (myLocCircle) map.removeLayer(myLocCircle);
         myLocCircle = L.circle([lat,lon], {radius: acc, color:'#3b82f6', fillColor:'#3b82f6', fillOpacity:0.1, weight:1.5}).addTo(map);
-        const pulseIcon = L.divIcon({
+        const icon = L.divIcon({
           html: `<div style="position:relative;width:18px;height:18px"><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:14px;height:14px;background:#3b82f6;border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.5)"></div></div>`,
           iconSize: [18,18], iconAnchor: [9,9], className: ''
         });
-        myLocMarker = L.marker([lat,lon], {icon: pulseIcon, zIndexOffset: 1000}).addTo(map);
+        myLocMarker = L.marker([lat,lon], {icon, zIndexOffset: 1000}).addTo(map);
       },
-      err => {
-        console.error('Track error:', err);
-        document.getElementById('gps-acc-text').textContent = 'Failed';
-      },
+      err => { document.getElementById('gps-acc-text').textContent = 'Failed'; },
       {enableHighAccuracy:true, maximumAge:1000, timeout:10000}
     );
   }
 };
 
 function stopTracking() {
-  if (trackingWatchId) {
-    navigator.geolocation.clearWatch(trackingWatchId);
-    trackingWatchId = null;
-  }
+  if (trackingWatchId) { navigator.geolocation.clearWatch(trackingWatchId); trackingWatchId = null; }
   document.getElementById('track-fab').classList.remove('on');
   document.getElementById('gps-live-info').classList.remove('show');
   if (myLocMarker) { map.removeLayer(myLocMarker); myLocMarker = null; }
@@ -768,9 +753,7 @@ window.patchAtGPS = () => {
       if (s && !pointInPoly([lat,lon], s.corners)) {
         showToast('⚠️ Outside stratum!', 'err');
         document.getElementById('patch-warn').classList.add('show');
-      } else {
-        document.getElementById('patch-warn').classList.remove('show');
-      }
+      } else { document.getElementById('patch-warn').classList.remove('show'); }
     }
     const c = make8x8(lat, lon);
     pendingPatch = c;
@@ -792,7 +775,7 @@ window.jumpGPS = () => {
 };
 
 function addCorner(lat, lon) {
-  stratCorners.push([lat, lon]);
+  stratCorners.push([Number(lat), Number(lon)]);
   const m = L.marker([lat,lon], {icon: L.divIcon({
     html: `<div style="background:#3b82f6;color:white;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:2.5px solid white;box-shadow:0 3px 10px rgba(0,0,0,0.5)">${stratCorners.length}</div>`,
     iconSize:[24,24], iconAnchor:[12,12], className:''
@@ -814,7 +797,7 @@ window.startMode = m => {
   document.getElementById('banner-txt').textContent =
     m === 'tree' ? '🌳 Tap where tree is' :
     m === 'strat' ? '📐 Tap stratum corners' : '⬛ Tap to place 8×8m patch';
-  if (m === 'strat') { stratCorners = []; tempMkrs.forEach(t=>map.removeLayer(t)); tempMkrs=[]; if(previewPoly){map.removeLayer(previewPoly);previewPoly=null;} }
+  if (m === 'strat') { stratCorners = []; tempMkrs.forEach(t=>map.removeLayer(t)); tempMkrs=[]; if(previewPoly){map.removeLayer(previewPoly);previewPoly=null;} document.getElementById('corner-info').textContent='0 corners added (need 3+)'; }
   map.getContainer().style.cursor = 'crosshair';
 };
 window.cancelMode = () => {
@@ -823,37 +806,190 @@ window.cancelMode = () => {
   if (map) map.getContainer().style.cursor = '';
 };
 
+// ═══════════════════════════════
+// EDIT FUNCTIONS
+// ═══════════════════════════════
+window.editStratum = (id) => {
+  const s = strata.find(x => x.id === id);
+  if (!s) return;
+  editingStrat = id;
+  originalStratCorners = s.corners.map(c => [Number(c[0]), Number(c[1])]);
+  stratCorners = []; // start empty, user can choose to redraw or keep
+  
+  document.getElementById('s-id').value = s.id;
+  document.getElementById('s-id').disabled = true;
+  document.getElementById('s-num').value = s.num;
+  document.getElementById('s-name').value = s.name;
+  sColor = s.color;
+  document.querySelectorAll('#s-sw .swatch').forEach(sw => {
+    sw.classList.toggle('on', sw.dataset.c === s.color);
+  });
+  
+  document.getElementById('edit-s-banner').classList.add('show');
+  document.getElementById('edit-s-id').textContent = s.id;
+  document.getElementById('save-s-btn').textContent = '💾 Update Stratum';
+  document.getElementById('redraw-note').style.display = 'inline';
+  document.getElementById('corner-info').textContent = `Keeping old ${s.corners.length} corners (or redraw to change)`;
+  
+  swTab('strata', document.querySelector('.stab[onclick*="strata"]'));
+  openSheet();
+};
+
+window.editPatch = (id) => {
+  const p = patches.find(x => x.id === id);
+  if (!p) return;
+  editingPatch = id;
+  originalPatchCorners = p.corners.map(c => [Number(c[0]), Number(c[1])]);
+  pendingPatch = null;
+  
+  document.getElementById('p-id').value = p.id;
+  document.getElementById('p-id').disabled = true;
+  document.getElementById('p-name').value = p.name || '';
+  pColor = p.color;
+  document.querySelectorAll('#p-sw .swatch').forEach(sw => {
+    sw.classList.toggle('on', sw.dataset.c === p.color);
+  });
+  selectedPatchStratum = p.str;
+  
+  document.getElementById('edit-p-banner').classList.add('show');
+  document.getElementById('edit-p-id').textContent = p.id;
+  document.getElementById('save-p-btn').textContent = '💾 Update Patch';
+  document.getElementById('redraw-p-note').style.display = 'inline';
+  
+  swTab('patch', document.querySelector('.stab[onclick*="patch"]'));
+  openSheet();
+};
+
+window.editTree = (id) => {
+  const t = trees.find(x => x.id === id);
+  if (!t) return;
+  editingTree = id;
+  
+  document.getElementById('t-id').value = t.id;
+  document.getElementById('t-id').disabled = true;
+  document.getElementById('t-sp').value = t.sp;
+  document.getElementById('t-lat').value = t.lat;
+  document.getElementById('t-lon').value = t.lon;
+  document.getElementById('t-cnt').value = t.cnt;
+  document.getElementById('t-bark').value = t.bark || '';
+  document.getElementById('t-web').value = t.web || 'None';
+  document.getElementById('t-notes').value = t.nts || '';
+  selectedTreePatch = t.pt;
+  
+  document.getElementById('edit-t-banner').classList.add('show');
+  document.getElementById('edit-t-id').textContent = t.id;
+  document.getElementById('save-t-btn').textContent = '💾 Update Tree';
+  
+  swTab('tree', document.querySelector('.stab[onclick*="tree"]'));
+  openSheet();
+};
+
+window.cancelEdit = (type) => {
+  if (type === 's') {
+    editingStrat = null;
+    originalStratCorners = null;
+    document.getElementById('s-id').disabled = false;
+    document.getElementById('edit-s-banner').classList.remove('show');
+    document.getElementById('save-s-btn').textContent = '💾 Save Stratum';
+    document.getElementById('redraw-note').style.display = 'none';
+    clearStratForm();
+  } else if (type === 'p') {
+    editingPatch = null;
+    originalPatchCorners = null;
+    document.getElementById('p-id').disabled = false;
+    document.getElementById('edit-p-banner').classList.remove('show');
+    document.getElementById('save-p-btn').textContent = '💾 Save Patch';
+    document.getElementById('redraw-p-note').style.display = 'none';
+    clearPatchForm();
+  } else if (type === 't') {
+    editingTree = null;
+    document.getElementById('t-id').disabled = false;
+    document.getElementById('edit-t-banner').classList.remove('show');
+    document.getElementById('save-t-btn').textContent = '＋ Save Tree';
+    clearTreeForm();
+  }
+};
+
+function clearStratForm() {
+  document.getElementById('s-id').value = '';
+  document.getElementById('s-name').value = '';
+  document.getElementById('s-num').value = '';
+  document.getElementById('corner-info').textContent = '';
+  stratCorners = [];
+  tempMkrs.forEach(m => map.removeLayer(m)); tempMkrs = [];
+  if (previewPoly) { map.removeLayer(previewPoly); previewPoly = null; }
+}
+
+function clearPatchForm() {
+  document.getElementById('p-id').value = '';
+  document.getElementById('p-name').value = '';
+  document.getElementById('patch-ready').style.display = 'none';
+  pendingPatch = null;
+  if (previewPoly) { map.removeLayer(previewPoly); previewPoly = null; }
+}
+
+function clearTreeForm() {
+  ['t-id','t-sp','t-lat','t-lon','t-notes'].forEach(i => document.getElementById(i).value = '');
+  document.getElementById('t-cnt').value = '0';
+  document.getElementById('t-bark').value = '';
+  document.getElementById('t-web').value = 'None';
+  document.getElementById('gps-result').style.display = 'none';
+}
+
+// ═══════════════════════════════
+// SAVE FUNCTIONS WITH EDIT SUPPORT
+// ═══════════════════════════════
 window.saveStrat = async () => {
-  console.log('=== SAVE STRAT ===');
   if (!uid) { showToast('❌ Not signed in!', 'err'); return; }
   const id = document.getElementById('s-id').value.trim();
   const num = document.getElementById('s-num').value.trim() || '1';
   const name = document.getElementById('s-name').value.trim();
   if (!id) { showToast('Enter Stratum ID', 'err'); return; }
   if (!name) { showToast('Enter description', 'err'); return; }
-  if (stratCorners.length < 3) { showToast('Need 3+ corners', 'err'); return; }
+
+  // EDIT MODE: use new corners if drawn, else keep originals
+  let cornersToSave;
+  if (editingStrat) {
+    cornersToSave = stratCorners.length >= 3 ? stratCorners : originalStratCorners;
+  } else {
+    if (stratCorners.length < 3) { showToast('Need 3+ corners', 'err'); return; }
+    cornersToSave = stratCorners;
+  }
 
   try {
+    // Force into pure object (NO arrays inside)
+    const cornersObj = {};
+    for (let i = 0; i < cornersToSave.length; i++) {
+      cornersObj['c' + i] = {
+        lat: Number(cornersToSave[i][0]),
+        lon: Number(cornersToSave[i][1])
+      };
+    }
+
     const data = {
       num: String(num),
-      name: name,
-      color: sColor,
-      cornerCount: stratCorners.length,
-      corners: cornersToObj(stratCorners),
+      name: String(name),
+      color: String(sColor),
+      cornerCount: cornersToSave.length,
+      corners: cornersObj,
       ts: serverTimestamp()
     };
-    console.log('Saving stratum:', id, data);
+    
+    console.log('Saving stratum. Data type check:', typeof data.corners, 'Sample:', data.corners.c0);
+    
     await setDoc(doc(db, 'users', uid, 'strata', id), data);
-    console.log('✅ SAVED');
 
     tempMkrs.forEach(m => map.removeLayer(m)); tempMkrs = [];
     if (previewPoly) { map.removeLayer(previewPoly); previewPoly = null; }
     stratCorners = [];
-    document.getElementById('s-id').value = '';
-    document.getElementById('s-name').value = '';
-    document.getElementById('s-num').value = '';
-    document.getElementById('corner-info').textContent = '';
-    showToast('✅ Stratum saved to cloud');
+    
+    if (editingStrat) {
+      cancelEdit('s');
+      showToast('✅ Stratum updated');
+    } else {
+      clearStratForm();
+      showToast('✅ Stratum saved to cloud');
+    }
   } catch(e) {
     console.error('SAVE ERROR:', e);
     showToast('Save failed: ' + (e.code || e.message), 'err');
@@ -861,32 +997,49 @@ window.saveStrat = async () => {
 };
 
 window.savePatch = async () => {
-  console.log('=== SAVE PATCH ===');
   if (!uid) { showToast('❌ Not signed in!', 'err'); return; }
   const id = document.getElementById('p-id').value.trim();
   if (!id) { showToast('Enter Patch ID', 'err'); return; }
   if (!selectedPatchStratum) { showToast('Select parent stratum!', 'err'); return; }
-  if (!pendingPatch) { showToast('Place patch on map first!', 'err'); return; }
+
+  let cornersToSave;
+  if (editingPatch) {
+    cornersToSave = pendingPatch || originalPatchCorners;
+  } else {
+    if (!pendingPatch) { showToast('Place patch on map first!', 'err'); return; }
+    cornersToSave = pendingPatch;
+  }
 
   try {
+    const cornersObj = {};
+    for (let i = 0; i < cornersToSave.length; i++) {
+      cornersObj['c' + i] = {
+        lat: Number(cornersToSave[i][0]),
+        lon: Number(cornersToSave[i][1])
+      };
+    }
+
     const data = {
-      str: selectedPatchStratum,
-      name: document.getElementById('p-name').value.trim() || '',
-      color: pColor,
+      str: String(selectedPatchStratum),
+      name: String(document.getElementById('p-name').value.trim() || ''),
+      color: String(pColor),
       cornerCount: 4,
-      corners: cornersToObj(pendingPatch),
+      corners: cornersObj,
       ts: serverTimestamp()
     };
-    console.log('Saving patch:', id, data);
+    
     await setDoc(doc(db, 'users', uid, 'patches', id), data);
-    console.log('✅ Patch saved');
 
     if (previewPoly) { map.removeLayer(previewPoly); previewPoly = null; }
     pendingPatch = null;
-    document.getElementById('p-id').value = '';
-    document.getElementById('p-name').value = '';
-    document.getElementById('patch-ready').style.display = 'none';
-    showToast('✅ Patch saved');
+    
+    if (editingPatch) {
+      cancelEdit('p');
+      showToast('✅ Patch updated');
+    } else {
+      clearPatchForm();
+      showToast('✅ Patch saved');
+    }
   } catch(e) {
     console.error('PATCH SAVE ERROR:', e);
     showToast('Save failed: ' + (e.code || e.message), 'err');
@@ -894,7 +1047,6 @@ window.savePatch = async () => {
 };
 
 window.saveTree = async () => {
-  console.log('=== SAVE TREE ===');
   if (!uid) { showToast('❌ Not signed in!', 'err'); return; }
   const id = document.getElementById('t-id').value.trim();
   const sp = document.getElementById('t-sp').value.trim();
@@ -912,23 +1064,27 @@ window.saveTree = async () => {
 
   try {
     const data = {
-      sp: sp, lat: lat, lon: lon,
+      sp: String(sp),
+      lat: Number(lat),
+      lon: Number(lon),
       cnt: parseInt(document.getElementById('t-cnt').value) || 0,
-      bark: document.getElementById('t-bark').value || '',
-      web: document.getElementById('t-web').value || 'None',
-      nts: document.getElementById('t-notes').value.trim() || '',
-      pt: selectedTreePatch,
-      str: patch ? patch.str : '',
+      bark: String(document.getElementById('t-bark').value || ''),
+      web: String(document.getElementById('t-web').value || 'None'),
+      nts: String(document.getElementById('t-notes').value.trim() || ''),
+      pt: String(selectedTreePatch),
+      str: String(patch ? patch.str : ''),
       ts: serverTimestamp()
     };
-    console.log('Saving tree:', id, data);
+    
     await setDoc(doc(db, 'users', uid, 'trees', id), data);
-    console.log('✅ Tree saved');
 
-    ['t-id','t-sp','t-lat','t-lon','t-notes'].forEach(i => document.getElementById(i).value = '');
-    document.getElementById('t-cnt').value = '0';
-    document.getElementById('gps-result').style.display = 'none';
-    showToast('✅ Tree saved');
+    if (editingTree) {
+      cancelEdit('t');
+      showToast('✅ Tree updated');
+    } else {
+      clearTreeForm();
+      showToast('✅ Tree saved');
+    }
   } catch(e) {
     console.error('TREE SAVE ERROR:', e);
     showToast('Save failed: ' + (e.code || e.message), 'err');
@@ -940,10 +1096,7 @@ window.delItem = async (type, id) => {
   try {
     await deleteDoc(doc(db, 'users', uid, type === 's' ? 'strata' : type === 'p' ? 'patches' : 'trees', id));
     showToast('Deleted');
-  } catch(e) {
-    console.error('Delete error:', e);
-    showToast('Delete failed: ' + e.code, 'err');
-  }
+  } catch(e) { showToast('Delete failed: ' + e.code, 'err'); }
 };
 
 function updateUI() {
@@ -974,24 +1127,33 @@ function updateUI() {
     </div>`).join('') : '<p style="padding:10px;color:var(--muted);font-size:11px">Create a patch first</p>';
 
   document.getElementById('strat-list').innerHTML = strata.length ? strata.map(s => `
-    <div class="list-item" onclick="focusZone('s','${s.id}')">
+    <div class="list-item">
       <div class="list-sq" style="background:${s.color}"></div>
-      <div class="list-body"><div class="list-title">S${s.num}: ${s.name}</div><div class="list-sub">${s.id} · ${patches.filter(p=>p.str===s.id).length} patches</div></div>
-      <button class="del-btn" onclick="event.stopPropagation();delItem('s','${s.id}')">✕</button>
+      <div class="list-body" onclick="focusZone('s','${s.id}')"><div class="list-title">S${s.num}: ${s.name}</div><div class="list-sub">${s.id} · ${patches.filter(p=>p.str===s.id).length} patches</div></div>
+      <div class="list-actions">
+        <button class="edit-btn" onclick="event.stopPropagation();editStratum('${s.id}')">✏️</button>
+        <button class="del-btn" onclick="event.stopPropagation();delItem('s','${s.id}')">✕</button>
+      </div>
     </div>`).join('') : '<div class="empty-state">No strata yet</div>';
 
   document.getElementById('patch-list').innerHTML = patches.length ? patches.map(p => `
-    <div class="list-item" onclick="focusZone('p','${p.id}')">
+    <div class="list-item">
       <div class="list-sq" style="background:${p.color}"></div>
-      <div class="list-body"><div class="list-title">⬛ ${p.id} · 8×8m</div><div class="list-sub">Str ${p.str} · ${trees.filter(t=>t.pt===p.id).length} trees</div></div>
-      <button class="del-btn" onclick="event.stopPropagation();delItem('p','${p.id}')">✕</button>
+      <div class="list-body" onclick="focusZone('p','${p.id}')"><div class="list-title">⬛ ${p.id} · 8×8m</div><div class="list-sub">Str ${p.str} · ${trees.filter(t=>t.pt===p.id).length} trees</div></div>
+      <div class="list-actions">
+        <button class="edit-btn" onclick="event.stopPropagation();editPatch('${p.id}')">✏️</button>
+        <button class="del-btn" onclick="event.stopPropagation();delItem('p','${p.id}')">✕</button>
+      </div>
     </div>`).join('') : '<div class="empty-state">No patches yet</div>';
 
   document.getElementById('tree-list').innerHTML = trees.length ? trees.map(t => `
-    <div class="list-item" onclick="focusTree('${t.id}')">
+    <div class="list-item">
       <div class="list-dot" style="background:${tColor(t.cnt)}"></div>
-      <div class="list-body"><div class="list-title">${t.id} — ${t.sp}</div><div class="list-sub">${t.cnt} spider · P${t.pt}</div></div>
-      <button class="del-btn" onclick="event.stopPropagation();delItem('t','${t.id}')">✕</button>
+      <div class="list-body" onclick="focusTree('${t.id}')"><div class="list-title">${t.id} — ${t.sp}</div><div class="list-sub">${t.cnt} spider · P${t.pt}</div></div>
+      <div class="list-actions">
+        <button class="edit-btn" onclick="event.stopPropagation();editTree('${t.id}')">✏️</button>
+        <button class="del-btn" onclick="event.stopPropagation();delItem('t','${t.id}')">✕</button>
+      </div>
     </div>`).join('') : '<div class="empty-state">No trees yet</div>';
 }
 
