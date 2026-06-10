@@ -9,36 +9,9 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--bg:#050810;--card:#0d1424;--card2:#172033;--bdr:#1f293b;--bdr2:#334155;--acc:#3b82f6;--acc2:#8b5cf6;--txt:#f8fafc;--txt2:#94a3b8;--muted:#475569;--green:#10b981;--yellow:#f59e0b;--red:#ef4444}
-
-html,body{
-  width:100vw;
-  height:100vh;
-  height:100dvh;
-  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-  background:var(--bg);
-  color:var(--txt);
-  overflow:hidden;
-  position:fixed;
-  top:0;
-  left:0;
-}
-
-#map{
-  position:fixed !important;
-  top:0;
-  left:0;
-  width:100vw !important;
-  height:100vh !important;
-  height:100dvh !important;
-  z-index:1;
-  background:#050810;
-}
-
-.leaflet-container{
-  width:100% !important;
-  height:100% !important;
-  background:#050810 !important;
-}
+html,body{width:100vw;height:100vh;height:100dvh;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--txt);overflow:hidden;position:fixed;top:0;left:0}
+#map{position:fixed!important;top:0;left:0;width:100vw!important;height:100vh!important;height:100dvh!important;z-index:1;background:#050810}
+.leaflet-container{width:100%!important;height:100%!important;background:#050810!important}
 
 #auth-overlay{position:fixed;inset:0;background:linear-gradient(135deg,#050810,#0d1424);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:24px;padding:20px;text-align:center}
 .auth-logo{width:80px;height:80px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:36px;box-shadow:0 8px 30px rgba(59,130,246,0.5)}
@@ -50,17 +23,17 @@ html,body{
 
 #topbar{position:fixed;top:0;left:0;right:0;height:54px;background:rgba(5,8,16,0.95);border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;padding:0 12px;z-index:1000;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
 #topbar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--acc),var(--acc2),transparent)}
-.logo{display:flex;align-items:center;gap:8px;min-width:0;flex-shrink:1}
+.logo{display:flex;align-items:center;gap:8px;min-width:0}
 .logo-ico{width:32px;height:32px;background:linear-gradient(135deg,var(--acc),var(--acc2));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
 .logo-text{min-width:0;overflow:hidden}
-.logo h1{font-size:12px;font-weight:800;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.logo p{font-size:9px;color:var(--txt2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.logo h1{font-size:12px;font-weight:800;line-height:1.1}
+.logo p{font-size:9px;color:var(--txt2)}
 .top-right{display:flex;align-items:center;gap:5px;flex-shrink:0}
-.stat-pill{background:var(--card);border:1px solid var(--bdr);border-radius:8px;padding:3px 7px;text-align:center;position:relative;min-width:36px}
+.stat-pill{background:var(--card);border:1px solid var(--bdr);border-radius:8px;padding:3px 7px;text-align:center;min-width:36px;position:relative}
 .stat-pill::before{content:'';position:absolute;top:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,var(--acc),var(--acc2))}
 .stat-pill-n{font-size:12px;font-weight:800;color:var(--acc);line-height:1}
-.stat-pill-l{font-size:7px;color:var(--muted);text-transform:uppercase;letter-spacing:0.3px}
-.user-btn{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--bdr);cursor:pointer;overflow:hidden;background:var(--card);flex-shrink:0}
+.stat-pill-l{font-size:7px;color:var(--muted);text-transform:uppercase}
+.user-btn{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--bdr);cursor:pointer;overflow:hidden;background:var(--card)}
 .user-btn img{width:100%;height:100%;object-fit:cover;display:block}
 
 #save-ind{position:fixed;top:60px;right:12px;z-index:850;background:rgba(16,185,129,0.18);border:1px solid rgba(16,185,129,0.35);color:#6ee7b7;font-size:10px;font-weight:600;padding:5px 11px;border-radius:20px;opacity:0;transition:opacity 0.3s;display:flex;align-items:center;gap:6px;pointer-events:none}
@@ -80,8 +53,18 @@ html,body{
 .fab:active{transform:scale(0.88)}
 .fab-gps{background:linear-gradient(135deg,#10b981,#059669);color:white}
 .fab-fit{background:rgba(13,20,36,0.96);border:1.5px solid var(--bdr2);color:var(--txt2);font-size:17px}
+.fab-track{background:linear-gradient(135deg,#7c3aed,#6d28d9);color:white;font-size:16px;position:relative}
+.fab-track.on{animation:trackPulse 1.5s infinite;box-shadow:0 0 20px rgba(124,58,237,0.7)}
+@keyframes trackPulse{0%,100%{box-shadow:0 0 18px rgba(124,58,237,0.6)}50%{box-shadow:0 0 28px rgba(124,58,237,0.95)}}
 
 #tile-btn{position:fixed;top:62px;left:12px;background:rgba(13,20,36,0.96);border:1.5px solid var(--bdr2);border-radius:10px;padding:8px 12px;font-size:11px;font-weight:700;color:var(--txt);z-index:900;cursor:pointer;font-family:inherit;backdrop-filter:blur(10px)}
+
+#gps-live-info{position:fixed;top:108px;left:12px;background:rgba(13,20,36,0.95);border:1px solid var(--bdr);border-radius:10px;padding:8px 12px;font-size:10px;color:var(--txt2);z-index:850;display:none;backdrop-filter:blur(10px);box-shadow:0 4px 16px rgba(0,0,0,0.5);min-width:130px}
+#gps-live-info.show{display:block}
+#gps-live-info .gps-acc-val{font-size:13px;font-weight:700;font-family:'Courier New',monospace}
+.gps-acc-val.good{color:#10b981}
+.gps-acc-val.med{color:#fbbf24}
+.gps-acc-val.bad{color:#ef4444}
 
 #open-sheet-btn{position:fixed;bottom:0;left:0;right:0;height:60px;background:rgba(5,8,16,0.97);border-top:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;gap:12px;z-index:900;cursor:pointer;backdrop-filter:blur(20px)}
 #open-sheet-btn::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--acc),var(--acc2),transparent)}
@@ -126,9 +109,14 @@ textarea{resize:none;min-height:60px}
 .info-blue{background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.25);color:#93c5fd}
 .info-green{background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);color:#6ee7b7}
 .info-yellow{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);color:#fde68a}
+.info-red{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);color:#fca5a5}
 
 .parent-sel{background:rgba(59,130,246,0.06);border:1.5px solid rgba(59,130,246,0.3);border-radius:11px;padding:11px;margin-bottom:10px}
-.parent-sel-title{font-size:10px;font-weight:700;color:#60a5fa;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px}
+.parent-sel-title{font-size:10px;font-weight:700;color:#60a5fa;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.parent-sel-count{background:rgba(59,130,246,0.2);padding:2px 8px;border-radius:10px;font-size:10px}
+.parent-list-scroll{max-height:280px;overflow-y:auto;padding-right:4px}
+.parent-list-scroll::-webkit-scrollbar{width:4px}
+.parent-list-scroll::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:2px}
 .parent-opt{background:rgba(0,0,0,0.35);border:1.5px solid var(--bdr);border-radius:9px;padding:10px 11px;cursor:pointer;display:flex;align-items:center;gap:9px;margin-bottom:5px;transition:all 0.2s}
 .parent-opt.on{border-color:var(--acc);background:rgba(59,130,246,0.15)}
 .parent-opt-dot{width:11px;height:11px;border-radius:3px;flex-shrink:0}
@@ -158,19 +146,22 @@ textarea{resize:none;min-height:60px}
 .empty-state{text-align:center;padding:20px;color:var(--muted);font-size:12px}
 .scroll-end{height:18px}
 
-/* Loading screen */
 #map-loading{position:fixed;inset:0;background:#050810;z-index:500;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;pointer-events:none;transition:opacity 0.4s}
 #map-loading.hide{opacity:0;pointer-events:none}
 .loader{width:36px;height:36px;border:3px solid var(--bdr);border-top-color:var(--acc);border-radius:50%;animation:spin 0.8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loader-text{font-size:12px;color:var(--txt2)}
 
-/* Fix leaflet controls */
-.leaflet-control-zoom{margin-top:60px !important;margin-right:12px !important}
-.leaflet-control-zoom a{background:rgba(13,20,36,0.95) !important;color:var(--txt) !important;border:1px solid var(--bdr2) !important}
-.leaflet-control-zoom a:hover{background:var(--card) !important}
-.leaflet-control-attribution{background:rgba(5,8,16,0.7) !important;color:var(--muted) !important;font-size:9px !important}
-.leaflet-control-attribution a{color:var(--txt2) !important}
+.leaflet-control-zoom{margin-top:60px!important;margin-right:12px!important}
+.leaflet-control-zoom a{background:rgba(13,20,36,0.95)!important;color:var(--txt)!important;border:1px solid var(--bdr2)!important}
+.leaflet-control-attribution{background:rgba(5,8,16,0.7)!important;color:var(--muted)!important;font-size:9px!important}
+.leaflet-control-attribution a{color:var(--txt2)!important}
+
+.my-location-marker{position:relative}
+.my-location-marker::before{content:'';position:absolute;top:50%;left:50%;width:30px;height:30px;transform:translate(-50%,-50%);background:rgba(59,130,246,0.3);border-radius:50%;animation:locationPulse 2s infinite}
+@keyframes locationPulse{0%{transform:translate(-50%,-50%) scale(0.5);opacity:1}100%{transform:translate(-50%,-50%) scale(2.5);opacity:0}}
+
+#stratum-num{min-height:50px}
 </style>
 </head>
 <body>
@@ -178,7 +169,7 @@ textarea{resize:none;min-height:60px}
 <div id="auth-overlay">
   <div class="auth-logo">🕷️</div>
   <div class="auth-title">Spider Map Pro</div>
-  <div class="auth-sub">Sign in to sync your field data across phone, laptop, and tablet. Works offline too.</div>
+  <div class="auth-sub">Sign in to sync your field data across phone, laptop, and tablet.</div>
   <button class="auth-btn" id="signin-btn">
     <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
     Continue with Google
@@ -196,9 +187,9 @@ textarea{resize:none;min-height:60px}
     <div class="logo-text"><h1>Spider Map</h1><p>Cloud Synced</p></div>
   </div>
   <div class="top-right">
-    <div class="stat-pill"><div class="stat-pill-n" id="h-trees">0</div><div class="stat-pill-l">Trees</div></div>
+    <div class="stat-pill"><div class="stat-pill-n" id="h-trees">0</div><div class="stat-pill-l">Tr</div></div>
     <div class="stat-pill"><div class="stat-pill-n" id="h-sp">0</div><div class="stat-pill-l">Sp</div></div>
-    <div class="stat-pill"><div class="stat-pill-n" id="h-z">0</div><div class="stat-pill-l">Z</div></div>
+    <div class="stat-pill"><div class="stat-pill-n" id="h-z">0</div><div class="stat-pill-l">Zn</div></div>
     <div class="user-btn" onclick="confirmSignOut()"><img id="user-avatar" src="" alt="U"></div>
   </div>
 </div>
@@ -209,7 +200,13 @@ textarea{resize:none;min-height:60px}
 
 <button id="tile-btn" onclick="cycleTile()">🛰️ Satellite</button>
 
+<div id="gps-live-info">
+  <div style="font-size:9px;color:var(--acc);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;font-weight:700">📡 Live GPS</div>
+  <div class="gps-acc-val" id="gps-acc-text">--</div>
+</div>
+
 <div id="fab-group">
+  <button class="fab fab-track" id="track-fab" onclick="toggleTracking()" title="Live Location">📡</button>
   <button class="fab fab-fit" onclick="fitAll()">🎯</button>
   <button class="fab fab-gps" onclick="jumpGPS()">📍</button>
 </div>
@@ -238,12 +235,10 @@ textarea{resize:none;min-height:60px}
       <div class="card">
         <div class="card-title">📋 Stratum Info</div>
         <div class="row">
-          <div class="fg"><label>ID</label><input id="s-id" placeholder="S1"></div>
-          <div class="fg"><label>Number</label>
-            <select id="s-num"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
-          </div>
+          <div class="fg"><label>ID (any text)</label><input id="s-id" placeholder="S1, S2, S10, etc"></div>
+          <div class="fg"><label>Number</label><input id="s-num" type="number" placeholder="1" min="1" max="999"></div>
         </div>
-        <div class="fg"><label>Description</label><input id="s-name" placeholder="Academic Block"></div>
+        <div class="fg"><label>Description / Name</label><input id="s-name" placeholder="Academic Block / Library Zone"></div>
       </div>
       <div class="card">
         <div class="card-title">🎨 Color</div>
@@ -254,6 +249,10 @@ textarea{resize:none;min-height:60px}
           <div class="swatch" style="background:#ef4444" data-c="#ef4444" onclick="pickC(this,'s')"></div>
           <div class="swatch" style="background:#8b5cf6" data-c="#8b5cf6" onclick="pickC(this,'s')"></div>
           <div class="swatch" style="background:#06b6d4" data-c="#06b6d4" onclick="pickC(this,'s')"></div>
+          <div class="swatch" style="background:#f97316" data-c="#f97316" onclick="pickC(this,'s')"></div>
+          <div class="swatch" style="background:#ec4899" data-c="#ec4899" onclick="pickC(this,'s')"></div>
+          <div class="swatch" style="background:#84cc16" data-c="#84cc16" onclick="pickC(this,'s')"></div>
+          <div class="swatch" style="background:#14b8a6" data-c="#14b8a6" onclick="pickC(this,'s')"></div>
         </div>
       </div>
       <div class="card">
@@ -270,15 +269,15 @@ textarea{resize:none;min-height:60px}
       <div class="info-box info-green"><b>Step 2:</b> Patches inside stratum. 8×8m auto-sized.</div>
       <div class="card">
         <div class="parent-sel">
-          <div class="parent-sel-title">🔗 Parent Stratum</div>
-          <div id="patch-parent-opts"></div>
+          <div class="parent-sel-title">🔗 Parent Stratum <span class="parent-sel-count" id="patch-parent-count">0 available</span></div>
+          <div class="parent-list-scroll"><div id="patch-parent-opts"></div></div>
         </div>
         <div class="boundary-warning" id="patch-warn">⚠️ Place inside stratum boundary</div>
       </div>
       <div class="card">
         <div class="card-title">📋 Patch Info</div>
-        <div class="fg" style="margin-bottom:7px"><label>Patch ID</label><input id="p-id" placeholder="P1"></div>
-        <div class="fg"><label>Notes</label><input id="p-name" placeholder="Optional"></div>
+        <div class="fg" style="margin-bottom:7px"><label>Patch ID</label><input id="p-id" placeholder="P1, P2, etc"></div>
+        <div class="fg"><label>Notes (optional)</label><input id="p-name" placeholder="Optional"></div>
       </div>
       <div class="card">
         <div class="card-title">🎨 Color</div>
@@ -304,8 +303,8 @@ textarea{resize:none;min-height:60px}
       <div class="info-box info-blue"><b>Step 3:</b> Stand at tree. GPS takes 5 readings for accuracy.</div>
       <div class="card">
         <div class="parent-sel">
-          <div class="parent-sel-title">🔗 Parent Patch</div>
-          <div id="tree-parent-opts"></div>
+          <div class="parent-sel-title">🔗 Parent Patch <span class="parent-sel-count" id="tree-parent-count">0 available</span></div>
+          <div class="parent-list-scroll"><div id="tree-parent-opts"></div></div>
         </div>
         <div class="boundary-warning" id="tree-warn">⚠️ Must be inside patch</div>
       </div>
@@ -362,7 +361,7 @@ textarea{resize:none;min-height:60px}
     </div>
 
     <div class="tab-pane" id="tab-export">
-      <div class="info-box info-blue">📤 Generate standalone HTML map. Share via WhatsApp, email, anywhere.</div>
+      <div class="info-box info-blue">📤 Generate standalone HTML map. Share anywhere.</div>
       <div class="card">
         <div class="card-title">📝 Project Info</div>
         <div class="fg" style="margin-bottom:7px"><label>Title</label><input id="exp-title" placeholder="Spider Distribution at Ashoka"></div>
@@ -409,6 +408,7 @@ let selectedPatchStratum=null, selectedTreePatch=null;
 let sColor='#3b82f6', pColor='#fbbf24';
 let tileIdx=2, unsubs=[];
 let map=null, tiles=null;
+let trackingWatchId=null, myLocMarker=null, myLocCircle=null;
 
 const tileNames = ['🗺️ Street','🛰️ Satellite','🌍 Hybrid'];
 
@@ -419,20 +419,17 @@ function initMap() {
     zoom:16,
     zoomControl:true,
     tap:true,
-    tapTolerance:20,
-    preferCanvas:false
+    tapTolerance:20
   });
 
   tiles = [
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:22,attribution:'© OpenStreetMap'}),
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:22,attribution:'© OSM'}),
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:22,attribution:'© Esri'}),
     L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',{maxZoom:22,attribution:'© Google'})
   ];
   tiles[tileIdx].addTo(map);
-
   map.on('click', mapClickHandler);
 
-  // Force size recalculation multiple times to ensure map renders
   setTimeout(() => {
     map.invalidateSize(true);
     document.getElementById('map-loading').classList.add('hide');
@@ -440,16 +437,18 @@ function initMap() {
   }, 100);
   setTimeout(() => map.invalidateSize(true), 500);
   setTimeout(() => map.invalidateSize(true), 1000);
+
+  // Auto-start GPS tracking
+  setTimeout(() => toggleTracking(), 1500);
 }
 
-// Auth handler
 document.getElementById('signin-btn').onclick = async () => {
   document.getElementById('signin-btn').style.display='none';
   document.getElementById('auth-loading').style.display='block';
   try {
     await signInWithPopup(auth, new GoogleAuthProvider());
   } catch(e) {
-    console.error(e);
+    console.error('SIGN-IN ERROR:', e);
     document.getElementById('signin-btn').style.display='flex';
     document.getElementById('auth-loading').style.display='none';
     showToast('Sign-in failed: ' + e.message, 'err');
@@ -459,17 +458,15 @@ document.getElementById('signin-btn').onclick = async () => {
 onAuthStateChanged(auth, user => {
   if (user) {
     uid = user.uid;
+    console.log('User signed in:', uid, user.email);
     document.getElementById('auth-overlay').style.display='none';
     document.getElementById('app').style.display='block';
     document.getElementById('user-avatar').src = user.photoURL || '';
-
-    // Initialize map AFTER app is visible
     setTimeout(() => {
       initMap();
       startSync();
     }, 100);
-
-    showToast('✅ Signed in: ' + (user.displayName||'User').split(' ')[0]);
+    showToast('✅ ' + (user.displayName||'User').split(' ')[0]);
   } else {
     uid = null;
     document.getElementById('auth-overlay').style.display='flex';
@@ -483,62 +480,86 @@ onAuthStateChanged(auth, user => {
 
 window.confirmSignOut = async () => {
   if (confirm('Sign out? Your data stays in cloud.')) {
+    stopTracking();
     await signOut(auth);
     location.reload();
   }
 };
 
 function startSync() {
+  if (!uid) {
+    console.error('No UID for sync');
+    showToast('Not signed in', 'err');
+    return;
+  }
+  console.log('Starting sync for:', uid);
   unsubs.forEach(u => u());
   unsubs = [];
 
-  unsubs.push(onSnapshot(collection(db, 'users', uid, 'strata'), snap => {
-    sLayers.forEach(l => map.removeLayer(l));
-    sLayers = []; strata = [];
-    snap.forEach(d => {
-      const s = {id:d.id, ...d.data()};
-      strata.push(s);
-      const poly = L.polygon(s.corners, {color:s.color, fillColor:s.color, fillOpacity:0.12, weight:3, dashArray:'10,5'})
-        .addTo(map)
-        .bindPopup(`<div style="padding:8px"><b style="color:${s.color}">Stratum ${s.num}</b><br>${s.name}<br><span style="font-size:11px;color:#666">ID: ${s.id}</span></div>`);
-      sLayers.push(poly);
-    });
-    updateUI();
-    flashSaved();
-  }, err => console.error('strata:', err)));
+  try {
+    unsubs.push(onSnapshot(collection(db, 'users', uid, 'strata'), snap => {
+      sLayers.forEach(l => map.removeLayer(l));
+      sLayers = []; strata = [];
+      snap.forEach(d => {
+        const s = {id:d.id, ...d.data()};
+        strata.push(s);
+        const poly = L.polygon(s.corners, {color:s.color, fillColor:s.color, fillOpacity:0.12, weight:3, dashArray:'10,5'})
+          .addTo(map)
+          .bindPopup(`<div style="padding:8px"><b style="color:${s.color}">Stratum ${s.num}</b><br>${s.name}<br><span style="font-size:11px;color:#666">ID: ${s.id}</span></div>`);
+        sLayers.push(poly);
+      });
+      console.log('Loaded strata:', strata.length);
+      updateUI();
+      flashSaved();
+    }, err => {
+      console.error('STRATA SYNC ERROR:', err);
+      showToast('Sync error: ' + err.code, 'err');
+    }));
 
-  unsubs.push(onSnapshot(collection(db, 'users', uid, 'patches'), snap => {
-    pLayers.forEach(l => map.removeLayer(l));
-    pLayers = []; patches = [];
-    snap.forEach(d => {
-      const p = {id:d.id, ...d.data()};
-      patches.push(p);
-      const poly = L.polygon(p.corners, {color:p.color, fillColor:p.color, fillOpacity:0.35, weight:2.5})
-        .addTo(map)
-        .bindPopup(`<div style="padding:8px"><b style="color:${p.color}">Patch ${p.id}</b><br>8×8m · Stratum ${p.str}${p.name?'<br>'+p.name:''}</div>`);
-      pLayers.push(poly);
-    });
-    updateUI();
-    flashSaved();
-  }, err => console.error('patches:', err)));
+    unsubs.push(onSnapshot(collection(db, 'users', uid, 'patches'), snap => {
+      pLayers.forEach(l => map.removeLayer(l));
+      pLayers = []; patches = [];
+      snap.forEach(d => {
+        const p = {id:d.id, ...d.data()};
+        patches.push(p);
+        const poly = L.polygon(p.corners, {color:p.color, fillColor:p.color, fillOpacity:0.35, weight:2.5})
+          .addTo(map)
+          .bindPopup(`<div style="padding:8px"><b style="color:${p.color}">Patch ${p.id}</b><br>8×8m · Stratum ${p.str}${p.name?'<br>'+p.name:''}</div>`);
+        pLayers.push(poly);
+      });
+      console.log('Loaded patches:', patches.length);
+      updateUI();
+      flashSaved();
+    }, err => {
+      console.error('PATCHES SYNC ERROR:', err);
+      showToast('Sync error: ' + err.code, 'err');
+    }));
 
-  unsubs.push(onSnapshot(collection(db, 'users', uid, 'trees'), snap => {
-    tMkrs.forEach(m => map.removeLayer(m));
-    tMkrs = []; trees = [];
-    snap.forEach(d => {
-      const t = {id:d.id, ...d.data()};
-      trees.push(t);
-      const col = tColor(t.cnt);
-      const m = L.circleMarker([t.lat, t.lon], {
-        radius: tRad(t.cnt), color:col, fillColor:col, fillOpacity:0.9, weight:2.5
-      }).addTo(map)
-        .bindTooltip(`<b>${t.sp}</b> · ${t.cnt} spider${t.cnt!==1?'s':''}`, {sticky:true})
-        .bindPopup(buildTreePopup(t));
-      tMkrs.push(m);
-    });
-    updateUI();
-    flashSaved();
-  }, err => console.error('trees:', err)));
+    unsubs.push(onSnapshot(collection(db, 'users', uid, 'trees'), snap => {
+      tMkrs.forEach(m => map.removeLayer(m));
+      tMkrs = []; trees = [];
+      snap.forEach(d => {
+        const t = {id:d.id, ...d.data()};
+        trees.push(t);
+        const col = tColor(t.cnt);
+        const m = L.circleMarker([t.lat, t.lon], {
+          radius: tRad(t.cnt), color:col, fillColor:col, fillOpacity:0.9, weight:2.5
+        }).addTo(map)
+          .bindTooltip(`<b>${t.sp}</b> · ${t.cnt} spider${t.cnt!==1?'s':''}`, {sticky:true})
+          .bindPopup(buildTreePopup(t));
+        tMkrs.push(m);
+      });
+      console.log('Loaded trees:', trees.length);
+      updateUI();
+      flashSaved();
+    }, err => {
+      console.error('TREES SYNC ERROR:', err);
+      showToast('Sync error: ' + err.code, 'err');
+    }));
+  } catch(e) {
+    console.error('Sync setup error:', e);
+    showToast('Sync setup failed: ' + e.message, 'err');
+  }
 }
 
 function buildTreePopup(t) {
@@ -596,7 +617,7 @@ function mapClickHandler(e) {
     document.getElementById('t-lon').value = lon.toFixed(6);
     document.getElementById('tree-warn').classList.remove('show');
     cancelMode(); openSheet();
-    showToast('📍 Tree location set');
+    showToast('📍 Location set');
     return;
   }
   if (mode === 'strat') { addCorner(lat, lon); return; }
@@ -616,8 +637,61 @@ function mapClickHandler(e) {
     document.getElementById('patch-ready').style.display = 'block';
     document.getElementById('patch-warn').classList.remove('show');
     cancelMode(); openSheet();
-    showToast('✅ 8×8m patch placed');
+    showToast('✅ Patch placed');
   }
+}
+
+// LIVE GPS TRACKING
+window.toggleTracking = () => {
+  const btn = document.getElementById('track-fab');
+  const info = document.getElementById('gps-live-info');
+  if (trackingWatchId) {
+    stopTracking();
+  } else {
+    if (!navigator.geolocation) { showToast('GPS not supported', 'err'); return; }
+    btn.classList.add('on');
+    info.classList.add('show');
+    document.getElementById('gps-acc-text').textContent = 'Searching...';
+    showToast('📡 Live tracking ON');
+    trackingWatchId = navigator.geolocation.watchPosition(
+      pos => {
+        const lat = pos.coords.latitude, lon = pos.coords.longitude, acc = pos.coords.accuracy;
+        const accEl = document.getElementById('gps-acc-text');
+        accEl.textContent = `±${Math.round(acc)}m`;
+        accEl.className = 'gps-acc-val ' + (acc < 10 ? 'good' : acc < 30 ? 'med' : 'bad');
+
+        if (myLocMarker) map.removeLayer(myLocMarker);
+        if (myLocCircle) map.removeLayer(myLocCircle);
+
+        myLocCircle = L.circle([lat,lon], {
+          radius: acc, color: '#3b82f6', fillColor: '#3b82f6',
+          fillOpacity: 0.1, weight: 1.5
+        }).addTo(map);
+
+        const pulseIcon = L.divIcon({
+          html: `<div class="my-location-marker" style="position:relative;width:18px;height:18px"><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:14px;height:14px;background:#3b82f6;border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.5);z-index:2"></div></div>`,
+          iconSize: [18,18], iconAnchor: [9,9], className: ''
+        });
+        myLocMarker = L.marker([lat,lon], {icon: pulseIcon, zIndexOffset: 1000}).addTo(map);
+      },
+      err => {
+        console.error('Track error:', err);
+        document.getElementById('gps-acc-text').textContent = 'Failed';
+      },
+      {enableHighAccuracy:true, maximumAge:1000, timeout:10000}
+    );
+  }
+};
+
+function stopTracking() {
+  if (trackingWatchId) {
+    navigator.geolocation.clearWatch(trackingWatchId);
+    trackingWatchId = null;
+  }
+  document.getElementById('track-fab').classList.remove('on');
+  document.getElementById('gps-live-info').classList.remove('show');
+  if (myLocMarker) { map.removeLayer(myLocMarker); myLocMarker = null; }
+  if (myLocCircle) { map.removeLayer(myLocCircle); myLocCircle = null; }
 }
 
 window.captureGPS = () => {
@@ -689,16 +763,17 @@ window.patchAtGPS = () => {
     previewPoly = L.polygon(c, {color:pColor, fillColor:pColor, fillOpacity:0.4, weight:3, dashArray:'6,3'}).addTo(map);
     map.flyToBounds(previewPoly.getBounds(), {padding:[50,50]});
     document.getElementById('patch-ready').style.display = 'block';
-    showToast(`📍 Patch placed ±${Math.round(p.coords.accuracy)}m`);
+    showToast(`📍 Placed ±${Math.round(p.coords.accuracy)}m`);
   }, () => showToast('GPS failed', 'err'), {enableHighAccuracy:true, timeout:15000, maximumAge:0});
 };
 
 window.jumpGPS = () => {
   if (!navigator.geolocation) { showToast('GPS not supported', 'err'); return; }
   navigator.geolocation.getCurrentPosition(p => {
-    map.flyTo([p.coords.latitude, p.coords.longitude], 18);
-    L.circleMarker([p.coords.latitude, p.coords.longitude], {radius:8, color:'white', fillColor:'#3b82f6', fillOpacity:1, weight:2}).addTo(map).bindTooltip('You', {permanent:true}).openTooltip();
+    map.flyTo([p.coords.latitude, p.coords.longitude], 19);
     showToast(`📍 ±${Math.round(p.coords.accuracy)}m`);
+    // Auto-enable tracking if off
+    if (!trackingWatchId) toggleTracking();
   });
 };
 
@@ -735,74 +810,128 @@ window.cancelMode = () => {
 };
 
 window.saveStrat = async () => {
-  const id = document.getElementById('s-id').value.trim();
-  const num = document.getElementById('s-num').value;
-  const name = document.getElementById('s-name').value.trim();
-  if (!id || !name || stratCorners.length < 3) {
-    showToast('Fill ID, name, 3+ corners', 'err'); return;
+  console.log('=== SAVE STRAT ===');
+  console.log('UID:', uid);
+
+  if (!uid) {
+    showToast('❌ Not signed in! Please sign in again.', 'err');
+    return;
   }
+
+  const id = document.getElementById('s-id').value.trim();
+  const num = document.getElementById('s-num').value.trim() || '1';
+  const name = document.getElementById('s-name').value.trim();
+
+  console.log('Data:', {id, num, name, corners: stratCorners.length});
+
+  if (!id) { showToast('Enter Stratum ID', 'err'); return; }
+  if (!name) { showToast('Enter description', 'err'); return; }
+  if (stratCorners.length < 3) { showToast('Need 3+ corners (draw on map)', 'err'); return; }
+
   try {
-    await setDoc(doc(db, 'users', uid, 'strata', id), {
-      num, name, color: sColor, corners: stratCorners, ts: serverTimestamp()
-    });
+    const data = {
+      num: String(num),
+      name: name,
+      color: sColor,
+      corners: stratCorners.map(c => [c[0], c[1]]),
+      ts: serverTimestamp()
+    };
+    console.log('Saving to: users/' + uid + '/strata/' + id);
+    console.log('Data being saved:', data);
+
+    await setDoc(doc(db, 'users', uid, 'strata', id), data);
+    console.log('✅ SAVED!');
+
     tempMkrs.forEach(m => map.removeLayer(m)); tempMkrs = [];
     if (previewPoly) { map.removeLayer(previewPoly); previewPoly = null; }
     stratCorners = [];
     document.getElementById('s-id').value = '';
     document.getElementById('s-name').value = '';
+    document.getElementById('s-num').value = '';
     document.getElementById('corner-info').textContent = '';
     showToast('✅ Stratum saved');
-  } catch(e) { showToast('Save failed', 'err'); console.error(e); }
+  } catch(e) {
+    console.error('SAVE ERROR FULL:', e);
+    console.error('Error code:', e.code);
+    console.error('Error message:', e.message);
+    showToast('Save failed: ' + (e.code || e.message), 'err');
+  }
 };
 
 window.savePatch = async () => {
+  console.log('=== SAVE PATCH ===');
+  if (!uid) { showToast('❌ Not signed in!', 'err'); return; }
+
   const id = document.getElementById('p-id').value.trim();
-  if (!id || !selectedPatchStratum || !pendingPatch) {
-    showToast('Need ID + parent + placed patch', 'err'); return;
-  }
+  if (!id) { showToast('Enter Patch ID', 'err'); return; }
+  if (!selectedPatchStratum) { showToast('Select parent stratum!', 'err'); return; }
+  if (!pendingPatch) { showToast('Place patch on map first!', 'err'); return; }
+
   try {
-    await setDoc(doc(db, 'users', uid, 'patches', id), {
+    const data = {
       str: selectedPatchStratum,
-      name: document.getElementById('p-name').value.trim(),
-      color: pColor, corners: pendingPatch, ts: serverTimestamp()
-    });
+      name: document.getElementById('p-name').value.trim() || '',
+      color: pColor,
+      corners: pendingPatch.map(c => [c[0], c[1]]),
+      ts: serverTimestamp()
+    };
+    console.log('Saving patch:', data);
+    await setDoc(doc(db, 'users', uid, 'patches', id), data);
+    console.log('✅ Patch saved');
+
     if (previewPoly) { map.removeLayer(previewPoly); previewPoly = null; }
     pendingPatch = null;
     document.getElementById('p-id').value = '';
     document.getElementById('p-name').value = '';
     document.getElementById('patch-ready').style.display = 'none';
     showToast('✅ Patch saved');
-  } catch(e) { showToast('Save failed', 'err'); console.error(e); }
+  } catch(e) {
+    console.error('PATCH SAVE ERROR:', e);
+    showToast('Save failed: ' + (e.code || e.message), 'err');
+  }
 };
 
 window.saveTree = async () => {
+  console.log('=== SAVE TREE ===');
+  if (!uid) { showToast('❌ Not signed in!', 'err'); return; }
+
   const id = document.getElementById('t-id').value.trim();
   const sp = document.getElementById('t-sp').value.trim();
   const lat = parseFloat(document.getElementById('t-lat').value);
   const lon = parseFloat(document.getElementById('t-lon').value);
-  if (!id || !sp || !selectedTreePatch || isNaN(lat) || isNaN(lon)) {
-    showToast('Fill all fields + select patch', 'err'); return;
-  }
+  if (!id) { showToast('Enter Tree ID', 'err'); return; }
+  if (!sp) { showToast('Enter species', 'err'); return; }
+  if (!selectedTreePatch) { showToast('Select parent patch!', 'err'); return; }
+  if (isNaN(lat) || isNaN(lon)) { showToast('Set GPS first', 'err'); return; }
+
   const patch = patches.find(p => p.id === selectedTreePatch);
   if (patch && !pointInPoly([lat,lon], patch.corners)) {
     if (!confirm('Tree is outside patch. Save anyway?')) return;
   }
+
   try {
-    await setDoc(doc(db, 'users', uid, 'trees', id), {
-      sp, lat, lon,
+    const data = {
+      sp: sp, lat: lat, lon: lon,
       cnt: parseInt(document.getElementById('t-cnt').value) || 0,
-      bark: document.getElementById('t-bark').value,
-      web: document.getElementById('t-web').value,
-      nts: document.getElementById('t-notes').value.trim(),
+      bark: document.getElementById('t-bark').value || '',
+      web: document.getElementById('t-web').value || 'None',
+      nts: document.getElementById('t-notes').value.trim() || '',
       pt: selectedTreePatch,
       str: patch ? patch.str : '',
       ts: serverTimestamp()
-    });
+    };
+    console.log('Saving tree:', data);
+    await setDoc(doc(db, 'users', uid, 'trees', id), data);
+    console.log('✅ Tree saved');
+
     ['t-id','t-sp','t-lat','t-lon','t-notes'].forEach(i => document.getElementById(i).value = '');
     document.getElementById('t-cnt').value = '0';
     document.getElementById('gps-result').style.display = 'none';
     showToast('✅ Tree saved');
-  } catch(e) { showToast('Save failed', 'err'); console.error(e); }
+  } catch(e) {
+    console.error('TREE SAVE ERROR:', e);
+    showToast('Save failed: ' + (e.code || e.message), 'err');
+  }
 };
 
 window.delItem = async (type, id) => {
@@ -810,7 +939,10 @@ window.delItem = async (type, id) => {
   try {
     await deleteDoc(doc(db, 'users', uid, type === 's' ? 'strata' : type === 'p' ? 'patches' : 'trees', id));
     showToast('Deleted');
-  } catch(e) { showToast('Delete failed', 'err'); }
+  } catch(e) {
+    console.error('Delete error:', e);
+    showToast('Delete failed: ' + e.code, 'err');
+  }
 };
 
 function updateUI() {
@@ -821,14 +953,19 @@ function updateUI() {
   document.getElementById('sc-n').textContent = strata.length;
   document.getElementById('pc-n').textContent = patches.length;
 
+  document.getElementById('patch-parent-count').textContent = strata.length + ' available';
+  document.getElementById('tree-parent-count').textContent = patches.length + ' available';
+
+  // Show ALL strata (no limit)
   const pps = document.getElementById('patch-parent-opts');
   pps.innerHTML = strata.length ? strata.map(s => `
     <div class="parent-opt ${selectedPatchStratum===s.id?'on':''}" onclick="selectPS('${s.id}')">
       <div class="parent-opt-dot" style="background:${s.color}"></div>
-      <div class="parent-opt-title">S${s.num}: ${s.name}</div>
+      <div class="parent-opt-title">S${s.num}: ${s.name} (${s.id})</div>
       <div class="parent-opt-check">${selectedPatchStratum===s.id?'✓':''}</div>
     </div>`).join('') : '<p style="padding:10px;color:var(--muted);font-size:11px">Create a stratum first</p>';
 
+  // Show ALL patches (no limit)
   const tps = document.getElementById('tree-parent-opts');
   tps.innerHTML = patches.length ? patches.map(p => `
     <div class="parent-opt ${selectedTreePatch===p.id?'on':''}" onclick="selectTP('${p.id}')">
@@ -859,8 +996,8 @@ function updateUI() {
     </div>`).join('') : '<div class="empty-state">No trees yet</div>';
 }
 
-window.selectPS = id => { selectedPatchStratum = id; updateUI(); const s = strata.find(x=>x.id===id); if(s){const idx=strata.indexOf(s); map.flyToBounds(sLayers[idx].getBounds(),{padding:[40,40]});} showToast('Selected'); };
-window.selectTP = id => { selectedTreePatch = id; updateUI(); const p = patches.find(x=>x.id===id); if(p){const idx=patches.indexOf(p); map.flyToBounds(pLayers[idx].getBounds(),{padding:[60,60]});} showToast('Selected'); };
+window.selectPS = id => { selectedPatchStratum = id; updateUI(); const s = strata.find(x=>x.id===id); if(s){const idx=strata.indexOf(s); map.flyToBounds(sLayers[idx].getBounds(),{padding:[40,40]});} showToast('Selected: '+s.name); };
+window.selectTP = id => { selectedTreePatch = id; updateUI(); const p = patches.find(x=>x.id===id); if(p){const idx=patches.indexOf(p); map.flyToBounds(pLayers[idx].getBounds(),{padding:[60,60]});} showToast('Selected: '+p.id); };
 window.focusTree = id => { const i=trees.findIndex(t=>t.id===id); if(i>=0){closeSheet(); map.flyTo([trees[i].lat,trees[i].lon],20); setTimeout(()=>tMkrs[i].openPopup(),900);} };
 window.focusZone = (type,id) => { closeSheet(); if(type==='s'){const i=strata.findIndex(s=>s.id===id); if(i>=0)map.flyToBounds(sLayers[i].getBounds(),{padding:[30,30]});} else{const i=patches.findIndex(p=>p.id===id); if(i>=0)map.flyToBounds(pLayers[i].getBounds(),{padding:[30,30]});} };
 
@@ -933,7 +1070,7 @@ function showToast(msg, type='ok') {
   document.getElementById('t-icon').textContent = type === 'ok' ? '✅' : '❌';
   el.className = 'toast show ' + (type === 'err' ? 'err' : '');
   clearTimeout(toastT);
-  toastT = setTimeout(() => el.classList.remove('show'), 3000);
+  toastT = setTimeout(() => el.classList.remove('show'), 4000);
 }
 function flashSaved() {
   const el = document.getElementById('save-ind');
@@ -942,7 +1079,6 @@ function flashSaved() {
 }
 window.showToast = showToast;
 
-// Force map resize on window resize and orientation change
 window.addEventListener('resize', () => { if(map) setTimeout(() => map.invalidateSize(true), 100); });
 window.addEventListener('orientationchange', () => { if(map) setTimeout(() => map.invalidateSize(true), 300); });
 </script>
