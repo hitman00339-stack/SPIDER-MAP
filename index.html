@@ -163,14 +163,25 @@ input:disabled{opacity:0.5;cursor:not-allowed}
 .leaflet-control-zoom{margin-top:60px!important;margin-right:12px!important}
 .leaflet-control-zoom a{background:rgba(13,20,36,0.95)!important;color:var(--txt)!important;border:1px solid var(--bdr2)!important}
 
+/* STANDARD PIN MARKER (no photo) */
 .tree-marker-wrap{position:relative;width:36px;height:46px;cursor:pointer;transition:transform 0.2s}
 .tree-marker-wrap:hover{transform:scale(1.15)}
 .tree-marker-pin{position:absolute;top:0;left:50%;width:36px;height:36px;border-radius:50% 50% 50% 0;transform-origin:50% 100%;transform:translateX(-50%) rotate(-45deg);box-shadow:0 4px 12px rgba(0,0,0,0.5),inset 0 2px 4px rgba(255,255,255,0.3);border:2.5px solid white;display:flex;align-items:center;justify-content:center}
 .tree-marker-pin::after{content:attr(data-count);position:absolute;font-size:13px;font-weight:800;color:white;transform:rotate(45deg);text-shadow:0 1px 2px rgba(0,0,0,0.5)}
 .tree-marker-shadow{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:14px;height:5px;background:rgba(0,0,0,0.4);border-radius:50%;filter:blur(2px)}
-.tree-marker-photo-badge{position:absolute;top:-2px;right:-2px;width:18px;height:18px;background:linear-gradient(135deg,#8b5cf6,#7c3aed);border:2px solid white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:white;font-weight:700;z-index:2;box-shadow:0 2px 6px rgba(0,0,0,0.4)}
 .tree-pulse-ring{position:absolute;top:4px;left:50%;transform:translateX(-50%);width:28px;height:28px;border-radius:50%;border:2px solid currentColor;opacity:0;animation:treePulse 2s infinite;pointer-events:none}
 @keyframes treePulse{0%{transform:translateX(-50%) scale(0.5);opacity:1}100%{transform:translateX(-50%) scale(2.2);opacity:0}}
+
+/* PHOTO MARKER (with photo) */
+.tree-marker-photo-wrap{position:relative;width:60px;height:60px;cursor:pointer;transition:transform 0.2s}
+.tree-marker-photo-wrap:hover{transform:scale(1.15);z-index:1000}
+.tree-marker-photo{position:absolute;inset:0;border-radius:50%;overflow:hidden;border:3px solid white;background:#000;animation:photoMarkerPop 0.4s cubic-bezier(0.34,1.56,0.64,1)}
+.tree-marker-photo img{width:100%;height:100%;object-fit:cover;display:block}
+@keyframes photoMarkerPop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.tree-marker-count-badge{position:absolute;bottom:-3px;right:-3px;min-width:24px;height:24px;border-radius:12px;border:2.5px solid white;display:flex;align-items:center;justify-content:center;color:white;font-size:12px;font-weight:800;padding:0 6px;box-shadow:0 3px 8px rgba(0,0,0,0.5);z-index:3}
+.tree-marker-photo-count{position:absolute;top:-3px;right:-3px;min-width:22px;height:22px;background:linear-gradient(135deg,#8b5cf6,#7c3aed);border:2.5px solid white;border-radius:11px;display:flex;align-items:center;justify-content:center;color:white;font-size:10px;font-weight:800;padding:0 5px;z-index:3;box-shadow:0 2px 6px rgba(0,0,0,0.5)}
+.tree-pulse-ring-photo{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:54px;height:54px;border-radius:50%;border:2.5px solid currentColor;opacity:0;animation:treePulsePhoto 2s infinite;pointer-events:none}
+@keyframes treePulsePhoto{0%{transform:translate(-50%,-50%) scale(0.7);opacity:0.9}100%{transform:translate(-50%,-50%) scale(1.9);opacity:0}}
 
 .photo-upload-zone{border:2px dashed var(--bdr2);border-radius:11px;padding:18px;text-align:center;cursor:pointer;transition:all 0.2s;background:rgba(0,0,0,0.2)}
 .photo-upload-zone:active{border-color:var(--acc);background:rgba(59,130,246,0.05)}
@@ -385,7 +396,7 @@ input:disabled{opacity:0.5;cursor:not-allowed}
 
     <div class="tab-pane on" id="tab-tree">
       <div class="edit-banner" id="edit-t-banner"><span><b>✏️ Editing:</b> <span id="edit-t-id"></span></span><button class="edit-cancel-btn" onclick="cancelEdit('t')">Cancel</button></div>
-      <div class="info-box info-blue"><b>Step 3:</b> Photos sync to cloud across devices.</div>
+      <div class="info-box info-blue"><b>Step 3:</b> Photos appear AS the marker on map!</div>
       <div class="card">
         <div class="parent-sel">
           <div class="parent-sel-title">🔗 Parent Patch <span class="parent-sel-count" id="tree-parent-count">0</span></div>
@@ -423,12 +434,12 @@ input:disabled{opacity:0.5;cursor:not-allowed}
       </div>
 
       <div class="card">
-        <div class="card-title">📷 Photos (Max 10 per tree)</div>
+        <div class="card-title">📷 Photos (First photo becomes marker)</div>
         <label class="photo-upload-zone" for="t-photo">
           <input type="file" id="t-photo" accept="image/*" multiple onchange="handlePhotos(this)">
           <div class="icon">📸</div>
           <div class="text">Tap to Add Photos</div>
-          <div class="sub">Auto-compressed · Saved to cloud</div>
+          <div class="sub">First photo shows AS tree on map</div>
         </label>
         <div class="photo-grid" id="photo-grid"></div>
         <div id="photo-count" style="font-size:10px;color:var(--muted);text-align:center;margin-top:6px"></div>
@@ -498,7 +509,7 @@ let editingStrat=null, editingPatch=null, editingTree=null;
 let originalStratCorners=null, originalPatchCorners=null;
 let currentPhotos=[];
 let popupGalleryIdx={};
-let photoCache={}; // cache loaded photos per tree
+let photoCache={};
 
 const tileNames = ['🗺️ Street','🛰️ Satellite','🌍 Hybrid'];
 const MAX_PHOTOS = 10;
@@ -555,7 +566,6 @@ window.confirmSignOut = async () => {
   if (confirm('Sign out?')) { stopTracking(); await signOut(auth); location.reload(); }
 };
 
-// COMPRESS IMAGE TO SMALL BASE64
 async function compressToBase64(file, maxWidth=500, quality=0.55) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -601,7 +611,7 @@ function tColor(n){if(n===0)return'#9e9e9e';if(n===1)return'#ffb300';if(n===2)re
 function rgb(h){return[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)].join(',');}
 function emoji(sp){const s=(sp||'').toLowerCase();if(s.includes('neem'))return'🌿';if(s.includes('mango'))return'🥭';if(s.includes('peepal'))return'🍃';if(s.includes('banyan'))return'🌳';if(s.includes('ashoka'))return'🌲';return'🌳';}
 
-// LOAD PHOTOS FROM SUBCOLLECTION
+// LOAD PHOTOS - returns array
 async function loadTreePhotos(treeId) {
   if (photoCache[treeId]) return photoCache[treeId];
   try {
@@ -621,30 +631,68 @@ async function loadTreePhotos(treeId) {
   }
 }
 
+// CREATE TREE MARKER - photo or pin
 function createTreeMarker(t) {
   const col = tColor(t.cnt);
   const photoCount = t.photoCount || 0;
   const hasSpiders = t.cnt > 0;
+  const firstPhoto = (photoCache[t.id] && photoCache[t.id][0]) || null;
   
-  const html = `
-    <div class="tree-marker-wrap">
-      ${hasSpiders ? `<div class="tree-pulse-ring" style="color:${col}"></div>` : ''}
-      <div class="tree-marker-pin" style="background:linear-gradient(135deg,${col},${col}dd)" data-count="${t.cnt}"></div>
-      <div class="tree-marker-shadow"></div>
-      ${photoCount > 0 ? `<div class="tree-marker-photo-badge">${photoCount}</div>` : ''}
-    </div>
-  `;
+  let html, iconSize, iconAnchor;
+  
+  if (firstPhoto) {
+    // PHOTO MARKER
+    html = `
+      <div class="tree-marker-photo-wrap">
+        ${hasSpiders ? `<div class="tree-pulse-ring-photo" style="color:${col}"></div>` : ''}
+        <div class="tree-marker-photo" style="border-color:${col};box-shadow:0 4px 14px ${col}80, 0 0 0 2px white">
+          <img src="${firstPhoto}" alt="">
+        </div>
+        <div class="tree-marker-count-badge" style="background:${col}">${t.cnt}</div>
+        ${photoCount > 1 ? `<div class="tree-marker-photo-count">${photoCount}</div>` : ''}
+      </div>
+    `;
+    iconSize = [60, 60];
+    iconAnchor = [30, 30];
+  } else {
+    // STANDARD PIN
+    html = `
+      <div class="tree-marker-wrap">
+        ${hasSpiders ? `<div class="tree-pulse-ring" style="color:${col}"></div>` : ''}
+        <div class="tree-marker-pin" style="background:linear-gradient(135deg,${col},${col}dd)" data-count="${t.cnt}"></div>
+        <div class="tree-marker-shadow"></div>
+      </div>
+    `;
+    iconSize = [36, 46];
+    iconAnchor = [18, 46];
+  }
   
   const icon = L.divIcon({
     html: html,
-    iconSize: [36, 46],
-    iconAnchor: [18, 46],
+    iconSize: iconSize,
+    iconAnchor: iconAnchor,
     className: 'tree-marker-icon'
   });
   
   const marker = L.marker([t.lat, t.lon], { icon: icon, riseOnHover: true });
-  marker.bindTooltip(`<b>${t.id}</b> · ${t.sp} · ${t.cnt} spider${t.cnt!==1?'s':''}${photoCount?' · 📷'+photoCount:''}`, { sticky: true, direction: 'top', offset: [0, -40] });
+  marker.bindTooltip(`<b>${t.id}</b> · ${t.sp} · ${t.cnt} spider${t.cnt!==1?'s':''}${photoCount?' · 📷'+photoCount:''}`, { sticky: true, direction: 'top', offset: [0, firstPhoto ? -30 : -40] });
   marker.on('click', () => showTreePopup(t.id));
+  
+  // If no photo cached but exists in DB, load and update marker
+  if (!firstPhoto && photoCount > 0) {
+    loadTreePhotos(t.id).then(photos => {
+      if (photos.length > 0) {
+        const idx = trees.findIndex(x => x.id === t.id);
+        if (idx >= 0 && tMkrs[idx]) {
+          map.removeLayer(tMkrs[idx]);
+          const newMarker = createTreeMarker(t);
+          newMarker.addTo(map);
+          tMkrs[idx] = newMarker;
+        }
+      }
+    });
+  }
+  
   return marker;
 }
 
@@ -689,7 +737,7 @@ function startSync() {
     tMkrs = []; trees = [];
     snap.docChanges().forEach(ch => {
       if (ch.type === 'modified' || ch.type === 'removed') {
-        delete photoCache[ch.doc.id]; // clear cache on change
+        delete photoCache[ch.doc.id];
       }
     });
     snap.forEach(d => {
@@ -766,7 +814,6 @@ window.showTreePopup = async function(treeId) {
     </div>
   ` : '';
   
-  // Show popup immediately with loading state
   document.getElementById('popup-modal').innerHTML = `
     <button class="popup-close-btn" onclick="closePopup()">✕</button>
     <div class="popup-gallery loading"><div class="loader"></div><div class="load-txt">Loading photos...</div></div>
@@ -794,13 +841,11 @@ window.showTreePopup = async function(treeId) {
   document.getElementById('popup-overlay').classList.add('show');
   map.flyTo([t.lat, t.lon], 20, {duration: 0.8});
   
-  // Load photos
   const photos = await loadTreePhotos(treeId);
   popupGalleryIdx[t.id] = 0;
   
-  // Update gallery
   const gallery = document.querySelector('#popup-modal .popup-gallery');
-  if (!gallery) return; // popup might be closed
+  if (!gallery) return;
   
   if (photos.length > 0) {
     gallery.className = 'popup-gallery';
@@ -813,7 +858,6 @@ window.showTreePopup = async function(treeId) {
       ` : ''}
     `;
     
-    // Add thumbnails after body
     if (photos.length > 1) {
       const body = document.querySelector('#popup-modal .popup-body');
       const thumbsDiv = document.createElement('div');
@@ -911,7 +955,7 @@ window.handlePhotos = async function(input) {
   }
   
   hideUploadProgress();
-  showToast(`✅ ${files.length} photo(s) ready to save`);
+  showToast(`✅ ${files.length} photo(s) ready`);
 };
 
 function showUploadProgress(current, total) {
@@ -934,7 +978,7 @@ function renderPhotoGrid() {
       <button class="remove-x" onclick="removePhoto(${i})">✕</button>
     </div>
   `).join('');
-  document.getElementById('photo-count').textContent = currentPhotos.length ? `${currentPhotos.length}/${MAX_PHOTOS} photos` : '';
+  document.getElementById('photo-count').textContent = currentPhotos.length ? `${currentPhotos.length}/${MAX_PHOTOS} photos · First will be tree marker` : '';
 }
 
 window.removePhoto = function(i) {
@@ -942,7 +986,6 @@ window.removePhoto = function(i) {
   renderPhotoGrid();
 };
 
-// GPS
 window.toggleTracking = function() {
   const btn = document.getElementById('track-fab');
   const info = document.getElementById('gps-live-info');
@@ -1204,7 +1247,6 @@ window.saveTree = async function() {
     showUploadProgress(1, 1);
     document.getElementById('upload-text').textContent = '☁️ Saving tree data...';
     
-    // Save tree document WITHOUT photos
     await setDoc(doc(db, 'users', uid, 'trees', id), {
       sp: String(sp), lat: Number(lat), lon: Number(lon),
       cnt: parseInt(document.getElementById('t-cnt').value) || 0,
@@ -1216,21 +1258,18 @@ window.saveTree = async function() {
       ts: serverTimestamp()
     });
     
-    // Delete old photos if editing
     if (editingTree) {
       try {
         const oldPhotos = await getDocs(collection(db, 'users', uid, 'trees', id, 'photos'));
         for (const pDoc of oldPhotos.docs) {
           await deleteDoc(doc(db, 'users', uid, 'trees', id, 'photos', pDoc.id));
         }
-      } catch(e) { console.warn('Could not delete old photos:', e); }
+      } catch(e) { console.warn('Old photos cleanup:', e); }
     }
     
-    // Save photos one by one in subcollection
     for (let i = 0; i < currentPhotos.length; i++) {
-      document.getElementById('upload-text').textContent = `☁️ Saving photo ${i+1}/${currentPhotos.length}...`;
+      document.getElementById('upload-text').textContent = `☁️ Photo ${i+1}/${currentPhotos.length}...`;
       showUploadProgress(i+1, currentPhotos.length);
-      
       await setDoc(doc(db, 'users', uid, 'trees', id, 'photos', 'p' + i), {
         data: currentPhotos[i],
         idx: i,
@@ -1238,8 +1277,8 @@ window.saveTree = async function() {
       });
     }
     
-    // Clear cache for this tree
-    delete photoCache[id];
+    // Update cache so marker uses new photo immediately
+    photoCache[id] = currentPhotos.slice();
     
     hideUploadProgress();
     
@@ -1256,13 +1295,12 @@ window.delItem = async function(type, id) {
   if (!confirm('Delete?')) return;
   try {
     if (type === 't') {
-      // Delete photo subcollection first
       try {
         const photosSnap = await getDocs(collection(db, 'users', uid, 'trees', id, 'photos'));
         for (const pDoc of photosSnap.docs) {
           await deleteDoc(doc(db, 'users', uid, 'trees', id, 'photos', pDoc.id));
         }
-      } catch(e) { console.warn('Photos delete error:', e); }
+      } catch(e) { console.warn('Photos delete:', e); }
       delete photoCache[id];
     }
     await deleteDoc(doc(db, 'users', uid, type === 's' ? 'strata' : type === 'p' ? 'patches' : 'trees', id));
@@ -1340,9 +1378,8 @@ window.exportCSV = function() {
 
 window.exportHTML = async function() {
   if (!trees.length && !strata.length) return;
-  showToast('Loading all photos...', 'info');
+  showToast('Loading all photos...');
   
-  // Load all photos
   const treesWithPhotos = [];
   for (const t of trees) {
     const photos = await loadTreePhotos(t.id);
@@ -1354,12 +1391,12 @@ window.exportHTML = async function() {
   const inst = document.getElementById('exp-inst').value.trim() || '';
   const stats = {tot:trees.length, sp:trees.reduce((s,t)=>s+(t.cnt||0),0)};
   const data = JSON.stringify({strata,patches,trees:treesWithPhotos}).replace(/<\/script>/g,'<\\/script>');
-  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"><\/script><style>*{margin:0;padding:0;box-sizing:border-box}html,body{width:100vw;height:100vh;overflow:hidden}body{font-family:sans-serif;background:#050810;color:#f8fafc;display:flex;flex-direction:column}.h{padding:14px 20px;background:#0d1424;border-bottom:1px solid #1f293b;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}.logo{width:42px;height:42px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px}#map{flex:1}.leaflet-popup-content-wrapper{background:#0d1424!important;color:#f8fafc!important;border-radius:14px!important}.pop-img{width:100%;height:160px;object-fit:cover}</style></head><body><div class="h"><div style="display:flex;align-items:center;gap:12px"><div class="logo">🕷️</div><div><h1 style="font-size:17px;font-weight:800">${title}</h1><p style="font-size:11px;color:#94a3b8;margin-top:2px">${author}${inst?' · '+inst:''}</p></div></div><div style="display:flex;gap:8px"><div style="background:#1e293b;border:1px solid #334155;border-radius:9px;padding:5px 11px;text-align:center"><b style="display:block;font-size:15px;color:#3b82f6">${stats.tot}</b><span style="font-size:9px;color:#94a3b8">Trees</span></div><div style="background:#1e293b;border:1px solid #334155;border-radius:9px;padding:5px 11px;text-align:center"><b style="display:block;font-size:15px;color:#3b82f6">${stats.sp}</b><span style="font-size:9px;color:#94a3b8">Spiders</span></div></div></div><div id="map"></div><script>const data=${data};const map=L.map('map').setView([28.9456,77.1015],17);L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',{maxZoom:22}).addTo(map);function tC(n){if(n===0)return'#9e9e9e';if(n===1)return'#ffb300';if(n===2)return'#ef6c00';if(n<=4)return'#d32f2f';return'#7b1fa2';}function objA(o){if(!o)return[];if(Array.isArray(o))return o;return Object.keys(o).sort().map(k=>o[k]).filter(x=>x);}data.strata.forEach(s=>L.polygon(objA(s.corners).map(c=>c.lat?[c.lat,c.lon]:c),{color:s.color,fillColor:s.color,fillOpacity:0.12,weight:3}).addTo(map).bindPopup('<b>Stratum '+s.num+': '+s.name+'</b>'));data.patches.forEach(p=>L.polygon(objA(p.corners).map(c=>c.lat?[c.lat,c.lon]:c),{color:p.color,fillColor:p.color,fillOpacity:0.35,weight:2.5}).addTo(map).bindPopup('<b>Patch '+p.id+'</b>'));const layers=[];data.trees.forEach(t=>{const c=tC(t.cnt);const m=L.circleMarker([t.lat,t.lon],{radius:8,color:c,fillColor:c,fillOpacity:0.9}).addTo(map);const photos=t.photos||[];const ph=photos.length?'<img class="pop-img" src="'+photos[0]+'">':'';m.bindPopup(ph+'<div style="padding:12px;width:230px"><b>'+t.id+'</b> · '+t.sp+'<br>Spiders: '+t.cnt+(t.nts?'<br><i>"'+t.nts+'"</i>':'')+'</div>');layers.push(m);});if(layers.length)setTimeout(()=>map.fitBounds(L.featureGroup(layers).getBounds(),{padding:[50,50]}),300);<\/script></body></html>`;
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"><\/script><style>*{margin:0;padding:0;box-sizing:border-box}html,body{width:100vw;height:100vh;overflow:hidden}body{font-family:sans-serif;background:#050810;color:#f8fafc;display:flex;flex-direction:column}.h{padding:14px 20px;background:#0d1424;border-bottom:1px solid #1f293b;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}.logo{width:42px;height:42px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px}#map{flex:1}.leaflet-popup-content-wrapper{background:#0d1424!important;color:#f8fafc!important;border-radius:14px!important}.pop-img{width:100%;height:160px;object-fit:cover}.tmp{width:50px;height:50px;border-radius:50%;border:3px solid white;overflow:hidden;background:#000}.tmp img{width:100%;height:100%;object-fit:cover}</style></head><body><div class="h"><div style="display:flex;align-items:center;gap:12px"><div class="logo">🕷️</div><div><h1 style="font-size:17px;font-weight:800">${title}</h1><p style="font-size:11px;color:#94a3b8;margin-top:2px">${author}${inst?' · '+inst:''}</p></div></div><div style="display:flex;gap:8px"><div style="background:#1e293b;border:1px solid #334155;border-radius:9px;padding:5px 11px;text-align:center"><b style="display:block;font-size:15px;color:#3b82f6">${stats.tot}</b><span style="font-size:9px;color:#94a3b8">Trees</span></div><div style="background:#1e293b;border:1px solid #334155;border-radius:9px;padding:5px 11px;text-align:center"><b style="display:block;font-size:15px;color:#3b82f6">${stats.sp}</b><span style="font-size:9px;color:#94a3b8">Spiders</span></div></div></div><div id="map"></div><script>const data=${data};const map=L.map('map').setView([28.9456,77.1015],17);L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',{maxZoom:22}).addTo(map);function tC(n){if(n===0)return'#9e9e9e';if(n===1)return'#ffb300';if(n===2)return'#ef6c00';if(n<=4)return'#d32f2f';return'#7b1fa2';}function objA(o){if(!o)return[];if(Array.isArray(o))return o;return Object.keys(o).sort().map(k=>o[k]).filter(x=>x);}data.strata.forEach(s=>L.polygon(objA(s.corners).map(c=>c.lat?[c.lat,c.lon]:c),{color:s.color,fillColor:s.color,fillOpacity:0.12,weight:3}).addTo(map).bindPopup('<b>Stratum '+s.num+': '+s.name+'</b>'));data.patches.forEach(p=>L.polygon(objA(p.corners).map(c=>c.lat?[c.lat,c.lon]:c),{color:p.color,fillColor:p.color,fillOpacity:0.35,weight:2.5}).addTo(map).bindPopup('<b>Patch '+p.id+'</b>'));const layers=[];data.trees.forEach(t=>{const c=tC(t.cnt);const photos=t.photos||[];let m;if(photos.length){const icon=L.divIcon({html:'<div class="tmp" style="border-color:'+c+'"><img src="'+photos[0]+'"></div>',iconSize:[50,50],iconAnchor:[25,25],className:''});m=L.marker([t.lat,t.lon],{icon:icon}).addTo(map);}else{m=L.circleMarker([t.lat,t.lon],{radius:8,color:c,fillColor:c,fillOpacity:0.9}).addTo(map);}const ph=photos.length?'<img class="pop-img" src="'+photos[0]+'">':'';m.bindPopup(ph+'<div style="padding:12px;width:230px"><b>'+t.id+'</b> · '+t.sp+'<br>Spiders: '+t.cnt+(t.nts?'<br><i>"'+t.nts+'"</i>':'')+'</div>');layers.push(m);});if(layers.length)setTimeout(()=>map.fitBounds(L.featureGroup(layers).getBounds(),{padding:[50,50]}),300);<\/script></body></html>`;
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([html], {type:'text/html'}));
   a.download = title.replace(/\W+/g,'_') + '.html';
   a.click();
-  showToast('📄 HTML downloaded!');
+  showToast('📄 Downloaded with photos!');
 };
 
 let toastT = null;
