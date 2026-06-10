@@ -121,7 +121,6 @@ input:disabled{opacity:0.5;cursor:not-allowed}
 .info-blue{background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.25);color:#93c5fd}
 .info-green{background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);color:#6ee7b7}
 .info-yellow{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);color:#fde68a}
-.info-purple{background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.25);color:#c4b5fd}
 
 .parent-sel{background:rgba(59,130,246,0.06);border:1.5px solid rgba(59,130,246,0.3);border-radius:11px;padding:11px;margin-bottom:10px}
 .parent-sel-title{font-size:10px;font-weight:700;color:#60a5fa;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
@@ -183,9 +182,7 @@ input:disabled{opacity:0.5;cursor:not-allowed}
 .photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:7px;margin-top:9px}
 .photo-thumb{position:relative;aspect-ratio:1;border-radius:9px;overflow:hidden;border:1.5px solid var(--bdr);background:#000}
 .photo-thumb img{width:100%;height:100%;object-fit:cover;display:block}
-.photo-thumb .uploading-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:700}
 .photo-thumb .remove-x{position:absolute;top:-5px;right:-5px;width:22px;height:22px;background:var(--red);color:white;border:none;border-radius:50%;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.5)}
-.photo-thumb .cloud-badge{position:absolute;bottom:3px;right:3px;background:rgba(16,185,129,0.9);color:white;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:10px}
 
 #popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,0);z-index:5000;display:none;align-items:center;justify-content:center;padding:20px;transition:background 0.3s ease}
 #popup-overlay.show{display:flex;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px)}
@@ -238,10 +235,6 @@ input:disabled{opacity:0.5;cursor:not-allowed}
 #img-viewer.show{display:flex}
 #img-viewer img{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px}
 #img-viewer .close-viewer{position:absolute;top:20px;right:20px;background:rgba(255,255,255,0.15);border:none;color:white;width:44px;height:44px;border-radius:50%;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-
-.migrate-banner{background:linear-gradient(135deg,rgba(139,92,246,0.15),rgba(124,58,237,0.15));border:1.5px solid rgba(139,92,246,0.4);border-radius:11px;padding:12px;font-size:12px;color:#c4b5fd;display:none;flex-direction:column;gap:8px;margin-bottom:10px}
-.migrate-banner.show{display:flex}
-.migrate-banner button{background:linear-gradient(135deg,#8b5cf6,#7c3aed);border:none;color:white;padding:8px 14px;border-radius:8px;font-weight:700;cursor:pointer;font-family:inherit;font-size:12px}
 </style>
 </head>
 <body>
@@ -249,7 +242,7 @@ input:disabled{opacity:0.5;cursor:not-allowed}
 <div id="auth-overlay">
   <div class="auth-logo">🕷️</div>
   <div class="auth-title">Spider Map Pro</div>
-  <div class="auth-sub">Photos sync to cloud across all your devices.</div>
+  <div class="auth-sub">Photos sync across all your devices.</div>
   <button class="auth-btn" id="signin-btn">
     <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
     Continue with Google
@@ -277,7 +270,7 @@ input:disabled{opacity:0.5;cursor:not-allowed}
 <div id="save-ind"><div class="dot"></div>Synced</div>
 
 <div id="upload-progress">
-  <span id="upload-text">📤 Uploading...</span>
+  <span id="upload-text">📤 Processing...</span>
   <div class="upload-bar"><div class="upload-fill" id="upload-fill"></div></div>
 </div>
 
@@ -391,13 +384,7 @@ input:disabled{opacity:0.5;cursor:not-allowed}
 
     <div class="tab-pane on" id="tab-tree">
       <div class="edit-banner" id="edit-t-banner"><span><b>✏️ Editing:</b> <span id="edit-t-id"></span></span><button class="edit-cancel-btn" onclick="cancelEdit('t')">Cancel</button></div>
-      
-      <div class="migrate-banner" id="migrate-banner">
-        <div><b>📦 Old photos found!</b> You have photos saved on this device. Upload them to cloud so they sync everywhere?</div>
-        <button onclick="migrateOldPhotos()">☁️ Upload Old Photos to Cloud</button>
-      </div>
-
-      <div class="info-box info-blue"><b>Step 3:</b> Stand at tree. Photos sync to cloud!</div>
+      <div class="info-box info-blue"><b>Step 3:</b> Photos sync to cloud across devices.</div>
       <div class="card">
         <div class="parent-sel">
           <div class="parent-sel-title">🔗 Parent Patch <span class="parent-sel-count" id="tree-parent-count">0</span></div>
@@ -435,12 +422,12 @@ input:disabled{opacity:0.5;cursor:not-allowed}
       </div>
 
       <div class="card">
-        <div class="card-title">☁️ Photos (Cloud Sync)</div>
+        <div class="card-title">📷 Photos (Max 5 per tree)</div>
         <label class="photo-upload-zone" for="t-photo">
           <input type="file" id="t-photo" accept="image/*" multiple onchange="handlePhotos(this)">
           <div class="icon">📸</div>
           <div class="text">Tap to Add Photos</div>
-          <div class="sub">Uploads to cloud · Syncs everywhere</div>
+          <div class="sub">Auto-compressed · Saved to cloud</div>
         </label>
         <div class="photo-grid" id="photo-grid"></div>
         <div id="photo-count" style="font-size:10px;color:var(--muted);text-align:center;margin-top:6px"></div>
@@ -459,7 +446,7 @@ input:disabled{opacity:0.5;cursor:not-allowed}
     </div>
 
     <div class="tab-pane" id="tab-export">
-      <div class="info-box info-blue">📤 Generate HTML with cloud photos.</div>
+      <div class="info-box info-blue">📤 Generate HTML with photos.</div>
       <div class="card">
         <div class="card-title">📝 Project Info</div>
         <div class="fg" style="margin-bottom:7px"><label>Title</label><input id="exp-title" placeholder="Spider Distribution"></div>
@@ -484,13 +471,11 @@ input:disabled{opacity:0.5;cursor:not-allowed}
 import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import {getAuth,onAuthStateChanged,signInWithPopup,GoogleAuthProvider,signOut} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 import {getFirestore,collection,doc,setDoc,deleteDoc,onSnapshot,enableIndexedDbPersistence,serverTimestamp,getDoc,updateDoc} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-import {getStorage,ref,uploadBytes,getDownloadURL,deleteObject} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyBCowRMjoU5dfep_OGKKIyxuE-WxdhEfho",
   authDomain: "spider-map-650e7.firebaseapp.com",
   projectId: "spider-map-650e7",
-storageBucket: "spider-map-650e7.appspot.com",
   messagingSenderId: "781791803461",
   appId: "1:781791803461:web:4e8d7279aa4aac648e4b2c"
 };
@@ -498,7 +483,6 @@ storageBucket: "spider-map-650e7.appspot.com",
 const fbApp = initializeApp(firebaseConfig);
 const auth = getAuth(fbApp);
 const db = getFirestore(fbApp);
-const storage = getStorage(fbApp);
 try { enableIndexedDbPersistence(db); } catch(e) {}
 
 let uid=null, trees=[], strata=[], patches=[];
@@ -511,11 +495,11 @@ let map=null, tiles=null;
 let trackingWatchId=null, myLocMarker=null, myLocCircle=null;
 let editingStrat=null, editingPatch=null, editingTree=null;
 let originalStratCorners=null, originalPatchCorners=null;
-let currentPhotoUrls=[];
+let currentPhotos=[]; // base64 strings
 let popupGalleryIdx={};
-let isUploading = false;
 
 const tileNames = ['🗺️ Street','🛰️ Satellite','🌍 Hybrid'];
+const MAX_PHOTOS = 5;
 
 function initMap() {
   if (map) return;
@@ -553,7 +537,7 @@ onAuthStateChanged(auth, user => {
     document.getElementById('auth-overlay').style.display='none';
     document.getElementById('app').style.display='block';
     document.getElementById('user-avatar').src = user.photoURL || '';
-    setTimeout(() => { initMap(); startSync(); checkOldPhotos(); }, 100);
+    setTimeout(() => { initMap(); startSync(); }, 100);
     showToast('✅ ' + (user.displayName||'User').split(' ')[0]);
   } else {
     uid = null;
@@ -569,122 +553,10 @@ window.confirmSignOut = async () => {
   if (confirm('Sign out?')) { stopTracking(); await signOut(auth); location.reload(); }
 };
 
-// CHECK FOR OLD LOCALSTORAGE PHOTOS
-function checkOldPhotos() {
-  const keys = Object.keys(localStorage).filter(k => k.startsWith('spider_photos_'));
-  if (keys.length > 0) {
-    let totalPhotos = 0;
-    keys.forEach(k => {
-      try {
-        const photos = JSON.parse(localStorage.getItem(k));
-        if (Array.isArray(photos)) totalPhotos += photos.length;
-      } catch(e) {}
-    });
-    if (totalPhotos > 0) {
-      const banner = document.getElementById('migrate-banner');
-      banner.classList.add('show');
-      banner.querySelector('div').innerHTML = `<b>📦 Found ${totalPhotos} old photos on this device!</b> Upload them to cloud so they sync to laptop too?`;
-    }
-  }
-}
-
-// MIGRATE OLD PHOTOS TO CLOUD
-window.migrateOldPhotos = async () => {
-  if (isUploading) { showToast('Wait for upload to finish', 'err'); return; }
-  if (!confirm('Upload all old photos to cloud? This may take a few minutes.')) return;
-  
-  const keys = Object.keys(localStorage).filter(k => k.startsWith('spider_photos_'));
-  isUploading = true;
-  
-  let totalUploaded = 0;
-  let totalFailed = 0;
-  let totalCount = 0;
-  
-  // Count total
-  for (const k of keys) {
-    try {
-      const photos = JSON.parse(localStorage.getItem(k));
-      if (Array.isArray(photos)) totalCount += photos.length;
-    } catch(e) {}
-  }
-  
-  let currentNum = 0;
-  
-  for (const k of keys) {
-    const treeId = k.replace('spider_photos_', '');
-    try {
-      const photos = JSON.parse(localStorage.getItem(k));
-      if (!Array.isArray(photos) || photos.length === 0) continue;
-      
-      // Get existing tree
-      const treeRef = doc(db, 'users', uid, 'trees', treeId);
-      const treeSnap = await getDoc(treeRef);
-      if (!treeSnap.exists()) {
-        console.warn('Tree not found in cloud:', treeId);
-        continue;
-      }
-      
-      const treeData = treeSnap.data();
-      const existingPhotos = treeData.photos || {};
-      const newUrls = [];
-      
-      for (let i = 0; i < photos.length; i++) {
-        currentNum++;
-        showUploadProgress(currentNum, totalCount);
-        
-        try {
-          // Convert base64 to blob
-          const base64 = photos[i];
-          const res = await fetch(base64);
-          const blob = await res.blob();
-          
-          // Compress
-          const compressedBlob = await compressBlob(blob);
-          
-          // Upload
-          const timestamp = Date.now();
-          const filename = `migrated_${timestamp}_${i}.jpg`;
-          const path = `users/${uid}/trees/${treeId}/${filename}`;
-          const storageRef = ref(storage, path);
-          await uploadBytes(storageRef, compressedBlob);
-          const url = await getDownloadURL(storageRef);
-          newUrls.push(url);
-          totalUploaded++;
-        } catch(err) {
-          console.error('Failed to upload photo:', err);
-          totalFailed++;
-        }
-      }
-      
-      // Update tree with merged photos
-      const photosObj = {...existingPhotos};
-      const existingCount = Object.keys(existingPhotos).length;
-      newUrls.forEach((url, i) => {
-        photosObj['p' + (existingCount + i)] = url;
-      });
-      
-      await updateDoc(treeRef, { photos: photosObj });
-      
-      // Remove from localStorage after successful upload
-      localStorage.removeItem(k);
-    } catch(err) {
-      console.error('Error migrating tree:', treeId, err);
-    }
-  }
-  
-  hideUploadProgress();
-  isUploading = false;
-  document.getElementById('migrate-banner').classList.remove('show');
-  
-  if (totalUploaded > 0) {
-    showToast(`✅ Uploaded ${totalUploaded} photos to cloud!`);
-  }
-  if (totalFailed > 0) {
-    setTimeout(() => showToast(`⚠️ ${totalFailed} photos failed`, 'err'), 3500);
-  }
-};
-
-async function compressBlob(blob, maxWidth=1200, quality=0.8) {
+// ═══════════════════════════════════
+// COMPRESS IMAGE TO TINY BASE64
+// ═══════════════════════════════════
+async function compressToBase64(file, maxWidth=600, quality=0.6) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -695,31 +567,17 @@ async function compressBlob(blob, maxWidth=1200, quality=0.8) {
         const canvas = document.createElement('canvas');
         canvas.width = w;
         canvas.height = h;
-        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        canvas.toBlob(resolve, 'image/jpeg', quality);
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        const base64 = canvas.toDataURL('image/jpeg', quality);
+        resolve(base64);
       };
       img.onerror = reject;
       img.src = e.target.result;
     };
     reader.onerror = reject;
-    reader.readAsDataURL(blob);
+    reader.readAsDataURL(file);
   });
-}
-
-async function compressImage(file, maxWidth=1200, quality=0.8) {
-  return compressBlob(file, maxWidth, quality);
-}
-
-async function uploadPhotoToCloud(file, treeId) {
-  const compressed = await compressImage(file);
-  const timestamp = Date.now();
-  const random = Math.random().toString(36).substring(7);
-  const filename = `${timestamp}_${random}.jpg`;
-  const path = `users/${uid}/trees/${treeId}/${filename}`;
-  const storageRef = ref(storage, path);
-  await uploadBytes(storageRef, compressed);
-  const url = await getDownloadURL(storageRef);
-  return { url, path };
 }
 
 function cornersToObj(arr) {
@@ -739,7 +597,6 @@ function objToCorners(obj) {
   return arr;
 }
 
-// CONVERT PHOTOS OBJECT TO ARRAY (handles both cloud and old base64)
 function photosObjToArray(photosObj) {
   if (!photosObj) return [];
   if (Array.isArray(photosObj)) return photosObj.filter(p => p);
@@ -764,7 +621,7 @@ function createTreeMarker(t) {
       ${hasSpiders ? `<div class="tree-pulse-ring" style="color:${col}"></div>` : ''}
       <div class="tree-marker-pin" style="background:linear-gradient(135deg,${col},${col}dd)" data-count="${t.cnt}"></div>
       <div class="tree-marker-shadow"></div>
-      ${photoCount > 0 ? `<div class="tree-marker-photo-badge">${photoCount > 9 ? '9+' : photoCount}</div>` : ''}
+      ${photoCount > 0 ? `<div class="tree-marker-photo-badge">${photoCount}</div>` : ''}
     </div>
   `;
   
@@ -823,7 +680,6 @@ function startSync() {
     snap.forEach(d => {
       const data = d.data();
       const photos = photosObjToArray(data.photos);
-      console.log('Tree', d.id, 'has', photos.length, 'photos');
       const t = {id:d.id, ...data, photos};
       trees.push(t);
       const marker = createTreeMarker(t);
@@ -878,10 +734,9 @@ function mapClickHandler(e) {
 
 window.showTreePopup = function(treeId) {
   const t = trees.find(x => x.id === treeId);
-  if (!t) { console.log('Tree not found:', treeId); return; }
+  if (!t) return;
   
   const photos = t.photos || [];
-  console.log('Showing popup for', treeId, 'with', photos.length, 'photos');
   popupGalleryIdx[t.id] = 0;
   
   const col = tColor(t.cnt);
@@ -892,7 +747,7 @@ window.showTreePopup = function(treeId) {
   if (photos.length > 0) {
     photoSection = `
       <div class="popup-gallery">
-        <img class="gallery-img" id="gallery-main-img" src="${photos[0]}" onclick="openImageViewer(this.src)" onerror="this.parentElement.innerHTML='<div style=color:white;padding:20px;text-align:center;font-size:12px>❌ Image failed to load</div>'">
+        <img class="gallery-img" id="gallery-main-img" src="${photos[0]}" onclick="openImageViewer(this.src)">
         ${photos.length > 1 ? `
           <div class="gallery-counter" id="gallery-counter">1 / ${photos.length}</div>
           <button class="gallery-nav-btn prev" onclick="changeGalleryImg('${t.id}', -1)">‹</button>
@@ -943,7 +798,6 @@ window.showTreePopup = function(treeId) {
     ${thumbsHTML}
     <div class="popup-actions">
       <button class="popup-action-btn popup-action-edit" onclick="closePopup();editTree('${t.id}')">✏️ Edit</button>
-      <button class="popup-action-btn popup-action-photo" onclick="addPhotosToTree('${t.id}')">📷 Add</button>
       <button class="popup-action-btn popup-action-close" onclick="closePopup()">Close</button>
     </div>
   `;
@@ -967,7 +821,7 @@ window.showZonePopup = function(type, id) {
   } else {
     const childTrees = trees.filter(t => t.pt === item.id);
     const totalSp = childTrees.reduce((s,t) => s + (t.cnt||0), 0);
-    extraInfo = `<div class="popup-fields-grid"><div class="popup-field-card"><div class="label">Trees</div><div class="value">${childTrees.length}</div></div><div class="popup-field-card"><div class="label">Spiders</div><div class="value">${totalSp}</div></div>${item.name ? `<div class="popup-field-card" style="grid-column:span 2"><div class="label">Notes</div><div class="value">${item.name}</div></div>` : ''}</div>`;
+    extraInfo = `<div class="popup-fields-grid"><div class="popup-field-card"><div class="label">Trees</div><div class="value">${childTrees.length}</div></div><div class="popup-field-card"><div class="label">Spiders</div><div class="value">${totalSp}</div></div></div>`;
   }
   document.getElementById('popup-modal').innerHTML = `
     <button class="popup-close-btn" onclick="closePopup()">✕</button>
@@ -1008,49 +862,42 @@ window.openImageViewer = function(src) {
   document.getElementById('img-viewer').classList.add('show');
 };
 
-window.addPhotosToTree = function(treeId) {
-  if (isUploading) { showToast('Already uploading', 'err'); return; }
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = 'image/*';
-  input.multiple = true;
-  input.onchange = async function(e) {
-    const files = Array.from(e.target.files);
-    if (!files.length) return;
-    const t = trees.find(x => x.id === treeId);
-    if (!t) return;
-    isUploading = true;
-    showUploadProgress(0, files.length);
-    const existingPhotos = t.photos || [];
-    const newUrls = [];
+// ═══════════════════════════════════
+// PHOTO UPLOAD (BASE64 IN FORM)
+// ═══════════════════════════════════
+window.handlePhotos = async function(input) {
+  const files = Array.from(input.files);
+  if (!files.length) return;
+  input.value = '';
+  
+  if (currentPhotos.length + files.length > MAX_PHOTOS) {
+    showToast(`Max ${MAX_PHOTOS} photos per tree!`, 'err');
+    return;
+  }
+  
+  showUploadProgress(0, files.length);
+  
+  for (let i = 0; i < files.length; i++) {
     try {
-      for (let i = 0; i < files.length; i++) {
-        showUploadProgress(i+1, files.length);
-        const { url } = await uploadPhotoToCloud(files[i], treeId);
-        newUrls.push(url);
-      }
-      const allPhotos = [...existingPhotos, ...newUrls];
-      const photosObj = {};
-      allPhotos.forEach((url, i) => photosObj['p' + i] = url);
-      await updateDoc(doc(db, 'users', uid, 'trees', treeId), { photos: photosObj });
-      hideUploadProgress();
-      isUploading = false;
-      showToast(`✅ ${files.length} photo(s) uploaded!`);
-      setTimeout(() => showTreePopup(treeId), 800);
+      showUploadProgress(i+1, files.length);
+      const base64 = await compressToBase64(files[i]);
+      currentPhotos.push(base64);
+      renderPhotoGrid();
     } catch(err) {
-      hideUploadProgress();
-      isUploading = false;
-      showToast('Upload failed: ' + err.message, 'err');
+      console.error('Compress error:', err);
+      showToast('Photo failed', 'err');
     }
-  };
-  input.click();
+  }
+  
+  hideUploadProgress();
+  showToast(`✅ ${files.length} photo(s) ready`);
 };
 
 function showUploadProgress(current, total) {
   const el = document.getElementById('upload-progress');
   const text = document.getElementById('upload-text');
   const fill = document.getElementById('upload-fill');
-  text.textContent = `📤 Uploading ${current}/${total}...`;
+  text.textContent = `📤 Processing ${current}/${total}...`;
   fill.style.width = `${(current / total) * 100}%`;
   el.classList.add('show');
 }
@@ -1059,71 +906,22 @@ function hideUploadProgress() {
   document.getElementById('upload-progress').classList.remove('show');
 }
 
-window.handlePhotos = async function(input) {
-  const files = Array.from(input.files);
-  if (!files.length) return;
-  input.value = '';
-  if (!uid) { showToast('Sign in first', 'err'); return; }
-  
-  const treeId = editingTree || document.getElementById('t-id').value.trim() || 'temp_' + Date.now();
-  
-  if (isUploading) { showToast('Already uploading', 'err'); return; }
-  isUploading = true;
-  
-  files.forEach((f, i) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const placeholder = document.createElement('div');
-      placeholder.className = 'photo-thumb';
-      placeholder.innerHTML = `<img src="${e.target.result}"><div class="uploading-overlay">⏳</div>`;
-      placeholder.id = 'temp-thumb-' + i;
-      document.getElementById('photo-grid').appendChild(placeholder);
-    };
-    reader.readAsDataURL(f);
-  });
-  
-  try {
-    for (let i = 0; i < files.length; i++) {
-      showUploadProgress(i+1, files.length);
-      const { url } = await uploadPhotoToCloud(files[i], treeId);
-      currentPhotoUrls.push(url);
-      const tempEl = document.getElementById('temp-thumb-' + i);
-      if (tempEl) tempEl.remove();
-    }
-    renderPhotoGrid();
-    hideUploadProgress();
-    isUploading = false;
-    showToast(`✅ ${files.length} photo(s) in cloud!`);
-  } catch(err) {
-    hideUploadProgress();
-    isUploading = false;
-    showToast('Upload failed: ' + err.message, 'err');
-    document.querySelectorAll('[id^=temp-thumb-]').forEach(el => el.remove());
-  }
-};
-
 function renderPhotoGrid() {
-  document.getElementById('photo-grid').innerHTML = currentPhotoUrls.map((url, i) => `
+  document.getElementById('photo-grid').innerHTML = currentPhotos.map((url, i) => `
     <div class="photo-thumb">
       <img src="${url}" onclick="openImageViewer('${url}')">
       <button class="remove-x" onclick="removePhoto(${i})">✕</button>
-      <div class="cloud-badge">☁️</div>
     </div>
   `).join('');
-  document.getElementById('photo-count').textContent = currentPhotoUrls.length ? `${currentPhotoUrls.length} photo(s) in cloud ☁️` : '';
+  document.getElementById('photo-count').textContent = currentPhotos.length ? `${currentPhotos.length}/${MAX_PHOTOS} photos` : '';
 }
 
-window.removePhoto = async function(i) {
-  if (!confirm('Remove this photo?')) return;
-  const url = currentPhotoUrls[i];
-  try {
-    const path = url.split('/o/')[1]?.split('?')[0];
-    if (path) await deleteObject(ref(storage, decodeURIComponent(path)));
-  } catch(e) {}
-  currentPhotoUrls.splice(i, 1);
+window.removePhoto = function(i) {
+  currentPhotos.splice(i, 1);
   renderPhotoGrid();
 };
 
+// GPS
 window.toggleTracking = function() {
   const btn = document.getElementById('track-fab');
   const info = document.getElementById('gps-live-info');
@@ -1279,7 +1077,7 @@ window.editTree = function(id) {
   const t = trees.find(x => x.id === id);
   if (!t) return;
   editingTree = id;
-  currentPhotoUrls = t.photos || [];
+  currentPhotos = [...(t.photos || [])];
   document.getElementById('t-id').value = t.id;
   document.getElementById('t-id').disabled = true;
   document.getElementById('t-sp').value = t.sp;
@@ -1326,7 +1124,7 @@ function clearTreeForm() {
   document.getElementById('t-bark').value = '';
   document.getElementById('t-web').value = 'None';
   document.getElementById('gps-result').style.display = 'none';
-  currentPhotoUrls = [];
+  currentPhotos = [];
   renderPhotoGrid();
 }
 
@@ -1377,9 +1175,15 @@ window.saveTree = async function() {
   const lon = parseFloat(document.getElementById('t-lon').value);
   if (!id || !sp || !selectedTreePatch || isNaN(lat) || isNaN(lon)) { showToast('Fill all fields', 'err'); return; }
   const patch = patches.find(p => p.id === selectedTreePatch);
+  
+  // Photos as object {p0, p1, ...}
   const photosObj = {};
-  currentPhotoUrls.forEach((url, i) => photosObj['p' + i] = url);
+  currentPhotos.forEach((url, i) => photosObj['p' + i] = url);
+  
   try {
+    showUploadProgress(1, 1);
+    document.getElementById('upload-text').textContent = '☁️ Saving to cloud...';
+    
     await setDoc(doc(db, 'users', uid, 'trees', id), {
       sp: String(sp), lat: Number(lat), lon: Number(lon),
       cnt: parseInt(document.getElementById('t-cnt').value) || 0,
@@ -1390,25 +1194,25 @@ window.saveTree = async function() {
       photos: photosObj,
       ts: serverTimestamp()
     });
-    if (editingTree) { cancelEdit('t'); showToast('✅ Updated with ' + currentPhotoUrls.length + ' photo(s)'); }
-    else { clearTreeForm(); showToast('✅ Saved with ' + currentPhotoUrls.length + ' photo(s)'); }
-  } catch(e) { showToast('Save failed: ' + e.code, 'err'); }
+    
+    hideUploadProgress();
+    
+    if (editingTree) { cancelEdit('t'); showToast('✅ Updated with ' + currentPhotos.length + ' photo(s)'); }
+    else { clearTreeForm(); showToast('✅ Saved with ' + currentPhotos.length + ' photo(s)'); }
+  } catch(e) {
+    hideUploadProgress();
+    console.error('Save error:', e);
+    if (e.code === 'resource-exhausted' || e.message.includes('exceed')) {
+      showToast('Photos too large! Try fewer/smaller photos', 'err');
+    } else {
+      showToast('Save failed: ' + e.code, 'err');
+    }
+  }
 };
 
 window.delItem = async function(type, id) {
   if (!confirm('Delete?')) return;
   try {
-    if (type === 't') {
-      const t = trees.find(x => x.id === id);
-      if (t && t.photos) {
-        for (const url of t.photos) {
-          try {
-            const path = url.split('/o/')[1]?.split('?')[0];
-            if (path) await deleteObject(ref(storage, decodeURIComponent(path)));
-          } catch(e) {}
-        }
-      }
-    }
     await deleteDoc(doc(db, 'users', uid, type === 's' ? 'strata' : type === 'p' ? 'patches' : 'trees', id));
     showToast('Deleted');
   } catch(e) { showToast('Delete failed', 'err'); }
@@ -1456,7 +1260,7 @@ function updateUI() {
     const pc = (t.photos || []).length;
     return `<div class="list-item">
       <div class="list-dot" style="background:${tColor(t.cnt)}"></div>
-      <div class="list-body" onclick="showTreePopup('${t.id}')"><div class="list-title">${emoji(t.sp)} ${t.id} — ${t.sp}</div><div class="list-sub">${t.cnt} spider · P${t.pt}${pc?' · ☁️'+pc:''}</div></div>
+      <div class="list-body" onclick="showTreePopup('${t.id}')"><div class="list-title">${emoji(t.sp)} ${t.id} — ${t.sp}</div><div class="list-sub">${t.cnt} spider · P${t.pt}${pc?' · 📷'+pc:''}</div></div>
       <div class="list-actions"><button class="edit-btn" onclick="event.stopPropagation();editTree('${t.id}')">✏️</button><button class="del-btn" onclick="event.stopPropagation();delItem('t','${t.id}')">✕</button></div>
     </div>`;
   }).join('') : '<div class="empty-state">No trees yet</div>';
@@ -1489,7 +1293,7 @@ window.exportHTML = function() {
   const inst = document.getElementById('exp-inst').value.trim() || '';
   const stats = {tot:trees.length, sp:trees.reduce((s,t)=>s+(t.cnt||0),0)};
   const data = JSON.stringify({strata,patches,trees}).replace(/<\/script>/g,'<\\/script>');
-  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"><\/script><style>*{margin:0;padding:0;box-sizing:border-box}html,body{width:100vw;height:100vh;overflow:hidden}body{font-family:sans-serif;background:#050810;color:#f8fafc;display:flex;flex-direction:column}.h{padding:14px 20px;background:#0d1424;border-bottom:1px solid #1f293b;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}.logo{width:42px;height:42px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px}#map{flex:1}.leaflet-popup-content-wrapper{background:#0d1424!important;color:#f8fafc!important;border-radius:14px!important}.pop-img{width:100%;height:160px;object-fit:cover}</style></head><body><div class="h"><div style="display:flex;align-items:center;gap:12px"><div class="logo">🕷️</div><div><h1 style="font-size:17px;font-weight:800">${title}</h1><p style="font-size:11px;color:#94a3b8;margin-top:2px">${author}${inst?' · '+inst:''}</p></div></div><div style="display:flex;gap:8px"><div style="background:#1e293b;border:1px solid #334155;border-radius:9px;padding:5px 11px;text-align:center"><b style="display:block;font-size:15px;color:#3b82f6">${stats.tot}</b><span style="font-size:9px;color:#94a3b8">Trees</span></div><div style="background:#1e293b;border:1px solid #334155;border-radius:9px;padding:5px 11px;text-align:center"><b style="display:block;font-size:15px;color:#3b82f6">${stats.sp}</b><span style="font-size:9px;color:#94a3b8">Spiders</span></div></div></div><div id="map"></div><script>const data=${data};const map=L.map('map').setView([28.9456,77.1015],17);L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',{maxZoom:22}).addTo(map);function tC(n){if(n===0)return'#9e9e9e';if(n===1)return'#ffb300';if(n===2)return'#ef6c00';if(n<=4)return'#d32f2f';return'#7b1fa2';}data.strata.forEach(s=>L.polygon(s.corners,{color:s.color,fillColor:s.color,fillOpacity:0.12,weight:3}).addTo(map).bindPopup('<b>Stratum '+s.num+': '+s.name+'</b>'));data.patches.forEach(p=>L.polygon(p.corners,{color:p.color,fillColor:p.color,fillOpacity:0.35,weight:2.5}).addTo(map).bindPopup('<b>Patch '+p.id+'</b>'));const layers=[];data.trees.forEach(t=>{const c=tC(t.cnt);const m=L.circleMarker([t.lat,t.lon],{radius:8,color:c,fillColor:c,fillOpacity:0.9}).addTo(map);const ph=(t.photos&&t.photos.length)?'<img class="pop-img" src="'+t.photos[0]+'">':'';m.bindPopup(ph+'<div style="padding:12px;width:230px"><b>'+t.id+'</b> · '+t.sp+'<br>Spiders: '+t.cnt+(t.nts?'<br><i>"'+t.nts+'"</i>':'')+'</div>');layers.push(m);});data.strata.forEach(s=>layers.push(L.polygon(s.corners)));if(layers.length)setTimeout(()=>map.fitBounds(L.featureGroup(layers).getBounds(),{padding:[50,50]}),300);<\/script></body></html>`;
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"><\/script><style>*{margin:0;padding:0;box-sizing:border-box}html,body{width:100vw;height:100vh;overflow:hidden}body{font-family:sans-serif;background:#050810;color:#f8fafc;display:flex;flex-direction:column}.h{padding:14px 20px;background:#0d1424;border-bottom:1px solid #1f293b;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}.logo{width:42px;height:42px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px}#map{flex:1}.leaflet-popup-content-wrapper{background:#0d1424!important;color:#f8fafc!important;border-radius:14px!important}.pop-img{width:100%;height:160px;object-fit:cover}</style></head><body><div class="h"><div style="display:flex;align-items:center;gap:12px"><div class="logo">🕷️</div><div><h1 style="font-size:17px;font-weight:800">${title}</h1><p style="font-size:11px;color:#94a3b8;margin-top:2px">${author}${inst?' · '+inst:''}</p></div></div><div style="display:flex;gap:8px"><div style="background:#1e293b;border:1px solid #334155;border-radius:9px;padding:5px 11px;text-align:center"><b style="display:block;font-size:15px;color:#3b82f6">${stats.tot}</b><span style="font-size:9px;color:#94a3b8">Trees</span></div><div style="background:#1e293b;border:1px solid #334155;border-radius:9px;padding:5px 11px;text-align:center"><b style="display:block;font-size:15px;color:#3b82f6">${stats.sp}</b><span style="font-size:9px;color:#94a3b8">Spiders</span></div></div></div><div id="map"></div><script>const data=${data};const map=L.map('map').setView([28.9456,77.1015],17);L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',{maxZoom:22}).addTo(map);function tC(n){if(n===0)return'#9e9e9e';if(n===1)return'#ffb300';if(n===2)return'#ef6c00';if(n<=4)return'#d32f2f';return'#7b1fa2';}function objA(o){if(!o)return[];if(Array.isArray(o))return o;return Object.keys(o).sort().map(k=>o[k]).filter(x=>x);}data.strata.forEach(s=>L.polygon(objA(s.corners).map(c=>c.lat?[c.lat,c.lon]:c),{color:s.color,fillColor:s.color,fillOpacity:0.12,weight:3}).addTo(map).bindPopup('<b>Stratum '+s.num+': '+s.name+'</b>'));data.patches.forEach(p=>L.polygon(objA(p.corners).map(c=>c.lat?[c.lat,c.lon]:c),{color:p.color,fillColor:p.color,fillOpacity:0.35,weight:2.5}).addTo(map).bindPopup('<b>Patch '+p.id+'</b>'));const layers=[];data.trees.forEach(t=>{const c=tC(t.cnt);const m=L.circleMarker([t.lat,t.lon],{radius:8,color:c,fillColor:c,fillOpacity:0.9}).addTo(map);const photos=objA(t.photos);const ph=photos.length?'<img class="pop-img" src="'+photos[0]+'">':'';m.bindPopup(ph+'<div style="padding:12px;width:230px"><b>'+t.id+'</b> · '+t.sp+'<br>Spiders: '+t.cnt+(t.nts?'<br><i>"'+t.nts+'"</i>':'')+'</div>');layers.push(m);});if(layers.length)setTimeout(()=>map.fitBounds(L.featureGroup(layers).getBounds(),{padding:[50,50]}),300);<\/script></body></html>`;
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([html], {type:'text/html'}));
   a.download = title.replace(/\W+/g,'_') + '.html';
