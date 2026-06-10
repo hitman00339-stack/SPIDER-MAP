@@ -3,248 +3,130 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Spider Map Pro</title>
+<title>Spider Map Pro — Research Tool</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
-  --bg:#070a14;--card:#0f1626;--card2:#1a2440;
-  --bdr:#1f2937;--bdr2:#334155;
+  --bg:#050810;--card:#0d1424;--card2:#172033;
+  --bdr:#1e293b;--bdr2:#334155;
   --acc:#3b82f6;--acc2:#8b5cf6;--acc3:#06b6d4;
-  --txt:#f1f5f9;--txt2:#94a3b8;--muted:#475569;
+  --txt:#f8fafc;--txt2:#94a3b8;--muted:#475569;
   --green:#10b981;--yellow:#f59e0b;--red:#ef4444;
-  --strat-color:#3b82f6;--patch-color:#fbbf24;
 }
-html,body{
-  width:100%;height:100%;
-  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
-  background:var(--bg);color:var(--txt);
-  overflow:hidden;position:fixed;
-}
+html,body{width:100%;height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--txt);overflow:hidden;position:fixed}
 #map{position:absolute;top:0;left:0;width:100%;height:100%;z-index:1}
 
 /* TOP BAR */
 #topbar{
-  position:fixed;top:0;left:0;right:0;height:54px;
-  background:linear-gradient(180deg,rgba(7,10,20,0.98),rgba(7,10,20,0.92));
+  position:fixed;top:0;left:0;right:0;height:56px;
+  background:linear-gradient(180deg,rgba(5,8,16,0.98),rgba(5,8,16,0.92));
   border-bottom:1px solid var(--bdr);
   display:flex;align-items:center;justify-content:space-between;
-  padding:0 12px;z-index:1000;
+  padding:0 14px;z-index:1000;
   backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
 }
 #topbar::after{
   content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
   background:linear-gradient(90deg,transparent,var(--acc),var(--acc2),var(--acc3),transparent);
 }
-.logo{display:flex;align-items:center;gap:9px}
+.logo{display:flex;align-items:center;gap:10px}
 .logo-ico{
-  width:34px;height:34px;
+  width:36px;height:36px;
   background:linear-gradient(135deg,var(--acc),var(--acc2));
-  border-radius:9px;display:flex;align-items:center;
-  justify-content:center;font-size:17px;
-  box-shadow:0 0 18px rgba(59,130,246,0.4),inset 0 1px 0 rgba(255,255,255,0.2);
+  border-radius:10px;display:flex;align-items:center;
+  justify-content:center;font-size:18px;
+  box-shadow:0 0 20px rgba(59,130,246,0.5),inset 0 1px 0 rgba(255,255,255,0.25);
   animation:logoPulse 3s ease-in-out infinite alternate;
 }
 @keyframes logoPulse{
-  from{box-shadow:0 0 12px rgba(59,130,246,0.3),inset 0 1px 0 rgba(255,255,255,0.2)}
-  to{box-shadow:0 0 28px rgba(139,92,246,0.5),inset 0 1px 0 rgba(255,255,255,0.3)}
+  from{box-shadow:0 0 14px rgba(59,130,246,0.4),inset 0 1px 0 rgba(255,255,255,0.25)}
+  to{box-shadow:0 0 30px rgba(139,92,246,0.6),inset 0 1px 0 rgba(255,255,255,0.35)}
 }
-.logo h1{font-size:13px;font-weight:800;letter-spacing:0.2px}
+.logo h1{font-size:14px;font-weight:800;letter-spacing:0.3px}
 .logo p{font-size:9px;color:var(--txt2);font-weight:500}
-
 .top-stats{display:flex;gap:6px}
-.stat-pill{
-  background:var(--card);border:1px solid var(--bdr);
-  border-radius:9px;padding:5px 11px;text-align:center;
-  position:relative;overflow:hidden;
-}
-.stat-pill::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,var(--acc),var(--acc2));
-}
-.stat-pill-n{font-size:15px;font-weight:800;color:var(--acc);line-height:1;font-variant-numeric:tabular-nums}
-.stat-pill-l{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-top:1px}
+.stat-pill{background:var(--card);border:1px solid var(--bdr);border-radius:10px;padding:5px 12px;text-align:center;position:relative;overflow:hidden}
+.stat-pill::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,var(--acc),var(--acc2))}
+.stat-pill-n{font-size:16px;font-weight:800;color:var(--acc);line-height:1;font-variant-numeric:tabular-nums}
+.stat-pill-l{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;margin-top:2px}
 
-/* AUTOSAVE INDICATOR */
-#save-indicator{
-  position:fixed;top:62px;right:12px;z-index:850;
-  background:rgba(16,185,129,0.15);
-  border:1px solid rgba(16,185,129,0.3);
-  color:#6ee7b7;font-size:10px;font-weight:600;
-  padding:4px 9px;border-radius:20px;
-  opacity:0;transition:opacity 0.3s;
-  display:flex;align-items:center;gap:5px;
-  pointer-events:none;
-}
+/* AUTOSAVE */
+#save-indicator{position:fixed;top:64px;right:14px;z-index:850;background:rgba(16,185,129,0.18);border:1px solid rgba(16,185,129,0.35);color:#6ee7b7;font-size:10px;font-weight:600;padding:5px 11px;border-radius:20px;opacity:0;transition:opacity 0.3s;display:flex;align-items:center;gap:6px;pointer-events:none}
 #save-indicator.show{opacity:1}
-#save-indicator .dot{
-  width:6px;height:6px;border-radius:50%;
-  background:#10b981;
-  animation:savePulse 1s ease-in-out infinite;
-}
+#save-indicator .dot{width:6px;height:6px;border-radius:50%;background:#10b981;animation:savePulse 1s ease-in-out infinite}
 @keyframes savePulse{0%,100%{opacity:1}50%{opacity:0.3}}
 
 /* MODE BANNER */
-#mode-banner{
-  position:fixed;top:64px;left:50%;
-  transform:translateX(-50%);
-  padding:11px 20px;border-radius:30px;
-  font-size:12px;font-weight:700;
-  z-index:1200;display:none;
-  white-space:nowrap;max-width:92vw;text-align:center;
-  box-shadow:0 8px 28px rgba(0,0,0,0.6);
-  align-items:center;gap:10px;flex-wrap:wrap;
-  justify-content:center;
-  animation:bannerSlide 0.4s cubic-bezier(0.4,0,0.2,1);
-}
+#mode-banner{position:fixed;top:66px;left:50%;transform:translateX(-50%);padding:12px 22px;border-radius:30px;font-size:12px;font-weight:700;z-index:1200;display:none;white-space:nowrap;max-width:92vw;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,0.7);align-items:center;gap:11px;flex-wrap:wrap;justify-content:center;animation:bannerSlide 0.4s cubic-bezier(0.4,0,0.2,1)}
 @keyframes bannerSlide{from{transform:translateX(-50%) translateY(-20px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
 #mode-banner.show{display:flex}
 #mode-banner.strat{background:linear-gradient(135deg,#1d4ed8,#2563eb);color:white}
 #mode-banner.patch{background:linear-gradient(135deg,#b45309,#d97706);color:white}
 #mode-banner.tree{background:linear-gradient(135deg,#065f46,#059669);color:white}
-.cancel-x{
-  background:rgba(255,255,255,0.22);border-radius:20px;
-  padding:4px 13px;cursor:pointer;border:none;
-  color:white;font-size:11px;font-weight:700;
-  font-family:inherit;touch-action:manipulation;
-}
+.cancel-x{background:rgba(255,255,255,0.25);border-radius:20px;padding:4px 14px;cursor:pointer;border:none;color:white;font-size:11px;font-weight:700;font-family:inherit;touch-action:manipulation}
 
-/* PARENT ZONE INDICATOR */
-#parent-zone-info{
-  position:fixed;top:64px;left:12px;
-  background:rgba(15,22,38,0.95);
-  border:1px solid rgba(251,191,36,0.3);
-  border-radius:10px;padding:8px 12px;
-  font-size:11px;color:#fbbf24;
-  z-index:850;display:none;
-  max-width:200px;backdrop-filter:blur(10px);
-  box-shadow:0 4px 16px rgba(0,0,0,0.5);
-}
+/* PARENT ZONE INFO */
+#parent-zone-info{position:fixed;top:66px;left:14px;background:rgba(13,20,36,0.96);border:1px solid rgba(251,191,36,0.35);border-radius:11px;padding:9px 13px;font-size:11px;color:#fbbf24;z-index:850;display:none;max-width:210px;backdrop-filter:blur(12px);box-shadow:0 6px 20px rgba(0,0,0,0.5)}
 #parent-zone-info.show{display:block}
-#parent-zone-info b{display:block;color:#fde68a;margin-bottom:2px;font-size:10px;text-transform:uppercase;letter-spacing:0.5px}
+#parent-zone-info b{display:block;color:#fde68a;margin-bottom:3px;font-size:10px;text-transform:uppercase;letter-spacing:0.6px}
+
+/* GPS ACCURACY DISPLAY */
+#gps-live{position:fixed;top:108px;right:14px;background:rgba(13,20,36,0.96);border:1px solid var(--bdr);border-radius:11px;padding:8px 12px;font-size:10px;color:var(--txt2);z-index:850;display:none;backdrop-filter:blur(10px);box-shadow:0 4px 16px rgba(0,0,0,0.5);min-width:140px}
+#gps-live.show{display:block}
+#gps-live .gps-title{font-size:9px;color:var(--acc);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;font-weight:700}
+#gps-live .gps-acc{font-size:11px;color:var(--txt);font-weight:600;font-family:'Courier New',monospace}
+#gps-live .gps-acc.good{color:#10b981}
+#gps-live .gps-acc.med{color:#fbbf24}
+#gps-live .gps-acc.bad{color:#ef4444}
 
 /* FAB */
-#fab-group{
-  position:fixed;right:12px;bottom:78px;
-  z-index:900;display:flex;flex-direction:column;gap:10px;
-}
-.fab{
-  width:50px;height:50px;border-radius:50%;border:none;
-  font-size:20px;display:flex;align-items:center;
-  justify-content:center;cursor:pointer;
-  touch-action:manipulation;
-  box-shadow:0 6px 20px rgba(0,0,0,0.5);
-  transition:transform 0.15s;
-  position:relative;
-}
+#fab-group{position:fixed;right:14px;bottom:80px;z-index:900;display:flex;flex-direction:column;gap:10px}
+.fab{width:52px;height:52px;border-radius:50%;border:none;font-size:21px;display:flex;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation;box-shadow:0 6px 22px rgba(0,0,0,0.55);transition:transform 0.15s;position:relative}
 .fab:active{transform:scale(0.88)}
 .fab-gps{background:linear-gradient(135deg,#10b981,#059669);color:white}
-.fab-fit{background:rgba(15,22,38,0.96);border:1.5px solid var(--bdr2);color:var(--txt2);font-size:18px}
-.fab-heat{background:rgba(15,22,38,0.96);border:1.5px solid var(--bdr2);color:#ef4444;font-size:20px}
-.fab-heat.on{background:rgba(239,68,68,0.2);border-color:var(--red);box-shadow:0 0 16px rgba(239,68,68,0.5)}
+.fab-track{background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;font-size:16px}
+.fab-track.on{box-shadow:0 0 20px rgba(139,92,246,0.6)}
+.fab-fit{background:rgba(13,20,36,0.97);border:1.5px solid var(--bdr2);color:var(--txt2);font-size:18px}
+.fab-heat{background:rgba(13,20,36,0.97);border:1.5px solid var(--bdr2);color:#ef4444;font-size:20px}
+.fab-heat.on{background:rgba(239,68,68,0.22);border-color:var(--red);box-shadow:0 0 18px rgba(239,68,68,0.55)}
 
 /* TILE BTN */
-#tile-btn{
-  position:fixed;top:62px;left:12px;
-  background:rgba(15,22,38,0.96);
-  border:1.5px solid var(--bdr2);
-  border-radius:10px;padding:8px 13px;
-  font-size:11px;font-weight:700;color:var(--txt);
-  z-index:900;cursor:pointer;touch-action:manipulation;
-  font-family:inherit;
-  backdrop-filter:blur(10px);
-}
-#tile-btn:active{border-color:var(--acc)}
+#tile-btn{position:fixed;top:64px;left:14px;background:rgba(13,20,36,0.97);border:1.5px solid var(--bdr2);border-radius:11px;padding:9px 14px;font-size:11px;font-weight:700;color:var(--txt);z-index:900;cursor:pointer;touch-action:manipulation;font-family:inherit;backdrop-filter:blur(12px)}
 
-/* OPEN SHEET BUTTON */
-#open-sheet-btn{
-  position:fixed;bottom:0;left:0;right:0;height:62px;
-  background:linear-gradient(0deg,rgba(7,10,20,0.99),rgba(7,10,20,0.95));
-  border-top:1px solid var(--bdr);
-  display:flex;align-items:center;
-  justify-content:center;gap:12px;
-  z-index:900;cursor:pointer;
-  touch-action:manipulation;
-  -webkit-tap-highlight-color:transparent;
-  backdrop-filter:blur(20px);
-}
-#open-sheet-btn::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,var(--acc),var(--acc2),transparent);
-}
-.osb-icon{font-size:22px}
+/* OPEN SHEET */
+#open-sheet-btn{position:fixed;bottom:0;left:0;right:0;height:64px;background:linear-gradient(0deg,rgba(5,8,16,0.99),rgba(5,8,16,0.95));border-top:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;gap:12px;z-index:900;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;backdrop-filter:blur(20px)}
+#open-sheet-btn::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--acc),var(--acc2),transparent)}
+.osb-icon{font-size:23px}
 .osb-text{display:flex;flex-direction:column;font-size:13px;font-weight:700;color:var(--txt)}
 .osb-sub{font-size:10px;color:var(--muted);font-weight:400}
 
 /* SHEET OVERLAY */
-#sheet-overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,0.7);
-  z-index:1500;display:none;opacity:0;transition:opacity 0.3s;
-  backdrop-filter:blur(4px);
-}
+#sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:1500;display:none;opacity:0;transition:opacity 0.3s;backdrop-filter:blur(5px)}
 #sheet-overlay.show{display:block;opacity:1}
 
 /* BOTTOM SHEET */
-#bottom-sheet{
-  position:fixed;left:0;right:0;bottom:0;
-  max-height:92vh;
-  background:var(--bg);
-  border-top:1.5px solid var(--bdr);
-  border-radius:24px 24px 0 0;
-  z-index:1600;
-  display:flex;flex-direction:column;
-  transform:translateY(100%);
-  transition:transform 0.4s cubic-bezier(0.32,0.72,0,1);
-  overflow:hidden;
-  box-shadow:0 -20px 40px rgba(0,0,0,0.4);
-}
+#bottom-sheet{position:fixed;left:0;right:0;bottom:0;max-height:93vh;background:var(--bg);border-top:1.5px solid var(--bdr);border-radius:26px 26px 0 0;z-index:1600;display:flex;flex-direction:column;transform:translateY(100%);transition:transform 0.4s cubic-bezier(0.32,0.72,0,1);overflow:hidden;box-shadow:0 -24px 50px rgba(0,0,0,0.5)}
 #bottom-sheet.open{transform:translateY(0)}
-.sheet-handle{
-  width:40px;height:4px;background:var(--bdr2);
-  border-radius:3px;margin:10px auto 6px;flex-shrink:0;
-}
+.sheet-handle{width:42px;height:5px;background:var(--bdr2);border-radius:3px;margin:11px auto 6px;flex-shrink:0}
 
 /* SHEET TABS */
-.sheet-tabs{
-  display:flex;border-bottom:1px solid var(--bdr);
-  background:rgba(7,10,20,0.9);flex-shrink:0;
-  overflow-x:auto;
-}
+.sheet-tabs{display:flex;border-bottom:1px solid var(--bdr);background:rgba(5,8,16,0.92);flex-shrink:0;overflow-x:auto}
 .sheet-tabs::-webkit-scrollbar{display:none}
-.stab{
-  flex-shrink:0;padding:12px 14px;background:none;border:none;
-  color:var(--muted);font-size:10px;font-weight:700;
-  text-transform:uppercase;letter-spacing:0.5px;
-  border-bottom:2px solid transparent;
-  cursor:pointer;white-space:nowrap;font-family:inherit;
-  touch-action:manipulation;min-height:46px;
-  transition:all 0.2s;
-}
-.stab.on{color:var(--acc);border-bottom-color:var(--acc);background:rgba(59,130,246,0.08)}
+.stab{flex-shrink:0;padding:13px 14px;background:none;border:none;color:var(--muted);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;font-family:inherit;touch-action:manipulation;min-height:48px;transition:all 0.2s}
+.stab.on{color:var(--acc);border-bottom-color:var(--acc);background:rgba(59,130,246,0.1)}
 
 /* SHEET CONTENT */
-.sheet-content{
-  flex:1;overflow-y:auto;
-  -webkit-overflow-scrolling:touch;
-  padding:14px;display:flex;flex-direction:column;gap:11px;
-}
+.sheet-content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;display:flex;flex-direction:column;gap:11px}
 .sheet-content::-webkit-scrollbar{display:none}
 .tab-pane{display:none;flex-direction:column;gap:11px}
 .tab-pane.on{display:flex}
 
 /* CARDS */
-.card{
-  background:var(--card);border:1px solid var(--bdr);
-  border-radius:14px;padding:14px;
-  position:relative;overflow:hidden;
-}
-.card-title{
-  font-size:10px;font-weight:800;color:var(--acc);
-  text-transform:uppercase;letter-spacing:1.2px;
-  margin-bottom:12px;display:flex;align-items:center;gap:7px;
-}
+.card{background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:14px;position:relative;overflow:hidden}
+.card-title{font-size:10px;font-weight:800;color:var(--acc);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:12px;display:flex;align-items:center;gap:7px}
 .card-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--bdr),transparent)}
 
 /* FORM */
@@ -252,43 +134,22 @@ html,body{
 .fg{flex:1;display:flex;flex-direction:column;gap:5px}
 label{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.5px}
 
-input,select,textarea{
-  background:rgba(0,0,0,0.5);
-  border:1.5px solid var(--bdr2);
-  border-radius:10px;padding:12px 13px;
-  color:var(--txt);font-size:15px;width:100%;
-  font-family:inherit;-webkit-appearance:none;appearance:none;
-  -webkit-text-fill-color:var(--txt);
-  touch-action:manipulation;transition:all 0.2s;
-}
-input:focus,select:focus,textarea:focus{
-  outline:none;border-color:var(--acc);
-  background:rgba(59,130,246,0.08);
-  box-shadow:0 0 0 3px rgba(59,130,246,0.15);
-}
+input,select,textarea{background:rgba(0,0,0,0.5);border:1.5px solid var(--bdr2);border-radius:10px;padding:12px 13px;color:var(--txt);font-size:15px;width:100%;font-family:inherit;-webkit-appearance:none;appearance:none;-webkit-text-fill-color:var(--txt);touch-action:manipulation;transition:all 0.2s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--acc);background:rgba(59,130,246,0.08);box-shadow:0 0 0 3px rgba(59,130,246,0.15)}
 input::placeholder{color:var(--muted);-webkit-text-fill-color:var(--muted)}
-select option{background:#1a2440;color:var(--txt)}
+select option{background:#172033;color:var(--txt)}
 textarea{resize:none;min-height:72px}
 
 /* BUTTONS */
-.btn{
-  width:100%;min-height:52px;border:none;border-radius:13px;
-  font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  touch-action:manipulation;-webkit-tap-highlight-color:transparent;
-  transition:all 0.15s;padding:0 16px;
-  letter-spacing:0.3px;position:relative;overflow:hidden;
-}
-.btn::before{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(180deg,rgba(255,255,255,0.1),transparent);
-  pointer-events:none;
-}
+.btn{width:100%;min-height:52px;border:none;border-radius:13px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:all 0.15s;padding:0 16px;letter-spacing:0.3px;position:relative;overflow:hidden}
+.btn::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,0.1),transparent);pointer-events:none}
 .btn:active{transform:scale(0.97)}
-.btn-primary{background:linear-gradient(135deg,#3b82f6,#2563eb);color:white;box-shadow:0 6px 18px rgba(59,130,246,0.35)}
-.btn-green{background:linear-gradient(135deg,#10b981,#059669);color:white;box-shadow:0 6px 18px rgba(16,185,129,0.3)}
-.btn-yellow{background:linear-gradient(135deg,#d97706,#b45309);color:white;box-shadow:0 6px 18px rgba(217,119,6,0.3)}
-.btn-purple{background:linear-gradient(135deg,#7c3aed,#6d28d9);color:white;box-shadow:0 6px 18px rgba(124,58,237,0.3)}
+.btn-primary{background:linear-gradient(135deg,#3b82f6,#2563eb);color:white;box-shadow:0 6px 20px rgba(59,130,246,0.4)}
+.btn-green{background:linear-gradient(135deg,#10b981,#059669);color:white;box-shadow:0 6px 20px rgba(16,185,129,0.35)}
+.btn-yellow{background:linear-gradient(135deg,#d97706,#b45309);color:white;box-shadow:0 6px 20px rgba(217,119,6,0.35)}
+.btn-purple{background:linear-gradient(135deg,#7c3aed,#6d28d9);color:white;box-shadow:0 6px 20px rgba(124,58,237,0.35)}
+.btn-cyan{background:linear-gradient(135deg,#06b6d4,#0891b2);color:white;box-shadow:0 6px 20px rgba(6,182,212,0.35)}
+.btn-pink{background:linear-gradient(135deg,#ec4899,#db2777);color:white;box-shadow:0 6px 20px rgba(236,72,153,0.35)}
 .btn-ghost{background:var(--card2);border:1.5px solid var(--bdr2);color:var(--txt)}
 .btn-red{background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:var(--red)}
 .btn-half{flex:1}
@@ -300,233 +161,112 @@ textarea{resize:none;min-height:72px}
 .info-green{background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);color:#6ee7b7}
 .info-yellow{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);color:#fde68a}
 .info-red{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);color:#fca5a5}
+.info-purple{background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.25);color:#c4b5fd}
 
-/* PARENT SELECTOR — show which strata/patch trees belong to */
-.parent-sel{
-  background:rgba(59,130,246,0.05);
-  border:1.5px solid rgba(59,130,246,0.25);
-  border-radius:11px;padding:11px;margin-bottom:10px;
-}
-.parent-sel-title{
-  font-size:10px;font-weight:700;color:#60a5fa;
-  text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;
-  display:flex;align-items:center;gap:5px;
-}
+/* PARENT SELECTOR */
+.parent-sel{background:rgba(59,130,246,0.06);border:1.5px solid rgba(59,130,246,0.3);border-radius:11px;padding:11px;margin-bottom:10px}
+.parent-sel-title{font-size:10px;font-weight:700;color:#60a5fa;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;display:flex;align-items:center;gap:5px}
 .parent-options{display:flex;flex-direction:column;gap:6px}
-.parent-opt{
-  background:rgba(0,0,0,0.3);
-  border:1.5px solid var(--bdr);
-  border-radius:9px;padding:9px 11px;
-  cursor:pointer;touch-action:manipulation;
-  display:flex;align-items:center;gap:9px;
-  transition:all 0.2s;
-}
-.parent-opt:active,.parent-opt.on{
-  border-color:var(--acc);
-  background:rgba(59,130,246,0.12);
-}
-.parent-opt-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.parent-opt{background:rgba(0,0,0,0.35);border:1.5px solid var(--bdr);border-radius:9px;padding:10px 11px;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;gap:9px;transition:all 0.2s}
+.parent-opt:active,.parent-opt.on{border-color:var(--acc);background:rgba(59,130,246,0.15)}
+.parent-opt-dot{width:11px;height:11px;border-radius:3px;flex-shrink:0}
 .parent-opt-title{font-size:12px;font-weight:600;color:var(--txt);flex:1}
-.parent-opt-check{
-  width:18px;height:18px;border-radius:50%;
-  border:1.5px solid var(--bdr2);flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  font-size:11px;color:white;
-}
+.parent-opt-check{width:19px;height:19px;border-radius:50%;border:1.5px solid var(--bdr2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:white}
 .parent-opt.on .parent-opt-check{background:var(--acc);border-color:var(--acc)}
 
 /* SWATCHES */
 .swatches{display:flex;gap:10px;flex-wrap:wrap;padding:4px 0}
-.swatch{
-  width:32px;height:32px;border-radius:50%;
-  border:2.5px solid transparent;cursor:pointer;
-  touch-action:manipulation;transition:all 0.15s;
-  box-shadow:0 2px 6px rgba(0,0,0,0.3);
-}
+.swatch{width:34px;height:34px;border-radius:50%;border:2.5px solid transparent;cursor:pointer;touch-action:manipulation;transition:all 0.15s;box-shadow:0 2px 8px rgba(0,0,0,0.4)}
 .swatch:active{transform:scale(1.2)}
-.swatch.on{border-color:white;transform:scale(1.15);box-shadow:0 0 10px rgba(255,255,255,0.5)}
+.swatch.on{border-color:white;transform:scale(1.15);box-shadow:0 0 12px rgba(255,255,255,0.6)}
 
 /* PHOTO */
-.photo-upload{
-  border:2px dashed var(--bdr2);border-radius:13px;
-  padding:20px;text-align:center;cursor:pointer;
-  touch-action:manipulation;color:var(--muted);
-  transition:all 0.2s;
-}
+.photo-upload{border:2px dashed var(--bdr2);border-radius:13px;padding:22px;text-align:center;cursor:pointer;touch-action:manipulation;color:var(--muted);transition:all 0.2s}
 .photo-upload:active{border-color:var(--acc);background:rgba(59,130,246,0.05);color:var(--acc)}
 .photo-upload input{display:none}
 .photo-strip{display:flex;gap:8px;overflow-x:auto;padding:6px 0;margin-top:9px}
 .photo-strip::-webkit-scrollbar{display:none}
 .ph-wrap{position:relative;flex-shrink:0}
-.ph-img{width:66px;height:66px;border-radius:10px;object-fit:cover;border:1.5px solid var(--bdr);display:block}
-.ph-del{
-  position:absolute;top:-6px;right:-6px;
-  width:22px;height:22px;background:var(--red);color:white;
-  border-radius:50%;border:none;font-size:12px;font-weight:700;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;touch-action:manipulation;
-  box-shadow:0 2px 6px rgba(0,0,0,0.4);
-}
+.ph-img{width:68px;height:68px;border-radius:11px;object-fit:cover;border:1.5px solid var(--bdr);display:block}
+.ph-del{position:absolute;top:-6px;right:-6px;width:22px;height:22px;background:var(--red);color:white;border-radius:50%;border:none;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation;box-shadow:0 2px 8px rgba(0,0,0,0.5)}
 
 /* STEPS BOX */
-.steps-box{
-  background:rgba(59,130,246,0.08);
-  border:1px solid rgba(59,130,246,0.25);
-  border-radius:11px;padding:11px;display:none;
-}
+.steps-box{background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.25);border-radius:11px;padding:11px;display:none}
 .steps-box.show{display:block}
 .steps-title{font-size:11px;font-weight:700;color:var(--acc);margin-bottom:6px}
 .steps-list{font-size:10px;color:var(--txt2);line-height:2;font-family:'Courier New',monospace}
 
 /* DATA LIST */
-.list-item{
-  background:var(--card2);border:1px solid var(--bdr);
-  border-radius:11px;padding:11px 13px;
-  display:flex;align-items:center;gap:10px;
-  cursor:pointer;touch-action:manipulation;margin-bottom:6px;
-  transition:all 0.15s;
-}
+.list-item{background:var(--card2);border:1px solid var(--bdr);border-radius:11px;padding:11px 13px;display:flex;align-items:center;gap:10px;cursor:pointer;touch-action:manipulation;margin-bottom:6px;transition:all 0.15s}
 .list-item:active{border-color:var(--acc);transform:scale(0.98)}
-.list-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;box-shadow:0 0 8px currentColor}
-.list-sq{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+.list-dot{width:13px;height:13px;border-radius:50%;flex-shrink:0;box-shadow:0 0 8px currentColor}
+.list-sq{width:13px;height:13px;border-radius:3px;flex-shrink:0}
 .list-body{flex:1;min-width:0}
 .list-title{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .list-sub{font-size:11px;color:var(--muted);margin-top:2px}
-.del-btn{
-  background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.25);
-  color:var(--red);border-radius:8px;padding:7px 11px;
-  font-size:11px;font-weight:700;cursor:pointer;
-  touch-action:manipulation;flex-shrink:0;font-family:inherit;min-height:36px;
-}
+.del-btn{background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.25);color:var(--red);border-radius:8px;padding:7px 11px;font-size:11px;font-weight:700;cursor:pointer;touch-action:manipulation;flex-shrink:0;font-family:inherit;min-height:36px}
 
 /* STATS */
 .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.stat-card{
-  background:var(--card2);border:1px solid var(--bdr);
-  border-radius:12px;padding:14px;text-align:center;
-  position:relative;overflow:hidden;
-}
-.stat-card::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,var(--acc),var(--acc2));
-}
-.stat-n{
-  font-size:28px;font-weight:800;
-  background:linear-gradient(135deg,var(--acc),var(--acc2));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  background-clip:text;line-height:1;
-}
-.stat-l{font-size:10px;color:var(--muted);text-transform:uppercase;margin-top:5px;letter-spacing:0.5px}
+.stat-card{background:var(--card2);border:1px solid var(--bdr);border-radius:13px;padding:15px;text-align:center;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--acc),var(--acc2))}
+.stat-n{font-size:30px;font-weight:800;background:linear-gradient(135deg,var(--acc),var(--acc2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+.stat-l{font-size:10px;color:var(--muted);text-transform:uppercase;margin-top:6px;letter-spacing:0.5px}
 
 .chart-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.chart-lbl{font-size:11px;color:var(--txt2);width:68px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.chart-track{flex:1;background:rgba(0,0,0,0.5);border-radius:5px;height:15px;overflow:hidden}
+.chart-lbl{font-size:11px;color:var(--txt2);width:70px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chart-track{flex:1;background:rgba(0,0,0,0.5);border-radius:5px;height:16px;overflow:hidden}
 .chart-fill{height:100%;border-radius:5px;transition:width 0.8s cubic-bezier(0.4,0,0.2,1);box-shadow:0 0 10px currentColor}
-.chart-val{font-size:11px;color:var(--txt2);width:20px;text-align:right;font-variant-numeric:tabular-nums}
+.chart-val{font-size:11px;color:var(--txt2);width:22px;text-align:right;font-variant-numeric:tabular-nums}
 
 .leg-item{display:flex;align-items:center;gap:10px;margin-bottom:9px;font-size:12px;color:var(--txt2)}
-.leg-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;box-shadow:0 0 6px currentColor}
+.leg-dot{width:13px;height:13px;border-radius:50%;flex-shrink:0;box-shadow:0 0 6px currentColor}
 
 /* POPUP */
-.leaflet-popup-content-wrapper{
-  background:rgba(10,14,26,0.98)!important;
-  border:1px solid #1f2937!important;
-  border-radius:18px!important;
-  box-shadow:0 24px 70px rgba(0,0,0,0.85),0 0 0 1px rgba(59,130,246,0.1)!important;
-  padding:0!important;overflow:hidden;
-}
+.leaflet-popup-content-wrapper{background:rgba(8,12,22,0.98)!important;border:1px solid #1e293b!important;border-radius:18px!important;box-shadow:0 24px 70px rgba(0,0,0,0.85),0 0 0 1px rgba(59,130,246,0.1)!important;padding:0!important;overflow:hidden}
 .leaflet-popup-content{margin:0!important}
 .leaflet-popup-tip-container{display:none!important}
-.leaflet-popup-close-button{
-  color:#94a3b8!important;font-size:22px!important;
-  top:6px!important;right:8px!important;z-index:10;
-  width:28px!important;height:28px!important;
-  background:rgba(0,0,0,0.5)!important;
-  border-radius:50%!important;
-  display:flex!important;align-items:center!important;justify-content:center!important;
-  line-height:1!important;padding:0!important;
-}
+.leaflet-popup-close-button{color:#94a3b8!important;font-size:22px!important;top:6px!important;right:8px!important;z-index:10;width:28px!important;height:28px!important;background:rgba(0,0,0,0.5)!important;border-radius:50%!important;display:flex!important;align-items:center!important;justify-content:center!important;line-height:1!important;padding:0!important}
 
-.popup-wrap{width:278px;overflow:hidden;font-family:-apple-system,sans-serif}
-.popup-gallery{
-  width:100%;height:175px;background:#070a14;
-  position:relative;overflow:hidden;
-  display:flex;align-items:center;justify-content:center;
-}
-.popup-gallery.empty{height:60px;background:linear-gradient(135deg,rgba(59,130,246,0.1),rgba(139,92,246,0.1))}
+.popup-wrap{width:282px;overflow:hidden;font-family:-apple-system,sans-serif}
+.popup-gallery{width:100%;height:180px;background:#050810;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.popup-gallery.empty{height:62px;background:linear-gradient(135deg,rgba(59,130,246,0.12),rgba(139,92,246,0.12))}
 .pop-img{width:100%;height:100%;object-fit:cover;cursor:pointer;display:block}
-.pop-img-count{
-  position:absolute;bottom:8px;right:9px;
-  background:rgba(0,0,0,0.75);color:white;
-  border-radius:14px;padding:3px 10px;font-size:10px;font-weight:700;
-  backdrop-filter:blur(8px);
-}
-.pop-nav{
-  position:absolute;top:50%;transform:translateY(-50%);
-  background:rgba(0,0,0,0.6);color:white;border:none;
-  width:32px;height:32px;border-radius:50%;font-size:17px;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;
-  touch-action:manipulation;backdrop-filter:blur(4px);
-}
+.pop-img-count{position:absolute;bottom:8px;right:9px;background:rgba(0,0,0,0.78);color:white;border-radius:14px;padding:3px 11px;font-size:10px;font-weight:700;backdrop-filter:blur(8px)}
+.pop-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.62);color:white;border:none;width:34px;height:34px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation;backdrop-filter:blur(4px)}
 .pop-nav-l{left:6px}
 .pop-nav-r{right:6px}
 
-.popup-body{padding:13px 14px 10px}
+.popup-body{padding:14px 15px 11px}
 .popup-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:11px}
 .popup-name{font-size:16px;font-weight:800;color:#f1f5f9;line-height:1.2}
 .popup-species{font-size:11px;color:#64748b;font-style:italic;margin-top:3px}
-.spider-chip{
-  display:flex;flex-direction:column;align-items:center;
-  border-radius:12px;padding:6px 11px;min-width:46px;
-  border:1.5px solid;flex-shrink:0;
-}
-.spider-chip-n{font-size:21px;font-weight:800;line-height:1}
+.spider-chip{display:flex;flex-direction:column;align-items:center;border-radius:12px;padding:6px 12px;min-width:48px;border:1.5px solid;flex-shrink:0}
+.spider-chip-n{font-size:22px;font-weight:800;line-height:1}
 .spider-chip-l{font-size:8px;color:#64748b;text-transform:uppercase;letter-spacing:0.4px;margin-top:2px}
 
 .popup-fields{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:9px}
-.pop-field{background:rgba(255,255,255,0.03);border:1px solid #1f2937;border-radius:8px;padding:7px 9px}
+.pop-field{background:rgba(255,255,255,0.03);border:1px solid #1e293b;border-radius:8px;padding:7px 9px}
 .pop-field-l{font-size:9px;color:#475569;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px}
 .pop-field-v{font-size:12px;font-weight:600;color:#e2e8f0}
-.popup-notes{
-  background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);
-  border-radius:8px;padding:8px 10px;font-size:11px;color:#94a3b8;
-  line-height:1.5;font-style:italic;margin-bottom:8px;
-}
+.popup-notes{background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:8px;padding:8px 10px;font-size:11px;color:#94a3b8;line-height:1.5;font-style:italic;margin-bottom:8px}
 .popup-gps{font-size:9px;color:#475569;text-align:center;font-family:'Courier New',monospace}
 
-.thumb-row{display:flex;gap:6px;padding:0 14px 12px;overflow-x:auto}
+.thumb-row{display:flex;gap:6px;padding:0 15px 13px;overflow-x:auto}
 .thumb-row::-webkit-scrollbar{display:none}
-.thumb-img{
-  width:46px;height:46px;border-radius:8px;object-fit:cover;
-  flex-shrink:0;border:2px solid transparent;cursor:pointer;
-}
+.thumb-img{width:48px;height:48px;border-radius:8px;object-fit:cover;flex-shrink:0;border:2px solid transparent;cursor:pointer}
 .thumb-img.on{border-color:#3b82f6}
 
 /* TOAST */
-#toast{
-  position:fixed;bottom:74px;left:50%;
-  transform:translateX(-50%) translateY(16px);
-  background:var(--card);border:1px solid var(--bdr2);
-  border-radius:12px;padding:11px 18px;font-size:12px;
-  font-weight:600;color:var(--txt);z-index:9999;opacity:0;
-  pointer-events:none;transition:all 0.3s;
-  display:flex;align-items:center;gap:8px;
-  max-width:calc(100vw - 32px);
-  box-shadow:0 12px 32px rgba(0,0,0,0.6);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
+#toast{position:fixed;bottom:78px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--card);border:1px solid var(--bdr2);border-radius:13px;padding:12px 19px;font-size:12px;font-weight:600;color:var(--txt);z-index:9999;opacity:0;pointer-events:none;transition:all 0.3s;display:flex;align-items:center;gap:8px;max-width:calc(100vw - 32px);box-shadow:0 14px 36px rgba(0,0,0,0.65);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.toast-bar{
-  position:absolute;bottom:0;left:0;height:3px;border-radius:0 0 12px 12px;
-  background:linear-gradient(90deg,var(--acc),var(--acc2));
-  animation:tbar 3s linear forwards;
-}
+.toast-bar{position:absolute;bottom:0;left:0;height:3px;border-radius:0 0 13px 13px;background:linear-gradient(90deg,var(--acc),var(--acc2));animation:tbar 3s linear forwards}
 @keyframes tbar{from{width:100%}to{width:0}}
 #toast.err .toast-bar{background:var(--red)}
 #toast.warn .toast-bar{background:var(--yellow)}
 
 .empty-state{text-align:center;padding:24px;color:var(--muted)}
-.empty-state .icon{font-size:30px;margin-bottom:8px}
+.empty-state .icon{font-size:32px;margin-bottom:8px}
 .empty-state p{font-size:12px;line-height:1.6}
 
 .tag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:9px;font-weight:700}
@@ -534,36 +274,31 @@ textarea{resize:none;min-height:72px}
 .tag-o{background:rgba(245,158,11,0.15);color:#fbbf24;border:1px solid rgba(245,158,11,0.25)}
 .tag-r{background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.25)}
 .tag-v{background:rgba(139,92,246,0.15);color:#a78bfa;border:1px solid rgba(139,92,246,0.25)}
-.tag-g{background:rgba(16,185,129,0.15);color:#6ee7b7;border:1px solid rgba(16,185,129,0.25)}
 
 .divider{height:1px;background:var(--bdr);margin:9px 0}
-.scroll-end{height:20px;flex-shrink:0}
+.scroll-end{height:22px;flex-shrink:0}
 
-/* WARNING when placing outside parent */
-.boundary-warning{
-  background:rgba(239,68,68,0.1);
-  border:1px solid rgba(239,68,68,0.3);
-  border-radius:10px;padding:10px 12px;
-  font-size:11px;color:#fca5a5;
-  margin-top:8px;display:none;
-}
+.boundary-warning{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:10px;padding:10px 12px;font-size:11px;color:#fca5a5;margin-top:8px;display:none}
 .boundary-warning.show{display:block;animation:shake 0.4s}
-@keyframes shake{
-  0%,100%{transform:translateX(0)}
-  25%{transform:translateX(-4px)}
-  75%{transform:translateX(4px)}
-}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+
+/* EXPORT META */
+.export-section{background:linear-gradient(135deg,rgba(59,130,246,0.08),rgba(139,92,246,0.08));border:1px solid rgba(59,130,246,0.25);border-radius:13px;padding:14px}
+
+/* My location marker pulse */
+.my-loc-marker{position:relative}
+.my-loc-marker::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:30px;height:30px;border-radius:50%;background:rgba(59,130,246,0.3);animation:locPulse 2s ease-out infinite}
+@keyframes locPulse{0%{transform:translate(-50%,-50%) scale(0.3);opacity:1}100%{transform:translate(-50%,-50%) scale(2.5);opacity:0}}
 </style>
 </head>
 <body>
 
 <div id="map"></div>
 
-<!-- TOP BAR -->
 <div id="topbar">
   <div class="logo">
     <div class="logo-ico">🕷️</div>
-    <div><h1>Spider Map Pro</h1><p>Field Research Tool</p></div>
+    <div><h1>Spider Map Pro</h1><p>Research & Field Tool</p></div>
   </div>
   <div class="top-stats">
     <div class="stat-pill"><div class="stat-pill-n" id="h-trees">0</div><div class="stat-pill-l">Trees</div></div>
@@ -572,44 +307,42 @@ textarea{resize:none;min-height:72px}
   </div>
 </div>
 
-<!-- AUTOSAVE INDICATOR -->
 <div id="save-indicator"><div class="dot"></div>Saved</div>
 
-<!-- PARENT ZONE INDICATOR -->
 <div id="parent-zone-info">
   <b id="pz-title">Active Zone</b>
   <span id="pz-msg"></span>
 </div>
 
-<!-- MODE BANNER -->
+<div id="gps-live">
+  <div class="gps-title">📡 Live GPS Tracking</div>
+  <div class="gps-acc" id="gps-acc-text">Waiting...</div>
+</div>
+
 <div id="mode-banner">
   <span id="banner-txt">Tap on map</span>
   <button class="cancel-x" onclick="cancelMode()">✕</button>
 </div>
 
-<!-- TILE BTN -->
 <button id="tile-btn" onclick="cycleTile()">🛰️ Satellite</button>
 
-<!-- FAB -->
 <div id="fab-group">
+  <button class="fab fab-track" id="track-fab" onclick="toggleTracking()">📡</button>
   <button class="fab fab-heat" id="heat-fab" onclick="toggleHeat()">🔥</button>
   <button class="fab fab-fit" onclick="fitAll()">🎯</button>
   <button class="fab fab-gps" onclick="jumpGPS()">📍</button>
 </div>
 
-<!-- OPEN SHEET -->
 <div id="open-sheet-btn" onclick="openSheet()">
   <span class="osb-icon">☰</span>
   <div class="osb-text">
     Open Field Menu
-    <span class="osb-sub">Trees · Strata · Patches · Data</span>
+    <span class="osb-sub">Trees · Strata · Patches · Export</span>
   </div>
 </div>
 
-<!-- SHEET OVERLAY -->
 <div id="sheet-overlay" onclick="closeSheet()"></div>
 
-<!-- BOTTOM SHEET -->
 <div id="bottom-sheet">
   <div class="sheet-handle"></div>
   <div class="sheet-tabs">
@@ -618,6 +351,7 @@ textarea{resize:none;min-height:72px}
     <button class="stab on" onclick="swTab('tree',this)">🌳 3.Tree</button>
     <button class="stab" onclick="swTab('data',this)">📋 Data</button>
     <button class="stab" onclick="swTab('stats',this)">📊 Stats</button>
+    <button class="stab" onclick="swTab('export',this)">📤 Export</button>
     <button class="stab" onclick="swTab('help',this)">❓ Help</button>
   </div>
 
@@ -626,16 +360,13 @@ textarea{resize:none;min-height:72px}
     <!-- STRATA TAB -->
     <div class="tab-pane" id="tab-strata">
       <div class="info-box info-blue">
-        <b>📐 Step 1:</b> Draw your stratum first.<br>
-        Walk to each corner → tap <b>"📍 Add Corner at My GPS"</b> → repeat all corners → tap <b>"✅ Done"</b> → Save.
+        <b>📐 Step 1:</b> Walk to each corner → tap <b>"📍 Add Corner at My GPS"</b> → repeat → tap <b>"✅ Done"</b> → Save.
       </div>
       <div class="card">
         <div class="card-title">📋 Stratum Details</div>
         <div class="row">
           <div class="fg"><label>Stratum ID</label><input id="s-id" placeholder="S1" autocomplete="off"></div>
-          <div class="fg"><label>Number</label>
-            <select id="s-num"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
-          </div>
+          <div class="fg"><label>Number</label><select id="s-num"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div>
         </div>
         <div class="fg"><label>Description</label><input id="s-name" placeholder="Near main gate / Academic block" autocomplete="off"></div>
       </div>
@@ -658,17 +389,11 @@ textarea{resize:none;min-height:72px}
           <button class="btn btn-primary btn-half" id="start-s-btn" onclick="startMode('strat')">🖱️ Tap Map Corners</button>
           <button class="btn btn-green btn-half" id="done-s-btn" onclick="finishStrat()" style="display:none">✅ Done</button>
         </div>
-        <button class="btn btn-green" style="margin-bottom:8px" onclick="addGPSCorner()">📍 Add Corner at My GPS</button>
+        <button class="btn btn-green" style="margin-bottom:8px" onclick="addGPSCorner()">📍 Add Corner at My GPS (Best Accuracy)</button>
         <div class="steps-box" id="s-steps">
           <div class="steps-title">Corners: <span id="corner-n">0</span> added (need 3+)</div>
           <div class="steps-list" id="corner-list"></div>
         </div>
-        <div class="divider"></div>
-        <p style="font-size:11px;color:var(--muted);margin-bottom:7px">Or type manually:</p>
-        <div class="row"><div class="fg"><label>C1 Lat</label><input class="slat" type="number" step="0.000001" placeholder="28.9454" inputmode="decimal"></div><div class="fg"><label>C1 Lon</label><input class="slon" type="number" step="0.000001" placeholder="77.1012" inputmode="decimal"></div></div>
-        <div class="row"><div class="fg"><label>C2 Lat</label><input class="slat" type="number" step="0.000001" placeholder="28.9460" inputmode="decimal"></div><div class="fg"><label>C2 Lon</label><input class="slon" type="number" step="0.000001" placeholder="77.1012" inputmode="decimal"></div></div>
-        <div class="row"><div class="fg"><label>C3 Lat</label><input class="slat" type="number" step="0.000001" placeholder="28.9460" inputmode="decimal"></div><div class="fg"><label>C3 Lon</label><input class="slon" type="number" step="0.000001" placeholder="77.1022" inputmode="decimal"></div></div>
-        <div class="row"><div class="fg"><label>C4 Lat</label><input class="slat" type="number" step="0.000001" placeholder="28.9454" inputmode="decimal"></div><div class="fg"><label>C4 Lon</label><input class="slon" type="number" step="0.000001" placeholder="77.1022" inputmode="decimal"></div></div>
       </div>
       <button class="btn btn-primary" onclick="saveStrat()">💾 Save Stratum</button>
       <div class="scroll-end"></div>
@@ -677,9 +402,8 @@ textarea{resize:none;min-height:72px}
     <!-- PATCH TAB -->
     <div class="tab-pane" id="tab-patch">
       <div class="info-box info-green">
-        <b>⬛ Step 2:</b> Patches go <b>INSIDE</b> a stratum. Pick parent stratum below, then place patch on map. Auto-sized 8×8 meters.
+        <b>⬛ Step 2:</b> Patches go INSIDE a stratum. Pick parent stratum, then place patch. Auto-sized 8×8 meters.
       </div>
-
       <div class="card">
         <div class="parent-sel">
           <div class="parent-sel-title">🔗 Which Stratum Does This Patch Belong To?</div>
@@ -687,20 +411,13 @@ textarea{resize:none;min-height:72px}
             <div class="empty-state" style="padding:14px"><p style="font-size:11px">No strata yet. Create one first!</p></div>
           </div>
         </div>
-        <div class="boundary-warning" id="patch-boundary-warn">
-          ⚠️ Patch is outside the selected stratum. Move it inside the stratum boundary.
-        </div>
+        <div class="boundary-warning" id="patch-boundary-warn">⚠️ Patch is outside the selected stratum.</div>
       </div>
-
       <div class="card">
         <div class="card-title">📋 Patch Details</div>
-        <div class="fg" style="margin-bottom:7px">
-          <label>Patch ID</label>
-          <input id="p-id" placeholder="P1" autocomplete="off">
-        </div>
+        <div class="fg" style="margin-bottom:7px"><label>Patch ID</label><input id="p-id" placeholder="P1" autocomplete="off"></div>
         <div class="fg"><label>Notes</label><input id="p-name" placeholder="Optional description..." autocomplete="off"></div>
       </div>
-
       <div class="card">
         <div class="card-title">🎨 Color</div>
         <div class="swatches" id="p-sw">
@@ -712,7 +429,6 @@ textarea{resize:none;min-height:72px}
           <div class="swatch" style="background:#a3e635" data-c="#a3e635" onclick="pickC(this,'p')"></div>
         </div>
       </div>
-
       <div class="card">
         <div class="card-title">📍 Place on Map</div>
         <div class="fg" style="margin-bottom:9px">
@@ -725,27 +441,19 @@ textarea{resize:none;min-height:72px}
             <option value="br">Bottom-Right corner</option>
           </select>
         </div>
-        <button class="btn btn-green" style="margin-bottom:8px" onclick="patchAtGPS()">📍 Place at My GPS Location</button>
+        <button class="btn btn-green" style="margin-bottom:8px" onclick="patchAtGPS()">📍 Place at My GPS (Most Accurate)</button>
         <button class="btn btn-yellow" onclick="startMode('patch')">🗺️ Tap Map to Place Patch</button>
-        <div class="info-box info-green" id="patch-ready" style="display:none;margin-top:8px">✅ 8×8m patch placed inside stratum!</div>
+        <div class="info-box info-green" id="patch-ready" style="display:none;margin-top:8px">✅ 8×8m patch placed!</div>
       </div>
-
-      <div class="card" id="patch-coord-card" style="display:none">
-        <div class="card-title">📏 Patch Corners</div>
-        <div id="patch-coords" style="font-size:10px;color:var(--muted);line-height:1.9"></div>
-      </div>
-
       <button class="btn btn-primary" onclick="savePatch()">💾 Save 8×8m Patch</button>
       <div class="scroll-end"></div>
     </div>
 
     <!-- TREE TAB -->
     <div class="tab-pane on" id="tab-tree">
-
       <div class="info-box info-blue">
-        <b>🌳 Step 3:</b> Trees go <b>INSIDE</b> a patch. Pick parent patch below, then place tree at GPS location.
+        <b>🌳 Step 3:</b> Stand AT the tree. Tap <b>"📍 Capture My GPS"</b>. App takes multiple GPS readings for best accuracy.
       </div>
-
       <div class="card">
         <div class="parent-sel">
           <div class="parent-sel-title">🔗 Which Patch Does This Tree Belong To?</div>
@@ -753,11 +461,8 @@ textarea{resize:none;min-height:72px}
             <div class="empty-state" style="padding:14px"><p style="font-size:11px">No patches yet. Create one first!</p></div>
           </div>
         </div>
-        <div class="boundary-warning" id="tree-boundary-warn">
-          ⚠️ Tree is outside the selected patch. Move it inside the 8×8m patch.
-        </div>
+        <div class="boundary-warning" id="tree-boundary-warn">⚠️ Tree is outside the selected patch.</div>
       </div>
-
       <div class="card">
         <div class="card-title">🪪 Tree Identity</div>
         <div class="row">
@@ -770,73 +475,50 @@ textarea{resize:none;min-height:72px}
           <option>Jamun</option><option>Bamboo</option><option>Amaltas</option>
         </datalist>
       </div>
-
       <div class="card">
-        <div class="card-title">📍 GPS Location</div>
-        <button class="btn btn-green" style="margin-bottom:8px" onclick="captureGPS()">📍 Capture My GPS (Stand at Tree)</button>
-        <div id="gps-result" style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:8px;display:none"></div>
+        <div class="card-title">📍 GPS Location (High Accuracy)</div>
+        <button class="btn btn-green" style="margin-bottom:8px" onclick="captureHighAccuracyGPS()">📍 Capture My GPS — Wait for Best Accuracy</button>
+        <div id="gps-result" style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:8px;display:none;line-height:1.6"></div>
         <div class="row" style="margin-bottom:8px">
           <div class="fg"><label>Latitude</label><input id="t-lat" type="number" placeholder="28.9456" step="0.000001" inputmode="decimal"></div>
           <div class="fg"><label>Longitude</label><input id="t-lon" type="number" placeholder="77.1015" step="0.000001" inputmode="decimal"></div>
         </div>
         <button class="btn btn-purple" onclick="startMode('tree')">🗺️ Tap Location on Map</button>
       </div>
-
       <div class="card">
         <div class="card-title">🔬 Spider Observation</div>
         <div class="row">
           <div class="fg"><label>Spider Count</label><input id="t-cnt" type="number" placeholder="0" min="0" inputmode="numeric"></div>
-          <div class="fg">
-            <label>Bark Type</label>
-            <select id="t-bark">
-              <option value="">—</option>
-              <option>Rough</option><option>Smooth</option>
-              <option>Fissured</option><option>Scaly</option><option>Fibrous</option>
-            </select>
+          <div class="fg"><label>Bark Type</label>
+            <select id="t-bark"><option value="">—</option><option>Rough</option><option>Smooth</option><option>Fissured</option><option>Scaly</option><option>Fibrous</option></select>
           </div>
         </div>
-        <div class="fg" style="margin-bottom:7px">
-          <label>Web Type</label>
-          <select id="t-web">
-            <option>None</option><option>Orb web</option><option>Sheet web</option>
-            <option>Cobweb</option><option>Funnel web</option><option>Tangle web</option>
-          </select>
+        <div class="fg" style="margin-bottom:7px"><label>Web Type</label>
+          <select id="t-web"><option>None</option><option>Orb web</option><option>Sheet web</option><option>Cobweb</option><option>Funnel web</option><option>Tangle web</option></select>
         </div>
-        <div class="fg" style="margin-bottom:7px">
-          <label>Spider Height on Tree</label>
-          <select id="t-ht">
-            <option value="">—</option>
-            <option>Ground (0–0.5m)</option><option>Low (0.5–1.5m)</option>
-            <option>Mid (1.5–3m)</option><option>High (3m+)</option>
-          </select>
+        <div class="fg" style="margin-bottom:7px"><label>Spider Height on Tree</label>
+          <select id="t-ht"><option value="">—</option><option>Ground (0–0.5m)</option><option>Low (0.5–1.5m)</option><option>Mid (1.5–3m)</option><option>High (3m+)</option></select>
         </div>
-        <div class="fg">
-          <label>Field Notes</label>
-          <textarea id="t-notes" placeholder="Spider behavior, web location, bark texture..."></textarea>
-        </div>
+        <div class="fg"><label>Field Notes</label><textarea id="t-notes" placeholder="Spider behavior, web location, bark texture..."></textarea></div>
       </div>
-
       <div class="card">
         <div class="card-title">📷 Photos</div>
         <div class="photo-upload" onclick="document.getElementById('t-photo').click()">
           <input type="file" id="t-photo" accept="image/*" multiple onchange="handlePhotos(this)">
-          <div style="font-size:30px;margin-bottom:5px">📸</div>
+          <div style="font-size:32px;margin-bottom:6px">📸</div>
           <div style="font-size:13px;font-weight:700">Tap to Add Photos</div>
           <div style="font-size:11px;margin-top:3px;color:var(--muted)">Tree · Bark · Spider · Web</div>
         </div>
         <div class="photo-strip" id="ph-strip"></div>
         <div id="ph-count" style="font-size:11px;color:var(--muted);text-align:center;margin-top:5px"></div>
       </div>
-
       <button class="btn btn-primary" onclick="saveTree()">＋ Save Tree to Map</button>
       <div class="scroll-end"></div>
     </div>
 
     <!-- DATA TAB -->
     <div class="tab-pane" id="tab-data">
-      <div class="info-box info-yellow">
-        💾 <b>Auto-save active!</b> All data saves to browser. Export CSV regularly as backup.
-      </div>
+      <div class="info-box info-yellow">💾 <b>Auto-saves after every action.</b> Data persists across refreshes.</div>
       <div class="card">
         <div class="card-title">🔍 Search Trees</div>
         <input placeholder="Search ID, species, patch..." oninput="filterList(this.value)" autocomplete="off">
@@ -854,7 +536,7 @@ textarea{resize:none;min-height:72px}
         <div id="tree-list"><div class="empty-state"><div class="icon">🌳</div><p>No trees yet.</p></div></div>
       </div>
       <div class="btn-row">
-        <button class="btn btn-green btn-half" onclick="exportCSV()">📥 Export CSV</button>
+        <button class="btn btn-green btn-half" onclick="exportCSV()">📥 CSV</button>
         <button class="btn btn-red btn-half" onclick="clearAll()">🗑️ Clear All</button>
       </div>
       <div class="scroll-end"></div>
@@ -876,30 +558,74 @@ textarea{resize:none;min-height:72px}
       <div class="scroll-end"></div>
     </div>
 
+    <!-- EXPORT TAB -->
+    <div class="tab-pane" id="tab-export">
+      <div class="info-box info-purple">
+        <b>📤 Export Presentation Map</b><br>
+        Creates a beautiful standalone HTML file. Share via WhatsApp, email, or upload. Anyone can open it and see all your data + photos.
+      </div>
+
+      <div class="card export-section">
+        <div class="card-title">📝 Project Info (Shown in Export)</div>
+        <div class="fg" style="margin-bottom:8px"><label>Project Title</label><input id="exp-title" placeholder="Spider Distribution at Ashoka University" autocomplete="off"></div>
+        <div class="fg" style="margin-bottom:8px"><label>Researcher Name</label><input id="exp-author" placeholder="Your Name" autocomplete="off"></div>
+        <div class="fg" style="margin-bottom:8px"><label>Institution</label><input id="exp-inst" placeholder="University / College / School" autocomplete="off"></div>
+        <div class="fg" style="margin-bottom:8px"><label>Date</label><input id="exp-date" type="date"></div>
+        <div class="fg"><label>Abstract / Description</label><textarea id="exp-abstract" placeholder="Brief description of your study..."></textarea></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🎨 Export Options</div>
+        <div class="fg" style="margin-bottom:8px">
+          <label>Map Style</label>
+          <select id="exp-style">
+            <option value="dark">Dark (Professional)</option>
+            <option value="light">Light (Print-friendly)</option>
+            <option value="elegant">Elegant (Publication)</option>
+          </select>
+        </div>
+        <div class="fg" style="margin-bottom:8px">
+          <label>Default Map Layer</label>
+          <select id="exp-tiles">
+            <option value="0">Street Map</option>
+            <option value="1">Satellite</option>
+            <option value="2" selected>Hybrid (Satellite + Labels)</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="btn btn-pink" onclick="exportPresentation()">📤 Generate Beautiful HTML Map</button>
+      <div style="height:8px"></div>
+      <button class="btn btn-cyan" onclick="exportCSV()">📥 Export Raw CSV Data</button>
+      <div class="scroll-end"></div>
+    </div>
+
     <!-- HELP TAB -->
     <div class="tab-pane" id="tab-help">
       <div class="card">
-        <div class="card-title">📋 Workflow Order</div>
+        <div class="card-title">📋 Correct Workflow</div>
         <div style="font-size:13px;color:var(--txt2);line-height:2">
           <b style="color:var(--txt)">1️⃣ Create Stratum first</b><br>
-          A stratum is your large study area (boundary)<br><br>
-          <b style="color:var(--txt)">2️⃣ Create Patches INSIDE stratum</b><br>
-          Each patch must be linked to a stratum<br>
-          Patches are 8×8m sampling squares<br><br>
-          <b style="color:var(--txt)">3️⃣ Add Trees INSIDE patches</b><br>
-          Each tree must be linked to a patch<br>
-          Trees auto-check they are inside patch
+          Walk corners → GPS → Save<br><br>
+          <b style="color:var(--txt)">2️⃣ Create Patches inside stratum</b><br>
+          Pick parent → place → Save<br><br>
+          <b style="color:var(--txt)">3️⃣ Add Trees inside patches</b><br>
+          Pick parent → GPS → photos → Save<br><br>
+          <b style="color:var(--txt)">4️⃣ Export</b><br>
+          Fill project info → generate HTML
         </div>
       </div>
       <div class="card">
-        <div class="card-title">🔒 Auto-Save System</div>
+        <div class="card-title">🎯 GPS Accuracy Tips</div>
         <div style="font-size:12px;color:var(--txt2);line-height:1.9">
-          ✅ Saves after <b>every action</b><br>
-          ✅ Saves when you close app<br>
-          ✅ Shows green "Saved" indicator<br>
-          ✅ Restores on next open<br><br>
-          <b style="color:#fbbf24">If data disappears on refresh:</b><br>
-          Browser may be in private/incognito mode. Use normal Chrome.
+          ✅ Use phone outdoors with clear sky<br>
+          ✅ Turn on Wi-Fi (helps GPS)<br>
+          ✅ Wait 3–5 seconds after tapping GPS<br>
+          ✅ Phone takes 5 readings & uses best<br>
+          ✅ Tap 📡 button to live-track accuracy<br>
+          ⚠️ Below 10m accuracy = excellent<br>
+          ⚠️ 10–30m = good<br>
+          ⚠️ Above 30m = move to open area
         </div>
       </div>
       <div class="card">
@@ -916,7 +642,6 @@ textarea{resize:none;min-height:72px}
   </div>
 </div>
 
-<!-- TOAST -->
 <div id="toast">
   <span id="t-icon">✅</span>
   <span id="t-msg"></span>
@@ -936,21 +661,21 @@ let stratCorners=[],tempMkrs=[],previewPoly=null,pendingPatch=null;
 let sColor='#3b82f6',pColor='#fbbf24';
 let tileIdx=0;
 let galIdx={};
+let selectedPatchParentStratum=null;
+let selectedTreeParentPatch=null;
 
-// Selected parents
-let selectedPatchParentStratum=null; // ID
-let selectedTreeParentPatch=null;    // ID
+// GPS tracking
+let trackingWatchId=null;
+let myLocMarker=null;
+let myLocAccCircle=null;
 
-const STORAGE_KEY='spiderMapPro_v7';
-const PHOTO_KEY_PREFIX='spiderMapPro_v7_ph_';
+const STORAGE_KEY='spiderMapPro_v8';
+const PHOTO_KEY_PREFIX='spiderMapPro_v8_ph_';
 
 // ═══════════════════
 // MAP
 // ═══════════════════
-const map=L.map('map',{
-  center:[28.9456,77.1015],zoom:16,
-  zoomControl:false,tap:true,tapTolerance:20
-});
+const map=L.map('map',{center:[28.9456,77.1015],zoom:16,zoomControl:false,tap:true,tapTolerance:20});
 L.control.zoom({position:'topright'}).addTo(map);
 
 const tiles=[
@@ -958,8 +683,9 @@ const tiles=[
   L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri',maxZoom:22}),
   L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',{attribution:'© Google',maxZoom:22}),
 ];
-const tileNames=['🛰️ Satellite','🌍 Hybrid','🗺️ Street'];
-tiles[0].addTo(map);
+const tileNames=['🗺️ Street','🛰️ Satellite','🌍 Hybrid'];
+tiles[2].addTo(map); // Default to Hybrid for clarity
+tileIdx=2;
 
 function cycleTile(){
   map.removeLayer(tiles[tileIdx]);
@@ -970,10 +696,10 @@ function cycleTile(){
 }
 
 // ═══════════════════
-// POINT-IN-POLYGON CHECK
+// POINT-IN-POLYGON
 // ═══════════════════
 function pointInPolygon(point,polygon){
-  const x=point[1],y=point[0]; // lon,lat
+  const x=point[1],y=point[0];
   let inside=false;
   for(let i=0,j=polygon.length-1;i<polygon.length;j=i++){
     const xi=polygon[i][1],yi=polygon[i][0];
@@ -989,12 +715,10 @@ function pointInPolygon(point,polygon){
 // ═══════════════════
 map.on('click',function(e){
   const lat=e.latlng.lat,lon=e.latlng.lng;
-
   if(mode==='tree'){
-    // Check if tree is inside selected patch
     if(selectedTreeParentPatch){
       const patch=patches.find(p=>p.id===selectedTreeParentPatch);
-      if(patch && !pointInPolygon([lat,lon],patch.corners)){
+      if(patch&&!pointInPolygon([lat,lon],patch.corners)){
         showToast('❌ Tap inside the selected patch!','err');
         document.getElementById('tree-boundary-warn').classList.add('show');
         return;
@@ -1004,20 +728,14 @@ map.on('click',function(e){
     document.getElementById('t-lon').value=lon.toFixed(6);
     document.getElementById('tree-boundary-warn').classList.remove('show');
     cancelMode();openSheet();
-    showToast('📍 Tree location set inside patch!');
+    showToast('📍 Tree location set!');
     return;
   }
-
-  if(mode==='strat'){
-    addStratCorner(lat,lon);
-    return;
-  }
-
+  if(mode==='strat'){addStratCorner(lat,lon);return;}
   if(mode==='patch'){
-    // Check if patch center is inside selected stratum
     if(selectedPatchParentStratum){
       const strat=strata.find(s=>s.id===selectedPatchParentStratum);
-      if(strat && !pointInPolygon([lat,lon],strat.corners)){
+      if(strat&&!pointInPolygon([lat,lon],strat.corners)){
         showToast('❌ Tap inside the selected stratum!','err');
         document.getElementById('patch-boundary-warn').classList.add('show');
         return;
@@ -1027,65 +745,84 @@ map.on('click',function(e){
     setPendingPatch(c);
     document.getElementById('patch-boundary-warn').classList.remove('show');
     cancelMode();openSheet();
-    showToast('✅ 8×8m patch placed inside stratum!');
+    showToast('✅ 8×8m patch placed!');
     return;
   }
 });
 
 // ═══════════════════
-// GPS
+// HIGH-ACCURACY GPS
+// Takes 5 readings, uses the most accurate one
 // ═══════════════════
-function captureGPS(){
-  if(!navigator.geolocation){
-    showToast('❌ GPS not supported','err');return;
-  }
+function captureHighAccuracyGPS(){
+  if(!navigator.geolocation){showToast('❌ GPS not supported','err');return;}
   const resultEl=document.getElementById('gps-result');
   resultEl.style.display='block';
-  resultEl.style.color='#6ee7b7';
-  resultEl.textContent='📡 Searching for GPS signal...';
-  showToast('📡 Getting GPS...','info');
+  resultEl.style.color='#93c5fd';
+  resultEl.innerHTML='📡 Taking multiple readings for best accuracy...<br>Stay still for 5 seconds';
+  showToast('📡 Getting high-accuracy GPS...','info');
 
-  navigator.geolocation.getCurrentPosition(
-    function(pos){
-      const lat=pos.coords.latitude;
-      const lon=pos.coords.longitude;
-      const acc=Math.round(pos.coords.accuracy);
+  const readings=[];
+  const maxReadings=5;
+  let attemptCount=0;
 
-      // Check if inside parent patch
-      if(selectedTreeParentPatch){
-        const patch=patches.find(p=>p.id===selectedTreeParentPatch);
-        if(patch && !pointInPolygon([lat,lon],patch.corners)){
-          resultEl.style.color='#fca5a5';
-          resultEl.textContent=`⚠️ GPS got ±${acc}m but you are OUTSIDE selected patch!`;
-          document.getElementById('tree-boundary-warn').classList.add('show');
-          showToast('You are outside the selected patch','warn');
-          // Still fill in
-          document.getElementById('t-lat').value=lat.toFixed(6);
-          document.getElementById('t-lon').value=lon.toFixed(6);
-          return;
+  function takeReading(){
+    attemptCount++;
+    navigator.geolocation.getCurrentPosition(
+      function(pos){
+        readings.push({
+          lat:pos.coords.latitude,
+          lon:pos.coords.longitude,
+          acc:pos.coords.accuracy
+        });
+        resultEl.innerHTML=`📡 Reading ${readings.length}/${maxReadings}<br>Current accuracy: ±${Math.round(pos.coords.accuracy)}m`;
+
+        if(readings.length<maxReadings&&attemptCount<10){
+          setTimeout(takeReading,1000);
+        }else{
+          // Pick best reading (lowest accuracy number)
+          const best=readings.reduce((a,b)=>a.acc<b.acc?a:b);
+          document.getElementById('t-lat').value=best.lat.toFixed(6);
+          document.getElementById('t-lon').value=best.lon.toFixed(6);
+
+          // Check parent patch
+          if(selectedTreeParentPatch){
+            const patch=patches.find(p=>p.id===selectedTreeParentPatch);
+            if(patch&&!pointInPolygon([best.lat,best.lon],patch.corners)){
+              resultEl.style.color='#fca5a5';
+              resultEl.innerHTML=`⚠️ Best accuracy: ±${Math.round(best.acc)}m<br><b>WARNING: You are OUTSIDE selected patch!</b>`;
+              document.getElementById('tree-boundary-warn').classList.add('show');
+              showToast('Outside patch boundary','warn');
+              return;
+            }
+          }
+
+          const accClass=best.acc<10?'#10b981':best.acc<30?'#fbbf24':'#ef4444';
+          const accLabel=best.acc<10?'Excellent':best.acc<30?'Good':'Move to open area';
+          resultEl.style.color=accClass;
+          resultEl.innerHTML=`✅ Best of ${readings.length} readings<br>Accuracy: <b>±${Math.round(best.acc)}m (${accLabel})</b>`;
+          showToast(`📍 Got GPS! ±${Math.round(best.acc)}m`);
         }
-      }
-
-      document.getElementById('t-lat').value=lat.toFixed(6);
-      document.getElementById('t-lon').value=lon.toFixed(6);
-      document.getElementById('tree-boundary-warn').classList.remove('show');
-      resultEl.textContent=`✅ GPS captured! Accuracy: ±${acc} meters`;
-      resultEl.style.color=acc>50?'#fbbf24':'#6ee7b7';
-      showToast(`📍 Got GPS! ±${acc}m`);
-    },
-    function(err){
-      resultEl.style.display='none';
-      handleGPSError(err);
-    },
-    {enableHighAccuracy:true,timeout:15000,maximumAge:0}
-  );
+      },
+      function(err){
+        if(attemptCount<3){
+          setTimeout(takeReading,1500);
+        }else{
+          handleGPSError(err);
+          resultEl.style.display='none';
+        }
+      },
+      {enableHighAccuracy:true,timeout:8000,maximumAge:0}
+    );
+  }
+  takeReading();
 }
 
 function handleGPSError(err){
   let msg='GPS failed';
-  if(err.code===1)msg='🔒 Permission blocked. Allow location in browser.';
-  else if(err.code===2)msg='📡 Signal not found. Go outdoors.';
-  else if(err.code===3)msg='⏱️ Timeout. Try again outdoors.';
+  if(err.code===1)msg='🔒 Permission blocked. Allow location.';
+  else if(err.code===2)msg='📡 No signal. Go outdoors.';
+  else if(err.code===3)msg='⏱️ Timeout. Try outdoors.';
   showToast(msg,'err');
 }
 
@@ -1094,12 +831,11 @@ function addGPSCorner(){
   showToast('📡 Getting GPS corner...','info');
   navigator.geolocation.getCurrentPosition(
     function(pos){
-      const lat=pos.coords.latitude,lon=pos.coords.longitude;
       if(mode!=='strat')startMode('strat');
-      addStratCorner(lat,lon);
+      addStratCorner(pos.coords.latitude,pos.coords.longitude);
       showToast(`📍 Corner ${stratCorners.length} added! ±${Math.round(pos.coords.accuracy)}m`);
     },
-    function(err){handleGPSError(err);},
+    handleGPSError,
     {enableHighAccuracy:true,timeout:15000,maximumAge:0}
   );
 }
@@ -1110,24 +846,20 @@ function patchAtGPS(){
   navigator.geolocation.getCurrentPosition(
     function(pos){
       const lat=pos.coords.latitude,lon=pos.coords.longitude;
-
-      // Check if inside selected stratum
       if(selectedPatchParentStratum){
         const strat=strata.find(s=>s.id===selectedPatchParentStratum);
-        if(strat && !pointInPolygon([lat,lon],strat.corners)){
-          showToast('⚠️ You are outside the selected stratum!','warn');
+        if(strat&&!pointInPolygon([lat,lon],strat.corners)){
+          showToast('⚠️ Outside selected stratum!','warn');
           document.getElementById('patch-boundary-warn').classList.add('show');
-          // Still place but warn
-        } else {
+        }else{
           document.getElementById('patch-boundary-warn').classList.remove('show');
         }
       }
-
       const c=make8x8(lat,lon,document.getElementById('p-anchor').value);
       setPendingPatch(c);
-      showToast(`📍 8×8m patch placed! ±${Math.round(pos.coords.accuracy)}m`);
+      showToast(`📍 Patch placed! ±${Math.round(pos.coords.accuracy)}m`);
     },
-    function(err){handleGPSError(err);},
+    handleGPSError,
     {enableHighAccuracy:true,timeout:15000,maximumAge:0}
   );
 }
@@ -1138,14 +870,50 @@ function jumpGPS(){
   navigator.geolocation.getCurrentPosition(
     function(pos){
       const lat=pos.coords.latitude,lon=pos.coords.longitude;
-      map.flyTo([lat,lon],18,{duration:1});
-      L.circleMarker([lat,lon],{radius:9,color:'#3b82f6',fillColor:'#3b82f6',fillOpacity:0.5,weight:2})
-        .addTo(map).bindTooltip('📍 You are here',{permanent:false,direction:'top'}).openTooltip();
-      showToast(`📍 Found you! ±${Math.round(pos.coords.accuracy)}m`);
+      map.flyTo([lat,lon],19,{duration:1});
+      if(myLocMarker)map.removeLayer(myLocMarker);
+      if(myLocAccCircle)map.removeLayer(myLocAccCircle);
+      myLocAccCircle=L.circle([lat,lon],{radius:pos.coords.accuracy,color:'#3b82f6',fillColor:'#3b82f6',fillOpacity:0.1,weight:1}).addTo(map);
+      myLocMarker=L.circleMarker([lat,lon],{radius:8,color:'white',fillColor:'#3b82f6',fillOpacity:1,weight:2}).addTo(map);
+      showToast(`📍 You are here! ±${Math.round(pos.coords.accuracy)}m`);
     },
-    function(err){handleGPSError(err);},
+    handleGPSError,
     {enableHighAccuracy:true,timeout:10000,maximumAge:5000}
   );
+}
+
+// LIVE GPS TRACKING
+function toggleTracking(){
+  const btn=document.getElementById('track-fab');
+  const liveEl=document.getElementById('gps-live');
+  if(trackingWatchId){
+    navigator.geolocation.clearWatch(trackingWatchId);
+    trackingWatchId=null;
+    btn.classList.remove('on');
+    liveEl.classList.remove('show');
+    if(myLocMarker){map.removeLayer(myLocMarker);myLocMarker=null;}
+    if(myLocAccCircle){map.removeLayer(myLocAccCircle);myLocAccCircle=null;}
+    showToast('Live tracking OFF');
+  }else{
+    if(!navigator.geolocation){showToast('GPS not supported','err');return;}
+    btn.classList.add('on');
+    liveEl.classList.add('show');
+    showToast('📡 Live tracking ON');
+    trackingWatchId=navigator.geolocation.watchPosition(
+      function(pos){
+        const lat=pos.coords.latitude,lon=pos.coords.longitude,acc=pos.coords.accuracy;
+        const accEl=document.getElementById('gps-acc-text');
+        accEl.textContent=`±${Math.round(acc)}m`;
+        accEl.className='gps-acc '+(acc<10?'good':acc<30?'med':'bad');
+        if(myLocMarker)map.removeLayer(myLocMarker);
+        if(myLocAccCircle)map.removeLayer(myLocAccCircle);
+        myLocAccCircle=L.circle([lat,lon],{radius:acc,color:'#3b82f6',fillColor:'#3b82f6',fillOpacity:0.08,weight:1}).addTo(map);
+        myLocMarker=L.circleMarker([lat,lon],{radius:8,color:'white',fillColor:'#3b82f6',fillOpacity:1,weight:2}).addTo(map);
+      },
+      function(err){console.warn('Track error:',err);},
+      {enableHighAccuracy:true,maximumAge:1000,timeout:10000}
+    );
+  }
 }
 
 // ═══════════════════
@@ -1172,148 +940,98 @@ function setPendingPatch(c){
   previewPoly=L.polygon(c,{color:pColor,fillColor:pColor,fillOpacity:0.4,weight:3,dashArray:'6,3'}).addTo(map);
   map.flyToBounds(previewPoly.getBounds(),{padding:[60,60],duration:0.8});
   document.getElementById('patch-ready').style.display='block';
-  document.getElementById('patch-coord-card').style.display='block';
-  document.getElementById('patch-coords').innerHTML=
-    c.map((pt,i)=>`<div>C${i+1}: ${pt[0].toFixed(5)}, ${pt[1].toFixed(5)}</div>`).join('')+
-    '<div style="color:#10b981;margin-top:4px;font-weight:600">✅ 8m × 8m verified</div>';
 }
 
-// ═══════════════════
 // STRATA CORNERS
-// ═══════════════════
 function addStratCorner(lat,lon){
   stratCorners.push([lat,lon]);
   const icon=L.divIcon({
-    html:`<div style="background:#3b82f6;color:white;border-radius:50%;
-      width:24px;height:24px;display:flex;align-items:center;justify-content:center;
-      font-size:11px;font-weight:700;border:2px solid white;
-      box-shadow:0 2px 10px rgba(0,0,0,0.5)">${stratCorners.length}</div>`,
-    iconSize:[24,24],iconAnchor:[12,12],className:''
+    html:`<div style="background:#3b82f6;color:white;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;border:2.5px solid white;box-shadow:0 3px 12px rgba(0,0,0,0.6)">${stratCorners.length}</div>`,
+    iconSize:[26,26],iconAnchor:[13,13],className:''
   });
   tempMkrs.push(L.marker([lat,lon],{icon}).addTo(map));
   updateStratPreview();
   document.getElementById('corner-n').textContent=stratCorners.length;
-  document.getElementById('corner-list').innerHTML=
-    stratCorners.map((c,i)=>`<div>C${i+1}: ${c[0].toFixed(5)}, ${c[1].toFixed(5)}</div>`).join('');
+  document.getElementById('corner-list').innerHTML=stratCorners.map((c,i)=>`<div>C${i+1}: ${c[0].toFixed(5)}, ${c[1].toFixed(5)}</div>`).join('');
   document.getElementById('s-steps').classList.add('show');
 }
-
 function updateStratPreview(){
   if(previewPoly){map.removeLayer(previewPoly);previewPoly=null;}
   if(stratCorners.length<2)return;
   previewPoly=L.polygon(stratCorners,{color:sColor,fillColor:sColor,fillOpacity:0.15,weight:2.5,dashArray:'8,4'}).addTo(map);
 }
-
 function finishStrat(){
-  if(stratCorners.length<3){showToast('Need at least 3 corners!','err');return;}
+  if(stratCorners.length<3){showToast('Need 3+ corners','err');return;}
   cancelMode();openSheet();
   showToast(`✅ ${stratCorners.length} corners. Fill details & Save.`);
 }
 
-// ═══════════════════
-// SAVE STRATUM
-// ═══════════════════
+// SAVE
 function saveStrat(){
   const sid=document.getElementById('s-id').value.trim();
   const snum=document.getElementById('s-num').value;
   const snm=document.getElementById('s-name').value.trim();
   if(!sid){showToast('Enter Stratum ID','err');return;}
   if(!snm){showToast('Enter description','err');return;}
-
-  // Check duplicate ID
-  if(strata.some(s=>s.id===sid)){
-    showToast('Stratum ID already exists!','err');return;
-  }
-
-  let corners=[...stratCorners];
-  if(corners.length<3){
-    const lats=document.querySelectorAll('.slat');
-    const lons=document.querySelectorAll('.slon');
-    corners=[];
-    for(let i=0;i<lats.length;i++){
-      const la=parseFloat(lats[i].value),lo=parseFloat(lons[i].value);
-      if(!isNaN(la)&&!isNaN(lo))corners.push([la,lo]);
-    }
-  }
-  if(corners.length<3){showToast('Need 3+ corners — draw on map or type','err');return;}
+  if(strata.some(s=>s.id===sid)){showToast('ID already exists!','err');return;}
+  if(stratCorners.length<3){showToast('Draw stratum on map first','err');return;}
 
   if(previewPoly){map.removeLayer(previewPoly);previewPoly=null;}
   tempMkrs.forEach(m=>map.removeLayer(m));tempMkrs=[];
 
-  const stratum={id:sid,num:snum,name:snm,color:sColor,corners};
+  const stratum={id:sid,num:snum,name:snm,color:sColor,corners:[...stratCorners]};
   strata.push(stratum);
+  sLayers.push(createStratumLayer(stratum));
+  stratCorners=[];
 
-  const poly=createStratumLayer(stratum);
-  sLayers.push(poly);
-
-  map.flyToBounds(poly.getBounds(),{padding:[40,40],duration:1});
+  map.flyToBounds(sLayers[sLayers.length-1].getBounds(),{padding:[40,40],duration:1});
   animN('h-z',strata.length+patches.length);
-  save();
-  refreshLists();
-  refreshParentSelectors();
-  clearStratForm();
+  save();refreshLists();refreshParentSelectors();clearStratForm();
   showToast(`✅ Stratum "${snm}" saved!`);
 }
 
 function createStratumLayer(s){
-  return L.polygon(s.corners,{
-    color:s.color,fillColor:s.color,
-    fillOpacity:0.12,weight:3,dashArray:'12,6'
-  }).addTo(map).bindPopup(
-    `<div style="font-family:-apple-system,sans-serif;padding:12px;background:#0a0e1a;border-radius:14px;min-width:170px">
-      <div style="font-size:11px;color:${s.color};font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px">📐 Stratum</div>
-      <b style="font-size:15px;color:#f1f5f9">${s.num}: ${s.name}</b><br>
-      <span style="font-size:11px;color:#64748b">ID: ${s.id} · ${s.corners.length} corners</span>
-     </div>`,{maxWidth:240}
-  );
+  return L.polygon(s.corners,{color:s.color,fillColor:s.color,fillOpacity:0.12,weight:3,dashArray:'12,6'})
+    .addTo(map).bindPopup(
+      `<div style="font-family:-apple-system,sans-serif;padding:13px;background:#050810;border-radius:14px;min-width:180px">
+        <div style="font-size:11px;color:${s.color};font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px">📐 Stratum</div>
+        <b style="font-size:15px;color:#f1f5f9">${s.num}: ${s.name}</b><br>
+        <span style="font-size:11px;color:#64748b">ID: ${s.id} · ${s.corners.length} corners</span>
+       </div>`,{maxWidth:250});
 }
 
-// ═══════════════════
-// SAVE PATCH
-// ═══════════════════
 function savePatch(){
   const pid=document.getElementById('p-id').value.trim();
   const pnm=document.getElementById('p-name').value.trim();
   if(!pid){showToast('Enter Patch ID','err');return;}
-  if(!selectedPatchParentStratum){showToast('Select parent stratum first!','err');return;}
-  if(!pendingPatch){showToast('Place patch on map first!','err');return;}
-  if(patches.some(p=>p.id===pid)){showToast('Patch ID already exists!','err');return;}
+  if(!selectedPatchParentStratum){showToast('Select parent stratum!','err');return;}
+  if(!pendingPatch){showToast('Place patch on map first','err');return;}
+  if(patches.some(p=>p.id===pid)){showToast('ID already exists!','err');return;}
 
   const c=pendingPatch.corners;
   if(previewPoly){map.removeLayer(previewPoly);previewPoly=null;}
 
   const patch={id:pid,str:selectedPatchParentStratum,name:pnm,color:pColor,corners:c};
   patches.push(patch);
-
-  const poly=createPatchLayer(patch);
-  pLayers.push(poly);
-
+  pLayers.push(createPatchLayer(patch));
   pendingPatch=null;
-  map.flyToBounds(poly.getBounds(),{padding:[30,30],duration:1});
+
+  map.flyToBounds(pLayers[pLayers.length-1].getBounds(),{padding:[40,40],duration:1});
   animN('h-z',strata.length+patches.length);
-  save();
-  refreshLists();
-  refreshParentSelectors();
-  clearPatchForm();
+  save();refreshLists();refreshParentSelectors();clearPatchForm();
   showToast(`✅ Patch ${pid} (8×8m) saved!`);
 }
 
 function createPatchLayer(p){
-  return L.polygon(p.corners,{
-    color:p.color,fillColor:p.color,
-    fillOpacity:0.4,weight:2.5
-  }).addTo(map).bindPopup(
-    `<div style="font-family:-apple-system,sans-serif;padding:12px;background:#0a0e1a;border-radius:14px;min-width:170px">
-      <div style="font-size:11px;color:${p.color};font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px">⬛ Patch · 8×8m</div>
-      <b style="font-size:15px;color:#f1f5f9">${p.id}</b><br>
-      <span style="font-size:11px;color:#64748b">Stratum: ${p.str}${p.name?'<br>'+p.name:''}</span>
-     </div>`,{maxWidth:240}
-  );
+  return L.polygon(p.corners,{color:p.color,fillColor:p.color,fillOpacity:0.4,weight:2.5})
+    .addTo(map).bindPopup(
+      `<div style="font-family:-apple-system,sans-serif;padding:13px;background:#050810;border-radius:14px;min-width:180px">
+        <div style="font-size:11px;color:${p.color};font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px">⬛ Patch · 8×8m</div>
+        <b style="font-size:15px;color:#f1f5f9">${p.id}</b><br>
+        <span style="font-size:11px;color:#64748b">Stratum: ${p.str}${p.name?'<br>'+p.name:''}</span>
+       </div>`,{maxWidth:250});
 }
 
-// ═══════════════════
-// SAVE TREE
-// ═══════════════════
 function saveTree(){
   const id=document.getElementById('t-id').value.trim();
   const sp=document.getElementById('t-sp').value.trim();
@@ -1327,46 +1045,38 @@ function saveTree(){
   const ph=[...photoURLs];
 
   if(!id){showToast('Enter Tree ID','err');return;}
-  if(!sp){showToast('Enter species name','err');return;}
-  if(!selectedTreeParentPatch){showToast('Select parent patch first!','err');return;}
-  if(isNaN(lat)||isNaN(lon)){showToast('Set GPS location first','err');return;}
+  if(!sp){showToast('Enter species','err');return;}
+  if(!selectedTreeParentPatch){showToast('Select parent patch!','err');return;}
+  if(isNaN(lat)||isNaN(lon)){showToast('Set GPS location','err');return;}
 
-  // Check if inside patch
   const patch=patches.find(p=>p.id===selectedTreeParentPatch);
-  if(patch && !pointInPolygon([lat,lon],patch.corners)){
-    if(!confirm('⚠️ Tree is OUTSIDE the selected patch boundary.\n\nSave anyway?')){return;}
+  if(patch&&!pointInPolygon([lat,lon],patch.corners)){
+    if(!confirm('⚠️ Tree is OUTSIDE the patch boundary.\n\nSave anyway?'))return;
   }
 
-  // Generate unique ID if duplicate
   let finalId=id;
   if(trees.some(t=>t.id===finalId)){
-    let counter=2;
-    while(trees.some(t=>t.id===id+'-'+counter))counter++;
-    finalId=id+'-'+counter;
+    let c=2;while(trees.some(t=>t.id===id+'-'+c))c++;
+    finalId=id+'-'+c;
   }
 
-  const str=patch ? patch.str : '';
+  const str=patch?patch.str:'';
   const tree={id:finalId,sp,str,pt:selectedTreeParentPatch,lat,lon,cnt,bark,web,ht,nts,ph};
   trees.push(tree);
   tMkrs.push(makeMarker(tree,trees.length-1));
-  map.flyTo([lat,lon],19,{duration:1});
+  map.flyTo([lat,lon],20,{duration:1});
   animN('h-trees',trees.length);
   animN('h-sp',trees.reduce((s,t)=>s+t.cnt,0));
-  save();
-  refreshLists();
-  clearTreeForm();
+  save();refreshLists();clearTreeForm();
   showToast(`✅ ${sp} saved — ${cnt} spider(s)`);
 }
 
-// ═══════════════════
 // PARENT SELECTORS
-// ═══════════════════
 function refreshParentSelectors(){
-  // Patch parent (stratum) selector
   const patchEl=document.getElementById('patch-parent-opts');
   if(strata.length===0){
     patchEl.innerHTML='<div class="empty-state" style="padding:14px"><p style="font-size:11px">No strata yet. Create one first!</p></div>';
-  } else {
+  }else{
     patchEl.innerHTML=strata.map(s=>`
       <div class="parent-opt ${selectedPatchParentStratum===s.id?'on':''}" onclick="selectPatchParent('${s.id}')">
         <div class="parent-opt-dot" style="background:${s.color}"></div>
@@ -1374,12 +1084,10 @@ function refreshParentSelectors(){
         <div class="parent-opt-check">${selectedPatchParentStratum===s.id?'✓':''}</div>
       </div>`).join('');
   }
-
-  // Tree parent (patch) selector
   const treeEl=document.getElementById('tree-parent-opts');
   if(patches.length===0){
     treeEl.innerHTML='<div class="empty-state" style="padding:14px"><p style="font-size:11px">No patches yet. Create one first!</p></div>';
-  } else {
+  }else{
     treeEl.innerHTML=patches.map(p=>{
       const strat=strata.find(s=>s.id===p.str);
       return`<div class="parent-opt ${selectedTreeParentPatch===p.id?'on':''}" onclick="selectTreeParent('${p.id}')">
@@ -1390,40 +1098,32 @@ function refreshParentSelectors(){
     }).join('');
   }
 }
-
 function selectPatchParent(id){
-  selectedPatchParentStratum=id;
-  refreshParentSelectors();
+  selectedPatchParentStratum=id;refreshParentSelectors();
   const strat=strata.find(s=>s.id===id);
   if(strat){
     showToast(`Parent: Stratum ${strat.num}`);
     document.getElementById('pz-title').textContent='Active Stratum';
     document.getElementById('pz-msg').textContent=`${strat.num}: ${strat.name}`;
     document.getElementById('parent-zone-info').classList.add('show');
-    // Zoom to stratum
     const layer=sLayers[strata.indexOf(strat)];
     if(layer)map.flyToBounds(layer.getBounds(),{padding:[40,40],duration:0.8});
   }
 }
-
 function selectTreeParent(id){
-  selectedTreeParentPatch=id;
-  refreshParentSelectors();
+  selectedTreeParentPatch=id;refreshParentSelectors();
   const patch=patches.find(p=>p.id===id);
   if(patch){
     showToast(`Parent: Patch ${patch.id}`);
     document.getElementById('pz-title').textContent='Active Patch';
     document.getElementById('pz-msg').textContent=`${patch.id} (8×8m)`;
     document.getElementById('parent-zone-info').classList.add('show');
-    // Zoom to patch
     const layer=pLayers[patches.indexOf(patch)];
     if(layer)map.flyToBounds(layer.getBounds(),{padding:[80,80],duration:0.8});
   }
 }
 
-// ═══════════════════
 // TREE MARKER
-// ═══════════════════
 function emoji(sp){
   const s=(sp||'').toLowerCase();
   if(s.includes('neem'))return'🌿';
@@ -1436,10 +1136,7 @@ function emoji(sp){
   if(s.includes('gulmohar'))return'🌺';
   return'🌳';
 }
-function tColor(n){
-  if(n===0)return'#9e9e9e';if(n===1)return'#ffb300';
-  if(n===2)return'#ef6c00';if(n<=4)return'#d32f2f';return'#7b1fa2';
-}
+function tColor(n){if(n===0)return'#9e9e9e';if(n===1)return'#ffb300';if(n===2)return'#ef6c00';if(n<=4)return'#d32f2f';return'#7b1fa2';}
 function tRad(n){return n===0?7:n===1?9:n===2?11:n<=4?13:15;}
 function tTag(n){
   if(n===0)return'<span class="tag tag-b">Clean</span>';
@@ -1451,11 +1148,9 @@ function rgb(h){return[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parse
 
 function makeMarker(tree,idx){
   const col=tColor(tree.cnt);
-  const mkr=L.circleMarker([tree.lat,tree.lon],{
-    radius:tRad(tree.cnt),color:col,fillColor:col,fillOpacity:0.9,weight:2.5
-  }).addTo(map);
+  const mkr=L.circleMarker([tree.lat,tree.lon],{radius:tRad(tree.cnt),color:col,fillColor:col,fillOpacity:0.9,weight:2.5}).addTo(map);
   mkr.bindTooltip(`${emoji(tree.sp)} <b>${tree.sp}</b> · ${tree.cnt} spider${tree.cnt!==1?'s':''}`,{sticky:true});
-  mkr.bindPopup(()=>buildPopup(tree,idx),{maxWidth:295,autoPan:true});
+  mkr.bindPopup(()=>buildPopup(tree,idx),{maxWidth:300,autoPan:true});
   return mkr;
 }
 
@@ -1463,16 +1158,13 @@ function buildPopup(tree,idx){
   const col=tColor(tree.cnt);
   const ph=tree.ph||[];
   galIdx[idx]=0;
-
   const gal=ph.length>0?`
     <div class="popup-gallery" id="pg-${idx}">
-      <img class="pop-img" id="pi-${idx}" src="${ph[0]}"
-        onclick="openImg('${ph[0].replace(/'/g,"\\'")}')">
+      <img class="pop-img" id="pi-${idx}" src="${ph[0]}" onclick="openImg('${ph[0].replace(/'/g,"\\'")}')">
       ${ph.length>1?`<div class="pop-img-count">1/${ph.length}</div>
         <button class="pop-nav pop-nav-l" onclick="event.stopPropagation();navImg(${idx},-1,${ph.length})">‹</button>
         <button class="pop-nav pop-nav-r" onclick="event.stopPropagation();navImg(${idx},1,${ph.length})">›</button>`:''}
-    </div>`:`<div class="popup-gallery empty"><div style="font-size:38px;opacity:0.25">${emoji(tree.sp)}</div></div>`;
-
+    </div>`:`<div class="popup-gallery empty"><div style="font-size:40px;opacity:0.3">${emoji(tree.sp)}</div></div>`;
   const flds=[
     tree.str?{l:'Stratum',v:tree.str}:null,
     tree.pt?{l:'Patch',v:tree.pt}:null,
@@ -1480,11 +1172,9 @@ function buildPopup(tree,idx){
     (tree.web&&tree.web!=='None')?{l:'Web',v:tree.web}:null,
     tree.ht?{l:'Height',v:tree.ht,span:2}:null,
   ].filter(Boolean);
-
   const div=document.createElement('div');
   div.className='popup-wrap';
-  div.innerHTML=`
-    ${gal}
+  div.innerHTML=`${gal}
     <div class="popup-body">
       <div class="popup-header">
         <div>
@@ -1501,12 +1191,9 @@ function buildPopup(tree,idx){
       ${tree.nts?`<div class="popup-notes">"${tree.nts}"</div>`:''}
       <div class="popup-gps">📍 ${tree.lat.toFixed(5)}, ${tree.lon.toFixed(5)}</div>
     </div>
-    ${ph.length>1?`<div class="thumb-row" id="tr-${idx}">
-      ${ph.map((p,i)=>`<img class="thumb-img${i===0?' on':''}" src="${p}" onclick="setImg(${idx},${i},${ph.length})">`).join('')}
-    </div>`:''}`;
+    ${ph.length>1?`<div class="thumb-row" id="tr-${idx}">${ph.map((p,i)=>`<img class="thumb-img${i===0?' on':''}" src="${p}" onclick="setImg(${idx},${i},${ph.length})">`).join('')}</div>`:''}`;
   return div;
 }
-
 function navImg(idx,dir,total){
   galIdx[idx]=((galIdx[idx]||0)+dir+total)%total;
   const i=galIdx[idx],ph=trees[idx].ph;
@@ -1527,13 +1214,10 @@ function setImg(idx,i,total){
 }
 function openImg(src){
   const w=window.open('','_blank');
-  if(w)w.document.write(`<html><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh;cursor:pointer" onclick="window.close()">
-    <img src="${src}" style="max-width:100%;max-height:100vh;object-fit:contain"></body></html>`);
+  if(w)w.document.write(`<html><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh;cursor:pointer" onclick="window.close()"><img src="${src}" style="max-width:100%;max-height:100vh;object-fit:contain"></body></html>`);
 }
 
-// ═══════════════════
 // PHOTOS
-// ═══════════════════
 photoURLs=[];
 function handlePhotos(inp){
   Array.from(inp.files).forEach(f=>{
@@ -1545,17 +1229,12 @@ function handlePhotos(inp){
 }
 function renderStrip(){
   document.getElementById('ph-strip').innerHTML=photoURLs.map((u,i)=>
-    `<div class="ph-wrap">
-      <img class="ph-img" src="${u}" onclick="openImg('${u.replace(/'/g,"\\'")}')">
-      <button class="ph-del" onclick="delPhoto(${i})">✕</button>
-    </div>`).join('');
+    `<div class="ph-wrap"><img class="ph-img" src="${u}" onclick="openImg('${u.replace(/'/g,"\\'")}')"><button class="ph-del" onclick="delPhoto(${i})">✕</button></div>`).join('');
   document.getElementById('ph-count').textContent=photoURLs.length?`${photoURLs.length} photo${photoURLs.length>1?'s':''} added`:'';
 }
 function delPhoto(i){photoURLs.splice(i,1);renderStrip();}
 
-// ═══════════════════
 // COLORS
-// ═══════════════════
 function pickC(el,t){
   const gid=t==='s'?'s-sw':'p-sw';
   document.querySelectorAll('#'+gid+' .swatch').forEach(s=>s.classList.remove('on'));
@@ -1563,17 +1242,15 @@ function pickC(el,t){
   if(t==='s')sColor=el.dataset.c;else pColor=el.dataset.c;
 }
 
-// ═══════════════════
 // MODE
-// ═══════════════════
 function startMode(m){
   cancelMode();mode=m;closeSheet();
   const b=document.getElementById('mode-banner');
   const t=document.getElementById('banner-txt');
   b.className='mode-banner show '+m;
-  if(m==='tree')t.textContent='🌳 Tap where tree is located';
+  if(m==='tree')t.textContent='🌳 Tap where tree is';
   if(m==='strat'){
-    t.textContent='📐 Tap corners of stratum';
+    t.textContent='📐 Tap stratum corners';
     document.getElementById('done-s-btn').style.display='flex';
     document.getElementById('start-s-btn').style.display='none';
     stratCorners=[];
@@ -1590,21 +1267,11 @@ function cancelMode(){
   map.getContainer().style.cursor='';
 }
 
-// ═══════════════════
 // SHEET
-// ═══════════════════
-function openSheet(){
-  document.getElementById('bottom-sheet').classList.add('open');
-  document.getElementById('sheet-overlay').classList.add('show');
-}
-function closeSheet(){
-  document.getElementById('bottom-sheet').classList.remove('open');
-  document.getElementById('sheet-overlay').classList.remove('show');
-}
+function openSheet(){document.getElementById('bottom-sheet').classList.add('open');document.getElementById('sheet-overlay').classList.add('show');}
+function closeSheet(){document.getElementById('bottom-sheet').classList.remove('open');document.getElementById('sheet-overlay').classList.remove('show');}
 
-// ═══════════════════
 // TABS
-// ═══════════════════
 function swTab(id,btn){
   document.querySelectorAll('.stab').forEach(b=>b.classList.remove('on'));
   document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('on'));
@@ -1615,44 +1282,32 @@ function swTab(id,btn){
   if(id==='patch'||id==='tree')refreshParentSelectors();
 }
 
-// ═══════════════════
 // TOAST
-// ═══════════════════
 let tT=null;
 function showToast(msg,type='ok'){
   const el=document.getElementById('toast');
   const bar=document.getElementById('tbar');
   document.getElementById('t-msg').textContent=msg;
-  document.getElementById('t-icon').textContent=
-    type==='ok'?'✅':type==='err'?'❌':type==='warn'?'⚠️':'📡';
+  document.getElementById('t-icon').textContent=type==='ok'?'✅':type==='err'?'❌':type==='warn'?'⚠️':'📡';
   el.className='toast show'+(type==='err'?' err':type==='warn'?' warn':'');
   bar.style.animation='none';void bar.offsetWidth;
   bar.style.animation='tbar 3s linear forwards';
   clearTimeout(tT);tT=setTimeout(()=>el.classList.remove('show'),3500);
 }
-
-// SAVE INDICATOR
 function flashSaved(){
   const el=document.getElementById('save-indicator');
   el.classList.add('show');
   setTimeout(()=>el.classList.remove('show'),1500);
 }
 
-// ═══════════════════
 // COUNTER
-// ═══════════════════
 function animN(id,target){
   const el=document.getElementById(id);
   const s=parseInt(el.textContent)||0,d=target-s,steps=15;let i=0;
-  const t=setInterval(()=>{
-    i++;el.textContent=Math.round(s+(d*i/steps));
-    if(i>=steps){el.textContent=target;clearInterval(t);}
-  },20);
+  const t=setInterval(()=>{i++;el.textContent=Math.round(s+(d*i/steps));if(i>=steps){el.textContent=target;clearInterval(t);}},20);
 }
 
-// ═══════════════════
-// HEAT MAP
-// ═══════════════════
+// HEAT
 function refreshHeat(){
   if(!heatOn)return;
   if(heatLayer)map.removeLayer(heatLayer);
@@ -1662,60 +1317,54 @@ function refreshHeat(){
 function toggleHeat(){
   heatOn=!heatOn;
   const btn=document.getElementById('heat-fab');
-  if(heatOn){refreshHeat();btn.classList.add('on');showToast('🔥 Heat map ON');}
-  else{if(heatLayer){map.removeLayer(heatLayer);heatLayer=null;}btn.classList.remove('on');showToast('Heat map OFF');}
+  if(heatOn){refreshHeat();btn.classList.add('on');showToast('🔥 Heat ON');}
+  else{if(heatLayer){map.removeLayer(heatLayer);heatLayer=null;}btn.classList.remove('on');showToast('Heat OFF');}
 }
 function fitAll(){
   const all=[...tMkrs,...sLayers,...pLayers];
-  if(!all.length){showToast('Nothing on map yet','err');return;}
+  if(!all.length){showToast('Nothing on map','err');return;}
   map.flyToBounds(L.featureGroup(all).getBounds(),{padding:[50,50],duration:1});
 }
 
-// ═══════════════════
 // LISTS
-// ═══════════════════
 function filterList(q){refreshLists(q.toLowerCase());}
 function refreshLists(f=''){
   document.getElementById('tc-n').textContent=trees.length;
   const fil=trees.filter(t=>t.id.toLowerCase().includes(f)||t.sp.toLowerCase().includes(f)||(t.pt&&t.pt.toLowerCase().includes(f)));
-  document.getElementById('tree-list').innerHTML=fil.length
-    ?fil.map(t=>{const i=trees.indexOf(t);return`
-      <div class="list-item" onclick="focusTree(${i})">
-        <div class="list-dot" style="background:${tColor(t.cnt)};color:${tColor(t.cnt)}"></div>
-        <div class="list-body">
-          <div class="list-title">${emoji(t.sp)} ${t.id} — ${t.sp} ${tTag(t.cnt)}</div>
-          <div class="list-sub">${t.cnt} spider(s) · S${t.str||'?'} · P${t.pt||'?'} · 📷${t.ph.length}</div>
-        </div>
-        <button class="del-btn" onclick="event.stopPropagation();remTree(${i})">✕</button>
-      </div>`;}).join('')
-    :`<div class="empty-state"><div class="icon">🌳</div><p>${f?'No matches.':'No trees yet.'}</p></div>`;
+  document.getElementById('tree-list').innerHTML=fil.length?fil.map(t=>{
+    const i=trees.indexOf(t);
+    return`<div class="list-item" onclick="focusTree(${i})">
+      <div class="list-dot" style="background:${tColor(t.cnt)};color:${tColor(t.cnt)}"></div>
+      <div class="list-body">
+        <div class="list-title">${emoji(t.sp)} ${t.id} — ${t.sp} ${tTag(t.cnt)}</div>
+        <div class="list-sub">${t.cnt} spider(s) · S${t.str||'?'} · P${t.pt||'?'} · 📷${t.ph.length}</div>
+      </div>
+      <button class="del-btn" onclick="event.stopPropagation();remTree(${i})">✕</button>
+    </div>`;}).join(''):`<div class="empty-state"><div class="icon">🌳</div><p>${f?'No matches':'No trees yet'}</p></div>`;
 
   document.getElementById('sc-n').textContent=strata.length;
-  document.getElementById('strat-list').innerHTML=strata.length
-    ?strata.map((s,i)=>`<div class="list-item" onclick="focusZone('s',${i})">
-        <div class="list-sq" style="background:${s.color}"></div>
-        <div class="list-body">
-          <div class="list-title">Stratum ${s.num}: ${s.name}</div>
-          <div class="list-sub">ID: ${s.id} · ${s.corners.length} corners · ${patches.filter(p=>p.str===s.id).length} patches</div>
-        </div>
-        <button class="del-btn" onclick="event.stopPropagation();remStrat(${i})">✕</button>
-      </div>`).join('')
-    :`<div class="empty-state"><div class="icon">📐</div><p>No strata yet.</p></div>`;
+  document.getElementById('strat-list').innerHTML=strata.length?strata.map((s,i)=>`
+    <div class="list-item" onclick="focusZone('s',${i})">
+      <div class="list-sq" style="background:${s.color}"></div>
+      <div class="list-body">
+        <div class="list-title">Stratum ${s.num}: ${s.name}</div>
+        <div class="list-sub">ID: ${s.id} · ${s.corners.length} corners · ${patches.filter(p=>p.str===s.id).length} patches</div>
+      </div>
+      <button class="del-btn" onclick="event.stopPropagation();remStrat(${i})">✕</button>
+    </div>`).join(''):`<div class="empty-state"><div class="icon">📐</div><p>No strata yet</p></div>`;
 
   document.getElementById('pc-n').textContent=patches.length;
-  document.getElementById('patch-list').innerHTML=patches.length
-    ?patches.map((p,i)=>{
-      const strat=strata.find(s=>s.id===p.str);
-      const treeCount=trees.filter(t=>t.pt===p.id).length;
-      return`<div class="list-item" onclick="focusZone('p',${i})">
-        <div class="list-sq" style="background:${p.color}"></div>
-        <div class="list-body">
-          <div class="list-title">⬛ ${p.id} <span class="tag tag-o">8×8m</span></div>
-          <div class="list-sub">Stratum ${strat?strat.num:'?'} · ${treeCount} trees ${p.name?'· '+p.name:''}</div>
-        </div>
-        <button class="del-btn" onclick="event.stopPropagation();remPatch(${i})">✕</button>
-      </div>`;}).join('')
-    :`<div class="empty-state"><div class="icon">⬛</div><p>No patches yet.</p></div>`;
+  document.getElementById('patch-list').innerHTML=patches.length?patches.map((p,i)=>{
+    const strat=strata.find(s=>s.id===p.str);
+    const tc=trees.filter(t=>t.pt===p.id).length;
+    return`<div class="list-item" onclick="focusZone('p',${i})">
+      <div class="list-sq" style="background:${p.color}"></div>
+      <div class="list-body">
+        <div class="list-title">⬛ ${p.id} <span class="tag tag-o">8×8m</span></div>
+        <div class="list-sub">Stratum ${strat?strat.num:'?'} · ${tc} trees ${p.name?'· '+p.name:''}</div>
+      </div>
+      <button class="del-btn" onclick="event.stopPropagation();remPatch(${i})">✕</button>
+    </div>`;}).join(''):`<div class="empty-state"><div class="icon">⬛</div><p>No patches yet</p></div>`;
 }
 
 function focusTree(i){closeSheet();map.flyTo([trees[i].lat,trees[i].lon],20,{duration:1});setTimeout(()=>tMkrs[i].openPopup(),1100);}
@@ -1723,7 +1372,6 @@ function focusZone(t,i){closeSheet();const l=t==='s'?sLayers[i]:pLayers[i];map.f
 function remTree(i){
   if(!confirm('Delete this tree?'))return;
   map.removeLayer(tMkrs[i]);
-  // Remove photos
   try{localStorage.removeItem(PHOTO_KEY_PREFIX+trees[i].id);}catch(e){}
   trees.splice(i,1);tMkrs.splice(i,1);
   animN('h-trees',trees.length);
@@ -1733,55 +1381,38 @@ function remTree(i){
 }
 function remStrat(i){
   const s=strata[i];
-  const childPatches=patches.filter(p=>p.str===s.id);
-  if(childPatches.length>0){
-    if(!confirm(`Delete stratum and its ${childPatches.length} patches and trees inside?`))return;
-    // Delete child patches and trees
-    childPatches.forEach(p=>{
-      const treesInPatch=trees.filter(t=>t.pt===p.id);
-      treesInPatch.forEach(t=>{
-        const idx=trees.indexOf(t);
-        map.removeLayer(tMkrs[idx]);
-        trees.splice(idx,1);tMkrs.splice(idx,1);
-      });
-      const pIdx=patches.indexOf(p);
-      map.removeLayer(pLayers[pIdx]);
-      patches.splice(pIdx,1);pLayers.splice(pIdx,1);
+  const cp=patches.filter(p=>p.str===s.id);
+  if(cp.length>0&&!confirm(`Delete stratum and ${cp.length} child patches and their trees?`))return;
+  if(cp.length===0&&!confirm('Delete this stratum?'))return;
+  cp.forEach(p=>{
+    trees.filter(t=>t.pt===p.id).forEach(t=>{
+      const idx=trees.indexOf(t);
+      map.removeLayer(tMkrs[idx]);trees.splice(idx,1);tMkrs.splice(idx,1);
     });
-  } else if(!confirm('Delete this stratum?'))return;
-
+    const pIdx=patches.indexOf(p);
+    map.removeLayer(pLayers[pIdx]);patches.splice(pIdx,1);pLayers.splice(pIdx,1);
+  });
   map.removeLayer(sLayers[i]);
   strata.splice(i,1);sLayers.splice(i,1);
-  animN('h-trees',trees.length);
-  animN('h-sp',trees.reduce((s,t)=>s+t.cnt,0));
-  animN('h-z',strata.length+patches.length);
-  save();refreshLists();refreshParentSelectors();
-  showToast('Stratum removed','err');
+  animN('h-trees',trees.length);animN('h-sp',trees.reduce((s,t)=>s+t.cnt,0));animN('h-z',strata.length+patches.length);
+  save();refreshLists();refreshParentSelectors();showToast('Stratum removed','err');
 }
 function remPatch(i){
   const p=patches[i];
-  const childTrees=trees.filter(t=>t.pt===p.id);
-  if(childTrees.length>0){
-    if(!confirm(`Delete patch and its ${childTrees.length} trees inside?`))return;
-    childTrees.forEach(t=>{
-      const idx=trees.indexOf(t);
-      map.removeLayer(tMkrs[idx]);
-      trees.splice(idx,1);tMkrs.splice(idx,1);
-    });
-  } else if(!confirm('Delete this patch?'))return;
-
+  const ct=trees.filter(t=>t.pt===p.id);
+  if(ct.length>0&&!confirm(`Delete patch and ${ct.length} trees inside?`))return;
+  if(ct.length===0&&!confirm('Delete this patch?'))return;
+  ct.forEach(t=>{
+    const idx=trees.indexOf(t);
+    map.removeLayer(tMkrs[idx]);trees.splice(idx,1);tMkrs.splice(idx,1);
+  });
   map.removeLayer(pLayers[i]);
   patches.splice(i,1);pLayers.splice(i,1);
-  animN('h-trees',trees.length);
-  animN('h-sp',trees.reduce((s,t)=>s+t.cnt,0));
-  animN('h-z',strata.length+patches.length);
-  save();refreshLists();refreshParentSelectors();
-  showToast('Patch removed','err');
+  animN('h-trees',trees.length);animN('h-sp',trees.reduce((s,t)=>s+t.cnt,0));animN('h-z',strata.length+patches.length);
+  save();refreshLists();refreshParentSelectors();showToast('Patch removed','err');
 }
 
-// ═══════════════════
 // STATS
-// ═══════════════════
 function refreshStats(){
   const tot=trees.length,sp=trees.reduce((s,t)=>s+t.cnt,0);
   const inf=trees.filter(t=>t.cnt>0).length;
@@ -1802,7 +1433,7 @@ function grpBy(k){const m={};trees.forEach(t=>{const v=t[k]||'?';m[v]=(m[v]||0)+
 function grpBySt(){const m={};trees.forEach(t=>{const k=t.str?`S${t.str}`:'?';m[k]=(m[k]||0)+t.cnt;});return m;}
 function mkChart(id,data,col){
   const el=document.getElementById(id);const ent=Object.entries(data);
-  if(!ent.length){el.innerHTML='<div class="empty-state"><p>No data.</p></div>';return;}
+  if(!ent.length){el.innerHTML='<div class="empty-state"><p>No data</p></div>';return;}
   const mx=Math.max(...ent.map(e=>e[1]),1);
   el.innerHTML=ent.sort((a,b)=>b[1]-a[1]).map(([l,v])=>
     `<div class="chart-row"><div class="chart-lbl" title="${l}">${l}</div>
@@ -1811,10 +1442,380 @@ function mkChart(id,data,col){
 }
 
 // ═══════════════════
-// EXPORT
+// EXPORT PRESENTATION HTML
 // ═══════════════════
+function exportPresentation(){
+  if(!trees.length&&!strata.length&&!patches.length){
+    showToast('Add some data first!','err');return;
+  }
+
+  const title=document.getElementById('exp-title').value.trim()||'Spider Distribution Map';
+  const author=document.getElementById('exp-author').value.trim()||'Researcher';
+  const inst=document.getElementById('exp-inst').value.trim()||'';
+  const dateVal=document.getElementById('exp-date').value||new Date().toISOString().split('T')[0];
+  const abstract=document.getElementById('exp-abstract').value.trim()||'';
+  const style=document.getElementById('exp-style').value;
+  const defaultTile=parseInt(document.getElementById('exp-tiles').value);
+
+  showToast('⏳ Generating beautiful HTML...','info');
+
+  // Build data payload
+  const exportData={
+    meta:{title,author,inst,date:dateVal,abstract,generated:new Date().toISOString()},
+    strata,patches,trees,defaultTile
+  };
+
+  const html=generatePresentationHTML(exportData,style);
+
+  // Download
+  const blob=new Blob([html],{type:'text/html'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=`${title.replace(/[^a-z0-9]/gi,'_').toLowerCase()}_map.html`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  showToast('✅ HTML map downloaded! Share it freely.');
+}
+
+function generatePresentationHTML(d,style){
+  const stats={
+    totalTrees:d.trees.length,
+    totalSpiders:d.trees.reduce((s,t)=>s+(t.cnt||0),0),
+    infested:d.trees.filter(t=>t.cnt>0).length,
+    rate:d.trees.length?Math.round((d.trees.filter(t=>t.cnt>0).length/d.trees.length)*100):0
+  };
+
+  const dataJSON=JSON.stringify(d).replace(/<\/script>/g,'<\\/script>');
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${d.meta.title}</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"><\/script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:${style==='light'?'#f8fafc':'#050810'};
+  --card:${style==='light'?'#ffffff':'#0d1424'};
+  --bdr:${style==='light'?'#e2e8f0':'#1e293b'};
+  --txt:${style==='light'?'#1e293b':'#f8fafc'};
+  --txt2:${style==='light'?'#475569':'#94a3b8'};
+  --muted:${style==='light'?'#94a3b8':'#475569'};
+  --acc:#3b82f6;--acc2:#8b5cf6;
+}
+html,body{width:100%;height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--txt);overflow:hidden}
+body{display:flex;flex-direction:column}
+
+.header{
+  background:linear-gradient(135deg,${style==='light'?'#ffffff,#f1f5f9':style==='elegant'?'#1e3a8a,#312e81':'#0d1424,#1e293b'});
+  padding:16px 24px;
+  border-bottom:1px solid var(--bdr);
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:14px;flex-shrink:0;
+  ${style==='elegant'?'color:white;':''}
+}
+.header-left{display:flex;align-items:center;gap:14px}
+.logo{
+  width:46px;height:46px;
+  background:linear-gradient(135deg,#3b82f6,#8b5cf6);
+  border-radius:12px;display:flex;align-items:center;
+  justify-content:center;font-size:22px;
+  box-shadow:0 4px 16px rgba(59,130,246,0.4);
+}
+.title-block h1{font-size:18px;font-weight:800;letter-spacing:0.2px}
+.title-block p{font-size:12px;color:var(--txt2);margin-top:2px}
+.header-meta{display:flex;gap:10px;flex-wrap:wrap}
+.meta-pill{
+  background:${style==='elegant'?'rgba(255,255,255,0.15)':style==='light'?'#f1f5f9':'#1e293b'};
+  border:1px solid ${style==='elegant'?'rgba(255,255,255,0.2)':'var(--bdr)'};
+  border-radius:10px;padding:6px 12px;
+  font-size:11px;
+}
+.meta-pill b{display:block;font-size:14px;color:#3b82f6;margin-top:2px;font-weight:700}
+${style==='elegant'?'.meta-pill b{color:#93c5fd}':''}
+
+.main{flex:1;display:flex;overflow:hidden;position:relative}
+#map{flex:1;height:100%}
+
+.sidebar{
+  width:340px;
+  background:var(--card);
+  border-left:1px solid var(--bdr);
+  overflow-y:auto;
+  display:flex;flex-direction:column;
+  flex-shrink:0;
+}
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:2px}
+
+.info-section{padding:16px 18px;border-bottom:1px solid var(--bdr)}
+.section-title{
+  font-size:10px;font-weight:800;color:#3b82f6;
+  text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px;
+}
+.abstract{font-size:12px;color:var(--txt2);line-height:1.7}
+
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat-box{
+  background:${style==='light'?'#f8fafc':'#172033'};
+  border:1px solid var(--bdr);
+  border-radius:10px;padding:12px;text-align:center;
+  position:relative;overflow:hidden;
+}
+.stat-box::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,#3b82f6,#8b5cf6);
+}
+.stat-n{
+  font-size:24px;font-weight:800;
+  background:linear-gradient(135deg,#3b82f6,#8b5cf6);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;line-height:1;
+}
+.stat-l{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-top:4px}
+
+.legend{padding:14px 18px;border-bottom:1px solid var(--bdr)}
+.leg-item{display:flex;align-items:center;gap:9px;margin-bottom:7px;font-size:11px;color:var(--txt2)}
+.leg-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0;box-shadow:0 0 4px currentColor}
+
+.toggle-sidebar{
+  position:fixed;top:80px;right:14px;
+  background:var(--card);border:1px solid var(--bdr);
+  width:36px;height:36px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;z-index:500;
+  box-shadow:0 4px 12px rgba(0,0,0,0.2);
+  font-size:14px;color:var(--txt);
+}
+
+@media(max-width:768px){
+  .sidebar{position:absolute;right:0;top:0;bottom:0;z-index:600;transform:translateX(100%);transition:transform 0.3s}
+  .sidebar.open{transform:translateX(0)}
+}
+@media(min-width:769px){.toggle-sidebar{display:none}}
+
+/* POPUP */
+.leaflet-popup-content-wrapper{
+  background:${style==='light'?'#ffffff':'rgba(8,12,22,0.98)'}!important;
+  border:1px solid ${style==='light'?'#e2e8f0':'#1e293b'}!important;
+  border-radius:18px!important;
+  box-shadow:0 24px 60px rgba(0,0,0,${style==='light'?'0.15':'0.7'})!important;
+  padding:0!important;overflow:hidden;color:var(--txt)!important;
+}
+.leaflet-popup-content{margin:0!important}
+.leaflet-popup-tip-container{display:none!important}
+.leaflet-popup-close-button{
+  color:${style==='light'?'#475569':'#94a3b8'}!important;
+  font-size:22px!important;top:6px!important;right:8px!important;
+  background:rgba(${style==='light'?'255,255,255':'0,0,0'},0.6)!important;
+  border-radius:50%!important;width:28px!important;height:28px!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  line-height:1!important;padding:0!important;
+}
+
+.popup-wrap{width:280px;overflow:hidden}
+.popup-gallery{width:100%;height:175px;background:${style==='light'?'#f1f5f9':'#050810'};position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.popup-gallery.empty{height:60px;background:linear-gradient(135deg,rgba(59,130,246,0.12),rgba(139,92,246,0.12))}
+.pop-img{width:100%;height:100%;object-fit:cover;cursor:pointer;display:block}
+.pop-img-count{position:absolute;bottom:8px;right:9px;background:rgba(0,0,0,0.78);color:white;border-radius:14px;padding:3px 11px;font-size:10px;font-weight:700}
+.pop-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.6);color:white;border:none;width:32px;height:32px;border-radius:50%;font-size:17px;cursor:pointer}
+.pop-nav-l{left:6px}.pop-nav-r{right:6px}
+
+.popup-body{padding:14px 15px 11px;color:${style==='light'?'#1e293b':'#f8fafc'}}
+.popup-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:11px}
+.popup-name{font-size:16px;font-weight:800;line-height:1.2;color:${style==='light'?'#0f172a':'#f1f5f9'}}
+.popup-species{font-size:11px;color:${style==='light'?'#64748b':'#64748b'};font-style:italic;margin-top:3px}
+.spider-chip{display:flex;flex-direction:column;align-items:center;border-radius:12px;padding:6px 12px;min-width:48px;border:1.5px solid;flex-shrink:0}
+.spider-chip-n{font-size:22px;font-weight:800;line-height:1}
+.spider-chip-l{font-size:8px;color:${style==='light'?'#94a3b8':'#64748b'};text-transform:uppercase;margin-top:2px}
+
+.popup-fields{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:9px}
+.pop-field{background:${style==='light'?'#f8fafc':'rgba(255,255,255,0.03)'};border:1px solid ${style==='light'?'#e2e8f0':'#1e293b'};border-radius:8px;padding:7px 9px}
+.pop-field-l{font-size:9px;color:${style==='light'?'#94a3b8':'#475569'};text-transform:uppercase;margin-bottom:3px}
+.pop-field-v{font-size:12px;font-weight:600;color:${style==='light'?'#334155':'#e2e8f0'}}
+.popup-notes{background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:8px;padding:8px 10px;font-size:11px;color:${style==='light'?'#475569':'#94a3b8'};line-height:1.5;font-style:italic;margin-bottom:8px}
+.popup-gps{font-size:9px;color:${style==='light'?'#94a3b8':'#475569'};text-align:center;font-family:'Courier New',monospace}
+
+.thumb-row{display:flex;gap:6px;padding:0 15px 13px;overflow-x:auto}
+.thumb-img{width:48px;height:48px;border-radius:8px;object-fit:cover;flex-shrink:0;border:2px solid transparent;cursor:pointer}
+.thumb-img.on{border-color:#3b82f6}
+
+.footer{
+  position:fixed;bottom:10px;left:10px;
+  background:${style==='light'?'rgba(255,255,255,0.95)':'rgba(10,14,26,0.95)'};
+  border:1px solid var(--bdr);border-radius:8px;
+  padding:6px 12px;font-size:10px;color:var(--muted);
+  backdrop-filter:blur(10px);z-index:500;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="logo">🕷️</div>
+    <div class="title-block">
+      <h1>${d.meta.title}</h1>
+      <p>${d.meta.author}${d.meta.inst?' · '+d.meta.inst:''} · ${new Date(d.meta.date).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}</p>
+    </div>
+  </div>
+  <div class="header-meta">
+    <div class="meta-pill">Trees<b>${stats.totalTrees}</b></div>
+    <div class="meta-pill">Spiders<b>${stats.totalSpiders}</b></div>
+    <div class="meta-pill">Infested<b>${stats.infested} (${stats.rate}%)</b></div>
+    <div class="meta-pill">Zones<b>${d.strata.length+d.patches.length}</b></div>
+  </div>
+</div>
+
+<div class="main">
+  <div id="map"></div>
+
+  <button class="toggle-sidebar" onclick="document.querySelector('.sidebar').classList.toggle('open')">ℹ️</button>
+
+  <div class="sidebar">
+    ${d.meta.abstract?`<div class="info-section">
+      <div class="section-title">📋 Abstract</div>
+      <div class="abstract">${d.meta.abstract}</div>
+    </div>`:''}
+
+    <div class="info-section">
+      <div class="section-title">📊 Summary Statistics</div>
+      <div class="stats-grid">
+        <div class="stat-box"><div class="stat-n">${stats.totalTrees}</div><div class="stat-l">Total Trees</div></div>
+        <div class="stat-box"><div class="stat-n">${stats.totalSpiders}</div><div class="stat-l">Spiders</div></div>
+        <div class="stat-box"><div class="stat-n">${stats.infested}</div><div class="stat-l">Infested</div></div>
+        <div class="stat-box"><div class="stat-n">${stats.rate}%</div><div class="stat-l">Rate</div></div>
+        <div class="stat-box"><div class="stat-n">${d.strata.length}</div><div class="stat-l">Strata</div></div>
+        <div class="stat-box"><div class="stat-n">${d.patches.length}</div><div class="stat-l">Patches</div></div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <div class="section-title">🕷️ Spider Count</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#9e9e9e;color:#9e9e9e"></div>0 spiders — No activity</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#ffb300;color:#ffb300"></div>1 spider — Low</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#ef6c00;color:#ef6c00"></div>2 spiders — Moderate</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#d32f2f;color:#d32f2f"></div>3–4 spiders — High</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#7b1fa2;color:#7b1fa2"></div>5+ spiders — Very High</div>
+    </div>
+
+    ${d.strata.length?`<div class="legend">
+      <div class="section-title">📐 Strata Areas</div>
+      ${d.strata.map(s=>`<div class="leg-item"><div style="width:12px;height:12px;background:${s.color};border-radius:3px;flex-shrink:0"></div>S${s.num}: ${s.name}</div>`).join('')}
+    </div>`:''}
+  </div>
+</div>
+
+<div class="footer">Generated by Spider Map Pro · ${new Date(d.meta.generated).toLocaleString()}</div>
+
+<script>
+const DATA=${dataJSON};
+let galIdx={};
+
+const map=L.map('map',{center:[28.9456,77.1015],zoom:16,zoomControl:true});
+
+const tiles=[
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OSM',maxZoom:22}),
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri',maxZoom:22}),
+  L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',{attribution:'© Google',maxZoom:22}),
+];
+tiles[${defaultTile}].addTo(map);
+L.control.layers({'Street':tiles[0],'Satellite':tiles[1],'Hybrid':tiles[2]},{},{position:'topright'}).addTo(map);
+
+function emoji(sp){const s=(sp||'').toLowerCase();if(s.includes('neem'))return'🌿';if(s.includes('mango'))return'🥭';if(s.includes('peepal'))return'🍃';if(s.includes('banyan'))return'🌳';if(s.includes('ashoka'))return'🌲';if(s.includes('bamboo'))return'🎋';if(s.includes('jamun'))return'🫐';if(s.includes('gulmohar'))return'🌺';return'🌳';}
+function tColor(n){if(n===0)return'#9e9e9e';if(n===1)return'#ffb300';if(n===2)return'#ef6c00';if(n<=4)return'#d32f2f';return'#7b1fa2';}
+function tRad(n){return n===0?7:n===1?9:n===2?11:n<=4?13:15;}
+function rgb(h){return[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)].join(',');}
+
+// Strata
+DATA.strata.forEach(s=>{
+  L.polygon(s.corners,{color:s.color,fillColor:s.color,fillOpacity:0.12,weight:3,dashArray:'12,6'})
+    .addTo(map).bindPopup('<div style="padding:13px;min-width:180px"><div style="font-size:11px;color:'+s.color+';font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px">📐 Stratum</div><b style="font-size:15px">'+s.num+': '+s.name+'</b><br><span style="font-size:11px;color:#64748b">ID: '+s.id+'</span></div>',{maxWidth:250});
+});
+
+// Patches
+DATA.patches.forEach(p=>{
+  L.polygon(p.corners,{color:p.color,fillColor:p.color,fillOpacity:0.4,weight:2.5})
+    .addTo(map).bindPopup('<div style="padding:13px;min-width:180px"><div style="font-size:11px;color:'+p.color+';font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px">⬛ Patch · 8×8m</div><b style="font-size:15px">'+p.id+'</b><br><span style="font-size:11px;color:#64748b">Stratum: '+p.str+(p.name?'<br>'+p.name:'')+'</span></div>',{maxWidth:250});
+});
+
+// Trees
+const treeMarkers=[];
+DATA.trees.forEach((t,idx)=>{
+  const col=tColor(t.cnt);
+  const m=L.circleMarker([t.lat,t.lon],{radius:tRad(t.cnt),color:col,fillColor:col,fillOpacity:0.9,weight:2.5}).addTo(map);
+  m.bindTooltip(emoji(t.sp)+' <b>'+t.sp+'</b> · '+t.cnt+' spider'+(t.cnt!==1?'s':''),{sticky:true});
+  m.bindPopup(()=>buildPop(t,idx),{maxWidth:300,autoPan:true});
+  treeMarkers.push(m);
+});
+
+function buildPop(tree,idx){
+  const col=tColor(tree.cnt);
+  const ph=tree.ph||[];
+  galIdx[idx]=0;
+  const gal=ph.length>0?
+    '<div class="popup-gallery" id="pg-'+idx+'"><img class="pop-img" id="pi-'+idx+'" src="'+ph[0]+'" onclick="openImg(\\''+ph[0].replace(/'/g,"\\\\'")+'\\')">'+
+    (ph.length>1?'<div class="pop-img-count">1/'+ph.length+'</div><button class="pop-nav pop-nav-l" onclick="event.stopPropagation();navImg('+idx+',-1,'+ph.length+')">‹</button><button class="pop-nav pop-nav-r" onclick="event.stopPropagation();navImg('+idx+',1,'+ph.length+')">›</button>':'')+
+    '</div>':
+    '<div class="popup-gallery empty"><div style="font-size:40px;opacity:0.3">'+emoji(tree.sp)+'</div></div>';
+  const flds=[tree.str?{l:'Stratum',v:tree.str}:null,tree.pt?{l:'Patch',v:tree.pt}:null,tree.bark?{l:'Bark',v:tree.bark}:null,(tree.web&&tree.web!=='None')?{l:'Web',v:tree.web}:null,tree.ht?{l:'Height',v:tree.ht,span:2}:null].filter(Boolean);
+  const div=document.createElement('div');
+  div.className='popup-wrap';
+  div.innerHTML=gal+
+    '<div class="popup-body">'+
+      '<div class="popup-header"><div><div class="popup-name">'+emoji(tree.sp)+' '+tree.id+'</div><div class="popup-species">'+tree.sp+'</div></div>'+
+      '<div class="spider-chip" style="border-color:rgba('+rgb(col)+',0.4);background:rgba('+rgb(col)+',0.15)"><div class="spider-chip-n" style="color:'+col+'">'+tree.cnt+'</div><div class="spider-chip-l">spiders</div></div></div>'+
+      (flds.length?'<div class="popup-fields">'+flds.map(f=>'<div class="pop-field"'+(f.span?' style="grid-column:span '+f.span+'"':'')+'><div class="pop-field-l">'+f.l+'</div><div class="pop-field-v">'+f.v+'</div></div>').join('')+'</div>':'')+
+      (tree.nts?'<div class="popup-notes">"'+tree.nts+'"</div>':'')+
+      '<div class="popup-gps">📍 '+tree.lat.toFixed(5)+', '+tree.lon.toFixed(5)+'</div>'+
+    '</div>'+
+    (ph.length>1?'<div class="thumb-row" id="tr-'+idx+'">'+ph.map((p,i)=>'<img class="thumb-img'+(i===0?' on':'')+'" src="'+p+'" onclick="setImg('+idx+','+i+','+ph.length+')">').join('')+'</div>':'');
+  return div;
+}
+function navImg(idx,dir,total){
+  galIdx[idx]=((galIdx[idx]||0)+dir+total)%total;
+  const i=galIdx[idx],ph=DATA.trees[idx].ph;
+  const img=document.getElementById('pi-'+idx);
+  const cnt=document.querySelector('#pg-'+idx+' .pop-img-count');
+  if(img){img.src=ph[i];img.onclick=()=>openImg(ph[i]);}
+  if(cnt)cnt.textContent=(i+1)+'/'+total;
+  document.querySelectorAll('#tr-'+idx+' .thumb-img').forEach((t,j)=>t.classList.toggle('on',j===i));
+}
+function setImg(idx,i,total){
+  galIdx[idx]=i;const ph=DATA.trees[idx].ph;
+  const img=document.getElementById('pi-'+idx);
+  const cnt=document.querySelector('#pg-'+idx+' .pop-img-count');
+  if(img){img.src=ph[i];img.onclick=()=>openImg(ph[i]);}
+  if(cnt)cnt.textContent=(i+1)+'/'+total;
+  document.querySelectorAll('#tr-'+idx+' .thumb-img').forEach((t,j)=>t.classList.toggle('on',j===i));
+}
+function openImg(src){
+  const w=window.open('','_blank');
+  if(w)w.document.write('<html><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh;cursor:pointer" onclick="window.close()"><img src="'+src+'" style="max-width:100%;max-height:100vh;object-fit:contain"></body></html>');
+}
+
+// Fit to all
+const allLayers=[...treeMarkers];
+DATA.strata.forEach(s=>{allLayers.push(L.polygon(s.corners));});
+DATA.patches.forEach(p=>{allLayers.push(L.polygon(p.corners));});
+if(allLayers.length){
+  setTimeout(()=>{map.fitBounds(L.featureGroup(allLayers).getBounds(),{padding:[60,60]});},300);
+}
+<\/script>
+</body>
+</html>`;
+}
+
+// CSV
 function exportCSV(){
-  if(!trees.length){showToast('No data to export','err');return;}
+  if(!trees.length){showToast('No data','err');return;}
   const h='tree_id,stratum,patch,lat,lon,species,spiders,bark,web,height,notes,photos';
   const r=trees.map(t=>[t.id,t.str,t.pt,t.lat,t.lon,t.sp,t.cnt,t.bark,t.web,t.ht,`"${(t.nts||'').replace(/"/g,'""')}"`,t.ph.length].join(','));
   const blob=new Blob([[h,...r].join('\n')],{type:'text/csv'});
@@ -1822,9 +1823,6 @@ function exportCSV(){
   a.click();showToast('📥 CSV downloaded!');
 }
 
-// ═══════════════════
-// CLEAR ALL
-// ═══════════════════
 function clearAll(){
   if(!confirm('⚠️ DELETE ALL DATA?\n\nThis cannot be undone.'))return;
   if(!confirm('Are you ABSOLUTELY sure?'))return;
@@ -1834,14 +1832,9 @@ function clearAll(){
   if(heatLayer){map.removeLayer(heatLayer);heatLayer=null;}
   if(previewPoly){map.removeLayer(previewPoly);previewPoly=null;}
   tempMkrs.forEach(m=>map.removeLayer(m));tempMkrs=[];
-
-  // Clear all photo storage
   trees.forEach(t=>{try{localStorage.removeItem(PHOTO_KEY_PREFIX+t.id);}catch(e){}});
-
   trees=[];strata=[];patches=[];tMkrs=[];sLayers=[];pLayers=[];
-  pendingPatch=null;stratCorners=[];
-  selectedPatchParentStratum=null;
-  selectedTreeParentPatch=null;
+  pendingPatch=null;stratCorners=[];selectedPatchParentStratum=null;selectedTreeParentPatch=null;
   ['h-trees','h-sp','h-z'].forEach(id=>document.getElementById(id).textContent='0');
   localStorage.removeItem(STORAGE_KEY);
   refreshLists();refreshParentSelectors();cancelMode();
@@ -1849,97 +1842,40 @@ function clearAll(){
   showToast('All data cleared','err');
 }
 
-// ═══════════════════
-// SAVE / LOAD - ROBUST
-// ═══════════════════
+// SAVE / LOAD
 function save(){
   try{
-    // Save metadata without photos
-    const meta={
-      trees:trees.map(t=>({...t,ph:[]})),
-      strata:strata,
-      patches:patches,
-      selectedPatchParentStratum:selectedPatchParentStratum,
-      selectedTreeParentPatch:selectedTreeParentPatch,
-      savedAt:Date.now()
-    };
+    const meta={trees:trees.map(t=>({...t,ph:[]})),strata,patches,selectedPatchParentStratum,selectedTreeParentPatch,savedAt:Date.now()};
     localStorage.setItem(STORAGE_KEY,JSON.stringify(meta));
-
-    // Save photos separately per tree
-    trees.forEach(t=>{
-      if(t.ph&&t.ph.length){
-        try{
-          localStorage.setItem(PHOTO_KEY_PREFIX+t.id,JSON.stringify(t.ph));
-        }catch(e){
-          console.warn('Photo too large for tree:',t.id);
-          showToast('⚠️ Photo storage full. Export CSV!','warn');
-        }
-      }
-    });
-
+    trees.forEach(t=>{if(t.ph&&t.ph.length){try{localStorage.setItem(PHOTO_KEY_PREFIX+t.id,JSON.stringify(t.ph));}catch(e){showToast('⚠️ Photo storage full!','warn');}}});
     flashSaved();
-  }catch(e){
-    console.error('Save failed:',e);
-    showToast('❌ Save failed! Export CSV NOW','err');
-  }
+  }catch(e){showToast('❌ Save failed!','err');}
 }
 
 function load(){
   try{
     const raw=localStorage.getItem(STORAGE_KEY);
-    if(!raw){
-      console.log('No saved data found');
-      return;
-    }
+    if(!raw)return;
     const d=JSON.parse(raw);
-    console.log('Loaded data from',new Date(d.savedAt||0));
-
-    // Restore strata FIRST
-    (d.strata||[]).forEach(s=>{
-      strata.push(s);
-      sLayers.push(createStratumLayer(s));
-    });
-
-    // Restore patches
-    (d.patches||[]).forEach(p=>{
-      patches.push(p);
-      pLayers.push(createPatchLayer(p));
-    });
-
-    // Restore trees (load photos)
+    (d.strata||[]).forEach(s=>{strata.push(s);sLayers.push(createStratumLayer(s));});
+    (d.patches||[]).forEach(p=>{patches.push(p);pLayers.push(createPatchLayer(p));});
     (d.trees||[]).forEach(t=>{
-      try{
-        const p=localStorage.getItem(PHOTO_KEY_PREFIX+t.id);
-        t.ph=p?JSON.parse(p):[];
-      }catch(e){t.ph=[];}
-      trees.push(t);
-      tMkrs.push(makeMarker(t,trees.length-1));
+      try{const p=localStorage.getItem(PHOTO_KEY_PREFIX+t.id);t.ph=p?JSON.parse(p):[];}catch(e){t.ph=[];}
+      trees.push(t);tMkrs.push(makeMarker(t,trees.length-1));
     });
-
-    // Restore selected parents
     if(d.selectedPatchParentStratum)selectedPatchParentStratum=d.selectedPatchParentStratum;
     if(d.selectedTreeParentPatch)selectedTreeParentPatch=d.selectedTreeParentPatch;
-
     document.getElementById('h-trees').textContent=trees.length;
     document.getElementById('h-sp').textContent=trees.reduce((s,t)=>s+t.cnt,0);
     document.getElementById('h-z').textContent=strata.length+patches.length;
-
-    refreshLists();
-    refreshParentSelectors();
-
+    refreshLists();refreshParentSelectors();
     if(trees.length||strata.length||patches.length){
       showToast(`📂 Restored ${trees.length} trees, ${strata.length} strata, ${patches.length} patches`);
       setTimeout(fitAll,1000);
     }
-  }catch(e){
-    console.error('Load error:',e);
-    showToast('⚠️ Load partially failed','warn');
-  }
+  }catch(e){console.error(e);}
 }
 
-// ═══════════════════
-// CLEAR FORMS
-// ═══════════════════
 function clearTreeForm(){
   ['t-id','t-sp','t-lat','t-lon','t-cnt','t-notes'].forEach(id=>document.getElementById(id).value='');
   ['t-bark','t-ht'].forEach(id=>document.getElementById(id).value='');
@@ -1952,7 +1888,6 @@ function clearTreeForm(){
 }
 function clearStratForm(){
   ['s-id','s-name'].forEach(id=>document.getElementById(id).value='');
-  document.querySelectorAll('.slat,.slon').forEach(el=>el.value='');
   stratCorners=[];tempMkrs.forEach(m=>map.removeLayer(m));tempMkrs=[];
   document.getElementById('corner-n').textContent='0';
   document.getElementById('corner-list').innerHTML='';
@@ -1961,39 +1896,19 @@ function clearStratForm(){
 function clearPatchForm(){
   ['p-id','p-name'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('patch-ready').style.display='none';
-  document.getElementById('patch-coord-card').style.display='none';
   document.getElementById('patch-boundary-warn').classList.remove('show');
   pendingPatch=null;
 }
 
-// ═══════════════════
-// AUTO-SAVE TRIGGERS
-// ═══════════════════
-// Save before page closes
-window.addEventListener('beforeunload',()=>{
-  save();
-});
+// Auto-save triggers
+window.addEventListener('beforeunload',()=>save());
+document.addEventListener('visibilitychange',()=>{if(document.hidden)save();});
+setInterval(()=>{if(trees.length||strata.length||patches.length)save();},30000);
 
-// Save when page becomes hidden (mobile background)
-document.addEventListener('visibilitychange',()=>{
-  if(document.hidden)save();
-});
-
-// Save every 30 seconds as backup
-setInterval(()=>{
-  if(trees.length||strata.length||patches.length){
-    save();
-  }
-},30000);
-
-// ═══════════════════
-// INIT
-// ═══════════════════
 window.addEventListener('load',()=>{
-  setTimeout(()=>{
-    load();
-    refreshParentSelectors();
-  },500);
+  setTimeout(()=>{load();refreshParentSelectors();},500);
+  // Set today's date in export
+  document.getElementById('exp-date').valueAsDate=new Date();
 });
 </script>
 </body>
