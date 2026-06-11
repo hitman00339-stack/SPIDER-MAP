@@ -62,6 +62,47 @@ html,body{width:100vw;height:100vh;height:100dvh;font-family:-apple-system,Blink
 .fab-track.on{animation:trackPulse 1.5s infinite;box-shadow:0 0 20px rgba(124,58,237,0.7)}
 @keyframes trackPulse{0%,100%{box-shadow:0 0 18px rgba(124,58,237,0.6)}50%{box-shadow:0 0 28px rgba(124,58,237,0.95)}}
 
+.fab-tour{background:linear-gradient(135deg,#ec4899,#db2777);color:white;font-size:18px;animation:tourPulse 2s infinite}
+.fab-tour.recording{background:linear-gradient(135deg,#ef4444,#dc2626);animation:recordPulse 1s infinite}
+@keyframes tourPulse{0%,100%{box-shadow:0 5px 18px rgba(236,72,153,0.4)}50%{box-shadow:0 5px 25px rgba(236,72,153,0.8)}}
+@keyframes recordPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0.7)}50%{box-shadow:0 0 0 12px rgba(239,68,68,0)}}
+
+#tour-overlay{position:fixed;inset:0;background:rgba(0,0,0,0);z-index:8000;display:none;align-items:center;justify-content:center;padding:20px;transition:background 0.3s}
+#tour-overlay.show{display:flex;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px)}
+#tour-modal{background:linear-gradient(145deg,#0d1424,#172033);border:1px solid var(--bdr2);border-radius:20px;max-width:380px;width:100%;padding:24px;text-align:center;animation:tourModalPop 0.4s cubic-bezier(0.34,1.56,0.64,1)}
+@keyframes tourModalPop{from{transform:scale(0.7);opacity:0}to{transform:scale(1);opacity:1}}
+.tour-icon{font-size:48px;margin-bottom:12px}
+.tour-title{font-size:20px;font-weight:800;color:#f8fafc;margin-bottom:8px}
+.tour-sub{font-size:13px;color:#94a3b8;line-height:1.6;margin-bottom:18px}
+.tour-stats{background:rgba(0,0,0,0.4);border-radius:11px;padding:12px;margin-bottom:18px;display:flex;justify-content:space-around}
+.tour-stat{text-align:center}
+.tour-stat-n{font-size:22px;font-weight:800;background:linear-gradient(135deg,#ec4899,#db2777);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.tour-stat-l{font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px}
+.tour-instructions{background:rgba(236,72,153,0.08);border:1px solid rgba(236,72,153,0.3);border-radius:11px;padding:13px;font-size:12px;color:#f9a8d4;line-height:1.7;text-align:left;margin-bottom:18px}
+.tour-instructions b{color:#fbcfe8}
+.tour-btn{width:100%;padding:14px;background:linear-gradient(135deg,#ec4899,#db2777);color:white;border:none;border-radius:11px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit}
+.tour-btn:active{transform:scale(0.97)}
+.tour-btn-secondary{background:rgba(255,255,255,0.08);border:1px solid var(--bdr2)}
+
+#tour-progress{position:fixed;top:60px;left:50%;transform:translateX(-50%);z-index:9000;background:rgba(0,0,0,0.85);color:white;padding:12px 20px;border-radius:14px;display:none;align-items:center;gap:14px;backdrop-filter:blur(10px);box-shadow:0 8px 30px rgba(236,72,153,0.4);min-width:260px;max-width:90vw}
+#tour-progress.show{display:flex}
+.tour-prog-icon{font-size:22px;animation:tourProgIcon 1.5s infinite}
+@keyframes tourProgIcon{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+.tour-prog-info{flex:1;min-width:0}
+.tour-prog-step{font-size:12px;font-weight:700;color:white;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tour-prog-bar{height:4px;background:rgba(255,255,255,0.15);border-radius:2px;overflow:hidden}
+.tour-prog-fill{height:100%;background:linear-gradient(90deg,#ec4899,#db2777);width:0%;transition:width 0.3s;border-radius:2px}
+.tour-stop-btn{background:rgba(239,68,68,0.3);border:1px solid #ef4444;color:white;border-radius:8px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
+
+#tour-caption{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:9000;background:linear-gradient(135deg,rgba(13,20,36,0.97),rgba(23,32,51,0.97));border:1px solid var(--bdr2);border-radius:16px;padding:14px 22px;display:none;text-align:center;backdrop-filter:blur(15px);box-shadow:0 10px 40px rgba(0,0,0,0.6);min-width:280px;max-width:90vw;animation:captionFadeIn 0.5s ease}
+#tour-caption.show{display:block}
+@keyframes captionFadeIn{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.caption-title{font-size:16px;font-weight:800;color:#fbcfe8;margin-bottom:4px;background:linear-gradient(135deg,#ec4899,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.caption-sub{font-size:12px;color:#cbd5e1;line-height:1.5}
+.caption-stats{display:flex;justify-content:center;gap:14px;margin-top:8px;padding-top:8px;border-top:1px solid var(--bdr);flex-wrap:wrap}
+.caption-stat{font-size:11px;color:#94a3b8}
+.caption-stat b{color:#fbcfe8;font-weight:700}
+
 #tile-btn{position:fixed;top:62px;left:12px;background:rgba(13,20,36,0.96);border:1.5px solid var(--bdr2);border-radius:10px;padding:8px 12px;font-size:11px;font-weight:700;color:var(--txt);z-index:900;cursor:pointer;font-family:inherit;backdrop-filter:blur(10px)}
 
 #gps-live-info{position:fixed;top:108px;left:12px;background:rgba(13,20,36,0.95);border:1px solid var(--bdr);border-radius:10px;padding:8px 12px;font-size:10px;color:var(--txt2);z-index:850;display:none;backdrop-filter:blur(10px);min-width:130px}
@@ -108,6 +149,7 @@ input:disabled{opacity:0.5;cursor:not-allowed}
 .btn-green{background:linear-gradient(135deg,#10b981,#059669);color:white;box-shadow:0 4px 14px rgba(16,185,129,0.3)}
 .btn-yellow{background:linear-gradient(135deg,#d97706,#b45309);color:white;box-shadow:0 4px 14px rgba(217,119,6,0.3)}
 .btn-purple{background:linear-gradient(135deg,#7c3aed,#6d28d9);color:white;box-shadow:0 4px 14px rgba(124,58,237,0.3)}
+.btn-pink{background:linear-gradient(135deg,#ec4899,#db2777);color:white;box-shadow:0 4px 14px rgba(236,72,153,0.3)}
 .btn-red{background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:var(--red)}
 .btn-half{flex:1}
 .btn-row{display:flex;gap:7px}
@@ -122,6 +164,7 @@ input:disabled{opacity:0.5;cursor:not-allowed}
 .info-green{background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);color:#6ee7b7}
 .info-yellow{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);color:#fde68a}
 .info-red{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);color:#fca5a5}
+.info-pink{background:rgba(236,72,153,0.08);border:1px solid rgba(236,72,153,0.25);color:#f9a8d4}
 
 .parent-sel{background:rgba(59,130,246,0.06);border:1.5px solid rgba(59,130,246,0.3);border-radius:11px;padding:11px;margin-bottom:10px}
 .parent-sel-title{font-size:10px;font-weight:700;color:#60a5fa;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
@@ -301,6 +344,7 @@ input:disabled{opacity:0.5;cursor:not-allowed}
 </div>
 
 <div id="fab-group">
+  <button class="fab fab-tour" id="tour-fab" onclick="startTour()" title="Start Video Tour">🎬</button>
   <button class="fab fab-track" id="track-fab" onclick="toggleTracking()">📡</button>
   <button class="fab fab-fit" onclick="fitAll()">🎯</button>
   <button class="fab fab-gps" onclick="jumpGPS()">📍</button>
@@ -312,6 +356,62 @@ input:disabled{opacity:0.5;cursor:not-allowed}
 </div>
 
 <div id="sheet-overlay" onclick="closeSheet()"></div>
+
+<!-- TOUR START MODAL -->
+<div id="tour-overlay">
+  <div id="tour-modal">
+    <div class="tour-icon">🎬</div>
+    <div class="tour-title">Cinematic Map Tour</div>
+    <div class="tour-sub">Auto-fly through all your strata, patches, and trees with photo previews!</div>
+    
+    <div class="tour-stats">
+      <div class="tour-stat">
+        <div class="tour-stat-n" id="tour-s-count">0</div>
+        <div class="tour-stat-l">Strata</div>
+      </div>
+      <div class="tour-stat">
+        <div class="tour-stat-n" id="tour-p-count">0</div>
+        <div class="tour-stat-l">Patches</div>
+      </div>
+      <div class="tour-stat">
+        <div class="tour-stat-n" id="tour-t-count">0</div>
+        <div class="tour-stat-l">Trees</div>
+      </div>
+      <div class="tour-stat">
+        <div class="tour-stat-n" id="tour-duration">0s</div>
+        <div class="tour-stat-l">Duration</div>
+      </div>
+    </div>
+    
+    <div class="tour-instructions">
+      <b>📹 To record video:</b><br>
+      <b>Android:</b> Swipe down → Screen Record<br>
+      <b>iPhone:</b> Control Center → Record (●)<br>
+      <b>Laptop:</b> Win+G or Cmd+Shift+5<br><br>
+      <b>Start recording first, then tap Start Tour!</b>
+    </div>
+    
+    <button class="tour-btn" onclick="beginTour()">▶️ Start Tour Now</button>
+    <button class="tour-btn tour-btn-secondary" onclick="closeTourModal()">Cancel</button>
+  </div>
+</div>
+
+<!-- TOUR PROGRESS BAR -->
+<div id="tour-progress">
+  <div class="tour-prog-icon">🎬</div>
+  <div class="tour-prog-info">
+    <div class="tour-prog-step" id="tour-step-text">Starting tour...</div>
+    <div class="tour-prog-bar"><div class="tour-prog-fill" id="tour-prog-fill"></div></div>
+  </div>
+  <button class="tour-stop-btn" onclick="stopTour()">⏹ Stop</button>
+</div>
+
+<!-- TOUR CAPTION -->
+<div id="tour-caption">
+  <div class="caption-title" id="caption-title">Title</div>
+  <div class="caption-sub" id="caption-sub">Subtitle</div>
+  <div class="caption-stats" id="caption-stats"></div>
+</div>
 
 <div id="popup-overlay" onclick="closePopup(event)">
   <div id="popup-modal" onclick="event.stopPropagation()"></div>
@@ -467,6 +567,7 @@ input:disabled{opacity:0.5;cursor:not-allowed}
     </div>
 
     <div class="tab-pane" id="tab-export">
+      <div class="info-box info-pink"><b>🎬 NEW:</b> Tap the pink 🎬 button (bottom right) to start auto-tour video!</div>
       <div class="info-box info-blue">📤 Generate HTML with photos.</div>
       <div class="card">
         <div class="card-title">📝 Project Info</div>
@@ -474,6 +575,8 @@ input:disabled{opacity:0.5;cursor:not-allowed}
         <div class="fg" style="margin-bottom:7px"><label>Researcher</label><input id="exp-author" placeholder="Your Name"></div>
         <div class="fg"><label>Institution</label><input id="exp-inst" placeholder="University"></div>
       </div>
+      <button class="btn btn-pink" onclick="startTour()">🎬 Start Video Tour</button>
+      <div style="height:8px"></div>
       <button class="btn btn-purple" onclick="exportHTML()">📄 Generate HTML</button>
       <div style="height:8px"></div>
       <button class="btn btn-green" onclick="exportCSV()">📊 Export CSV</button>
@@ -519,6 +622,8 @@ let originalStratCorners=null, originalPatchCorners=null;
 let currentPhotos=[];
 let popupGalleryIdx={};
 let photoCache={};
+let tourActive=false;
+let tourTimeouts=[];
 
 const tileNames = ['🗺️ Street','🛰️ Satellite','🌍 Hybrid'];
 const MAX_PHOTOS = 10;
@@ -669,7 +774,6 @@ function make8x8(lat, lon) {
   return [[lat+d/2, lon-dl/2], [lat+d/2, lon+dl/2], [lat-d/2, lon+dl/2], [lat-d/2, lon-dl/2]];
 }
 
-// CHECK ID HINT (real-time feedback)
 window.checkIdHint = function(type) {
   const id = document.getElementById(type+'-id').value.trim();
   const hint = document.getElementById(type+'-hint');
@@ -694,7 +798,6 @@ window.checkIdHint = function(type) {
   }
 };
 
-// AUTO-SUGGEST NEXT ID
 window.suggestNextId = function() {
   const existing = trees.map(t => t.id);
   let n = 1;
@@ -865,6 +968,213 @@ function mapClickHandler(e) {
     document.getElementById('patch-ready').style.display = 'block';
     cancelMode(); openSheet(); showToast('✅ Patch placed inside stratum');
   }
+}
+
+// ═══════════════════════════════════
+// CINEMATIC TOUR FEATURE
+// ═══════════════════════════════════
+window.startTour = function() {
+  if (!trees.length && !strata.length && !patches.length) {
+    showToast('Add some data first!', 'err');
+    return;
+  }
+  
+  document.getElementById('tour-s-count').textContent = strata.length;
+  document.getElementById('tour-p-count').textContent = patches.length;
+  document.getElementById('tour-t-count').textContent = trees.length;
+  
+  const dur = 4 + (strata.length * 5) + (patches.length * 4) + (trees.length * 5) + 3;
+  const m = Math.floor(dur/60);
+  const s = dur%60;
+  document.getElementById('tour-duration').textContent = m ? `~${m}m ${s}s` : `~${s}s`;
+  
+  document.getElementById('tour-overlay').classList.add('show');
+};
+
+window.closeTourModal = function() {
+  document.getElementById('tour-overlay').classList.remove('show');
+};
+
+window.beginTour = async function() {
+  closeTourModal();
+  closeSheet();
+  closePopup();
+  
+  tourActive = true;
+  document.getElementById('tour-fab').classList.add('recording');
+  document.getElementById('tour-progress').classList.add('show');
+  
+  const totalSteps = 1 + strata.length + patches.length + trees.length + 1;
+  let currentStep = 0;
+  
+  function updateProgress(step, total, text) {
+    currentStep = step;
+    document.getElementById('tour-prog-fill').style.width = `${(step/total)*100}%`;
+    document.getElementById('tour-step-text').textContent = text;
+  }
+  
+  function showCaption(title, sub, stats) {
+    const cap = document.getElementById('tour-caption');
+    document.getElementById('caption-title').textContent = title;
+    document.getElementById('caption-sub').textContent = sub;
+    if (stats) {
+      document.getElementById('caption-stats').innerHTML = stats;
+      document.getElementById('caption-stats').style.display = 'flex';
+    } else {
+      document.getElementById('caption-stats').style.display = 'none';
+    }
+    cap.classList.add('show');
+  }
+  
+  function wait(ms) {
+    return new Promise(resolve => {
+      const t = setTimeout(resolve, ms);
+      tourTimeouts.push(t);
+    });
+  }
+  
+  try {
+    // STEP 1: Overview
+    updateProgress(++currentStep, totalSteps, '🌍 Overview of entire map');
+    showCaption(
+      '🕷️ Spider Distribution Map',
+      'Auto cinematic tour starting...',
+      `<div class="caption-stat"><b>${strata.length}</b> Strata</div>
+       <div class="caption-stat"><b>${patches.length}</b> Patches</div>
+       <div class="caption-stat"><b>${trees.length}</b> Trees</div>
+       <div class="caption-stat"><b>${trees.reduce((s,t)=>s+(t.cnt||0),0)}</b> Spiders</div>`
+    );
+    
+    const allLayers = [...tMkrs, ...sLayers, ...pLayers];
+    if (allLayers.length) {
+      map.flyToBounds(L.featureGroup(allLayers).getBounds(), {padding:[60,60], duration:2});
+    }
+    await wait(4500);
+    
+    if (!tourActive) return;
+    
+    // STEP 2: Each Stratum
+    for (let i = 0; i < strata.length; i++) {
+      if (!tourActive) return;
+      const s = strata[i];
+      updateProgress(++currentStep, totalSteps, `📐 Stratum ${i+1}/${strata.length}: ${s.name}`);
+      
+      const childPatches = patches.filter(p => p.str === s.id);
+      const childTrees = trees.filter(t => t.str === s.id);
+      const totalSp = childTrees.reduce((sm,t) => sm + (t.cnt||0), 0);
+      
+      showCaption(
+        `📐 Stratum ${s.num}: ${s.name}`,
+        `Study area boundary`,
+        `<div class="caption-stat"><b>${childPatches.length}</b> Patches</div>
+         <div class="caption-stat"><b>${childTrees.length}</b> Trees</div>
+         <div class="caption-stat"><b>${totalSp}</b> Spiders</div>`
+      );
+      
+      const idx = strata.indexOf(s);
+      if (sLayers[idx]) {
+        map.flyToBounds(sLayers[idx].getBounds(), {padding:[40,40], duration:2});
+      }
+      await wait(4500);
+    }
+    
+    // STEP 3: Each Patch
+    for (let i = 0; i < patches.length; i++) {
+      if (!tourActive) return;
+      const p = patches[i];
+      updateProgress(++currentStep, totalSteps, `⬛ Patch ${i+1}/${patches.length}: ${p.id}`);
+      
+      const childTrees = trees.filter(t => t.pt === p.id);
+      const totalSp = childTrees.reduce((sm,t) => sm + (t.cnt||0), 0);
+      
+      showCaption(
+        `⬛ Patch ${p.id}`,
+        `8×8 meter sampling area · Stratum ${p.str}`,
+        `<div class="caption-stat"><b>${childTrees.length}</b> Trees</div>
+         <div class="caption-stat"><b>${totalSp}</b> Spiders</div>
+         ${p.name ? `<div class="caption-stat">${p.name}</div>` : ''}`
+      );
+      
+      const idx = patches.indexOf(p);
+      if (pLayers[idx]) {
+        map.flyToBounds(pLayers[idx].getBounds(), {padding:[80,80], duration:2});
+      }
+      await wait(4000);
+    }
+    
+    // STEP 4: Each Tree
+    for (let i = 0; i < trees.length; i++) {
+      if (!tourActive) return;
+      const t = trees[i];
+      updateProgress(++currentStep, totalSteps, `🌳 Tree ${i+1}/${trees.length}: ${t.id}`);
+      
+      const sp = t.sp || 'Unknown';
+      const e = emoji(sp);
+      const photoCount = t.photoCount || 0;
+      
+      const photos = await loadTreePhotos(t.id);
+      
+      showCaption(
+        `${e} ${t.id} — ${sp}`,
+        photoCount > 0 ? `📷 ${photoCount} photo(s)` : `No photos`,
+        `<div class="caption-stat"><b>${t.cnt}</b> Spiders</div>
+         ${t.bark ? `<div class="caption-stat">Bark: ${t.bark}</div>` : ''}
+         ${t.web && t.web !== 'None' ? `<div class="caption-stat">${t.web}</div>` : ''}`
+      );
+      
+      map.flyTo([t.lat, t.lon], 20, {duration: 1.5});
+      await wait(1800);
+      
+      if (!tourActive) return;
+      
+      if (photos.length > 0) {
+        showTreePopup(t.id);
+        await wait(3500);
+        if (!tourActive) return;
+        closePopup();
+        await wait(400);
+      } else {
+        await wait(2000);
+      }
+    }
+    
+    if (!tourActive) return;
+    
+    // STEP 5: Final overview
+    updateProgress(totalSteps, totalSteps, '✅ Tour complete!');
+    showCaption(
+      '✨ Tour Complete!',
+      'All data showcased',
+      `<div class="caption-stat"><b>${strata.length}</b> Strata</div>
+       <div class="caption-stat"><b>${patches.length}</b> Patches</div>
+       <div class="caption-stat"><b>${trees.length}</b> Trees</div>`
+    );
+    
+    if (allLayers.length) {
+      map.flyToBounds(L.featureGroup(allLayers).getBounds(), {padding:[60,60], duration:2});
+    }
+    await wait(4000);
+    
+    finishTour();
+  } catch(err) {
+    console.error('Tour error:', err);
+    finishTour();
+  }
+};
+
+window.stopTour = function() {
+  tourActive = false;
+  tourTimeouts.forEach(t => clearTimeout(t));
+  tourTimeouts = [];
+  finishTour();
+  showToast('Tour stopped');
+};
+
+function finishTour() {
+  tourActive = false;
+  document.getElementById('tour-fab').classList.remove('recording');
+  document.getElementById('tour-progress').classList.remove('show');
+  document.getElementById('tour-caption').classList.remove('show');
 }
 
 window.showTreePopup = async function(treeId) {
@@ -1300,7 +1610,6 @@ function clearTreeForm() {
   renderPhotoGrid();
 }
 
-// SAVE STRATUM with duplicate ID protection
 window.saveStrat = async function() {
   if (!uid) return;
   let id = document.getElementById('s-id').value.trim();
@@ -1310,14 +1619,13 @@ window.saveStrat = async function() {
   let cornersToSave = editingStrat ? (stratCorners.length >= 3 ? stratCorners : originalStratCorners) : stratCorners;
   if (cornersToSave.length < 3) { showToast('Need 3+ corners', 'err'); return; }
   
-  // DUPLICATE ID CHECK
   if (!editingStrat) {
     if (strata.find(s => s.id === id)) {
       let counter = 2;
       let newId = `${id}-${counter}`;
       while (strata.find(s => s.id === newId)) { counter++; newId = `${id}-${counter}`; }
-      if (!confirm(`⚠️ Stratum "${id}" already exists!\n\nSave as "${newId}" instead?\n(OK = save with new ID, Cancel = abort)`)) {
-        showToast('Cancelled. Use different ID.', 'err');
+      if (!confirm(`⚠️ Stratum "${id}" already exists!\n\nSave as "${newId}" instead?`)) {
+        showToast('Cancelled.', 'err');
         return;
       }
       id = newId;
@@ -1337,7 +1645,6 @@ window.saveStrat = async function() {
   } catch(e) { showToast('Save failed', 'err'); }
 };
 
-// SAVE PATCH with duplicate ID protection
 window.savePatch = async function() {
   if (!uid) return;
   let id = document.getElementById('p-id').value.trim();
@@ -1352,14 +1659,13 @@ window.savePatch = async function() {
     if (!confirm('⚠️ Patch extends outside stratum boundary. Save anyway?')) return;
   }
   
-  // DUPLICATE ID CHECK
   if (!editingPatch) {
     if (patches.find(p => p.id === id)) {
       let counter = 2;
       let newId = `${id}-${counter}`;
       while (patches.find(p => p.id === newId)) { counter++; newId = `${id}-${counter}`; }
-      if (!confirm(`⚠️ Patch "${id}" already exists!\n\nSave as "${newId}" instead?\n(OK = save with new ID, Cancel = abort)`)) {
-        showToast('Cancelled. Use different ID.', 'err');
+      if (!confirm(`⚠️ Patch "${id}" already exists!\n\nSave as "${newId}" instead?`)) {
+        showToast('Cancelled.', 'err');
         return;
       }
       id = newId;
@@ -1378,7 +1684,6 @@ window.savePatch = async function() {
   } catch(e) { showToast('Save failed', 'err'); }
 };
 
-// SAVE TREE with duplicate ID protection
 window.saveTree = async function() {
   if (!uid) return;
   let id = document.getElementById('t-id').value.trim();
@@ -1392,13 +1697,12 @@ window.saveTree = async function() {
     if (!confirm('⚠️ Tree is outside patch. Save anyway?')) return;
   }
   
-  // DUPLICATE ID CHECK - PROTECTS YOUR DATA!
   if (!editingTree) {
     if (trees.find(t => t.id === id)) {
       let counter = 2;
       let newId = `${id}-${counter}`;
       while (trees.find(t => t.id === newId)) { counter++; newId = `${id}-${counter}`; }
-      if (!confirm(`⚠️ Tree "${id}" already exists!\n\nSave as "${newId}" instead?\n\n(OK = save as new tree, Cancel = abort)\n\nThis protects your existing tree from being overwritten!`)) {
+      if (!confirm(`⚠️ Tree "${id}" already exists!\n\nSave as "${newId}" instead?\n\nThis protects your existing data!`)) {
         showToast('Cancelled. Use different ID.', 'err');
         return;
       }
