@@ -164,7 +164,6 @@ input:disabled{opacity:0.5;cursor:not-allowed}
 .leaflet-control-zoom{margin-top:60px!important;margin-right:12px!important}
 .leaflet-control-zoom a{background:rgba(13,20,36,0.95)!important;color:var(--txt)!important;border:1px solid var(--bdr2)!important}
 
-/* STANDARD PIN (no photo) */
 .tree-marker-wrap{position:relative;width:36px;height:46px;cursor:pointer;transition:transform 0.2s}
 .tree-marker-wrap:hover{transform:scale(1.15)}
 .tree-marker-pin{position:absolute;top:0;left:50%;width:36px;height:36px;border-radius:50% 50% 50% 0;transform-origin:50% 100%;transform:translateX(-50%) rotate(-45deg);box-shadow:0 4px 12px rgba(0,0,0,0.5),inset 0 2px 4px rgba(255,255,255,0.3);border:2.5px solid white;display:flex;align-items:center;justify-content:center}
@@ -173,7 +172,6 @@ input:disabled{opacity:0.5;cursor:not-allowed}
 .tree-pulse-ring{position:absolute;top:4px;left:50%;transform:translateX(-50%);width:28px;height:28px;border-radius:50%;border:2px solid currentColor;opacity:0;animation:treePulse 2s infinite;pointer-events:none}
 @keyframes treePulse{0%{transform:translateX(-50%) scale(0.5);opacity:1}100%{transform:translateX(-50%) scale(2.2);opacity:0}}
 
-/* PHOTO INSIDE PIN MARKER (same size as pin) */
 .tree-pin-photo-wrap{position:relative;width:36px;height:46px;cursor:pointer;transition:transform 0.2s}
 .tree-pin-photo-wrap:hover{transform:scale(1.15);z-index:1000}
 .tree-pin-photo{position:absolute;top:0;left:50%;width:36px;height:36px;border-radius:50% 50% 50% 0;transform-origin:50% 100%;transform:translateX(-50%) rotate(-45deg);box-shadow:0 4px 12px rgba(0,0,0,0.5);border:2.5px solid white;overflow:hidden;animation:pinPop 0.4s cubic-bezier(0.34,1.56,0.64,1)}
@@ -252,6 +250,9 @@ input:disabled{opacity:0.5;cursor:not-allowed}
 .boundary-warning{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:10px;padding:10px;font-size:11px;color:#fca5a5;margin-top:8px;display:none;animation:shakeWarn 0.4s}
 .boundary-warning.show{display:block}
 @keyframes shakeWarn{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+
+.id-hint{font-size:10px;color:var(--green);margin-top:3px;display:none}
+.id-hint.show{display:block}
 </style>
 </head>
 <body>
@@ -339,7 +340,7 @@ input:disabled{opacity:0.5;cursor:not-allowed}
       <div class="card">
         <div class="card-title">📋 Stratum Info</div>
         <div class="row">
-          <div class="fg"><label>ID</label><input id="s-id" placeholder="S1"></div>
+          <div class="fg"><label>ID</label><input id="s-id" placeholder="S1" oninput="checkIdHint('s')"><div class="id-hint" id="s-hint"></div></div>
           <div class="fg"><label>Number</label><input id="s-num" type="number" placeholder="1" min="1"></div>
         </div>
         <div class="fg"><label>Description</label><input id="s-name" placeholder="Academic Block"></div>
@@ -377,7 +378,7 @@ input:disabled{opacity:0.5;cursor:not-allowed}
       </div>
       <div class="card">
         <div class="card-title">📋 Patch Info</div>
-        <div class="fg" style="margin-bottom:7px"><label>Patch ID</label><input id="p-id" placeholder="P1"></div>
+        <div class="fg" style="margin-bottom:7px"><label>Patch ID</label><input id="p-id" placeholder="P1" oninput="checkIdHint('p')"><div class="id-hint" id="p-hint"></div></div>
         <div class="fg"><label>Notes</label><input id="p-name" placeholder="Optional"></div>
       </div>
       <div class="card">
@@ -402,7 +403,7 @@ input:disabled{opacity:0.5;cursor:not-allowed}
 
     <div class="tab-pane on" id="tab-tree">
       <div class="edit-banner" id="edit-t-banner"><span><b>✏️ Editing:</b> <span id="edit-t-id"></span></span><button class="edit-cancel-btn" onclick="cancelEdit('t')">Cancel</button></div>
-      <div class="info-box info-blue"><b>Step 3:</b> Photo will show inside the tree pin on map!</div>
+      <div class="info-box info-blue"><b>Step 3:</b> Photo shows inside pin on map. Use UNIQUE Tree IDs!</div>
       <div class="card">
         <div class="parent-sel">
           <div class="parent-sel-title">🔗 Parent Patch <span class="parent-sel-count" id="tree-parent-count">0</span></div>
@@ -413,9 +414,10 @@ input:disabled{opacity:0.5;cursor:not-allowed}
       <div class="card">
         <div class="card-title">🪪 Tree Identity</div>
         <div class="row">
-          <div class="fg"><label>Tree ID</label><input id="t-id" placeholder="T1"></div>
+          <div class="fg"><label>Tree ID (must be unique)</label><input id="t-id" placeholder="T1" oninput="checkIdHint('t')"><div class="id-hint" id="t-hint"></div></div>
           <div class="fg"><label>Species</label><input id="t-sp" placeholder="Neem" list="sp-list"></div>
         </div>
+        <button class="btn btn-yellow" style="min-height:36px;font-size:11px;margin-top:6px" onclick="suggestNextId()">💡 Auto-suggest next ID</button>
         <datalist id="sp-list"><option>Neem</option><option>Mango</option><option>Peepal</option><option>Banyan</option><option>Ashoka</option><option>Gulmohar</option></datalist>
       </div>
       <div class="card">
@@ -637,7 +639,6 @@ async function loadTreePhotos(treeId) {
   }
 }
 
-// IMPROVED POINT-IN-POLYGON with all corner check
 function pointInPoly(pt, poly) {
   if (!poly || poly.length < 3) return false;
   const x = pt[1], y = pt[0]; 
@@ -651,13 +652,10 @@ function pointInPoly(pt, poly) {
   return inside;
 }
 
-// Check if all 4 corners of patch are inside stratum (more accurate)
 function patchInsideStratum(patchCorners, stratumCorners) {
-  // Center must be inside
   const cLat = (patchCorners[0][0] + patchCorners[2][0]) / 2;
   const cLon = (patchCorners[0][1] + patchCorners[2][1]) / 2;
   if (!pointInPoly([cLat, cLon], stratumCorners)) return false;
-  // At least 3 of 4 corners must be inside
   let cornersInside = 0;
   for (const corner of patchCorners) {
     if (pointInPoly(corner, stratumCorners)) cornersInside++;
@@ -671,7 +669,41 @@ function make8x8(lat, lon) {
   return [[lat+d/2, lon-dl/2], [lat+d/2, lon+dl/2], [lat-d/2, lon+dl/2], [lat-d/2, lon-dl/2]];
 }
 
-// BEAUTIFUL TREE MARKER - Pin with photo INSIDE
+// CHECK ID HINT (real-time feedback)
+window.checkIdHint = function(type) {
+  const id = document.getElementById(type+'-id').value.trim();
+  const hint = document.getElementById(type+'-hint');
+  if (!id) { hint.classList.remove('show'); return; }
+  
+  const list = type === 's' ? strata : (type === 'p' ? patches : trees);
+  const editing = type === 's' ? editingStrat : (type === 'p' ? editingPatch : editingTree);
+  
+  if (editing) { hint.classList.remove('show'); return; }
+  
+  if (list.find(x => x.id === id)) {
+    let counter = 2;
+    let newId = `${id}-${counter}`;
+    while (list.find(x => x.id === newId)) { counter++; newId = `${id}-${counter}`; }
+    hint.textContent = `⚠️ "${id}" exists. Will save as "${newId}"`;
+    hint.style.color = 'var(--yellow)';
+    hint.classList.add('show');
+  } else {
+    hint.textContent = `✓ "${id}" is unique`;
+    hint.style.color = 'var(--green)';
+    hint.classList.add('show');
+  }
+};
+
+// AUTO-SUGGEST NEXT ID
+window.suggestNextId = function() {
+  const existing = trees.map(t => t.id);
+  let n = 1;
+  while (existing.includes('T' + n)) n++;
+  document.getElementById('t-id').value = 'T' + n;
+  checkIdHint('t');
+  showToast(`Suggested: T${n}`);
+};
+
 function createTreeMarker(t) {
   const col = tColor(t.cnt);
   const photoCount = t.photoCount || 0;
@@ -681,7 +713,6 @@ function createTreeMarker(t) {
   let html;
   
   if (firstPhoto) {
-    // PIN WITH PHOTO INSIDE - SAME SIZE AS REGULAR PIN
     html = `
       <div class="tree-pin-photo-wrap">
         ${hasSpiders ? `<div class="tree-pin-pulse" style="color:${col}"></div>` : ''}
@@ -695,7 +726,6 @@ function createTreeMarker(t) {
       </div>
     `;
   } else {
-    // STANDARD PIN (no photo)
     html = `
       <div class="tree-marker-wrap">
         ${hasSpiders ? `<div class="tree-pulse-ring" style="color:${col}"></div>` : ''}
@@ -716,7 +746,6 @@ function createTreeMarker(t) {
   marker.bindTooltip(`<b>${t.id}</b> · ${t.sp} · ${t.cnt} spider${t.cnt!==1?'s':''}${photoCount?' · 📷'+photoCount:''}`, { sticky: true, direction: 'top', offset: [0, -40] });
   marker.on('click', () => showTreePopup(t.id));
   
-  // If no photo cached but exists, load and update marker
   if (!firstPhoto && photoCount > 0) {
     loadTreePhotos(t.id).then(photos => {
       if (photos.length > 0) {
@@ -809,7 +838,6 @@ function mapClickHandler(e) {
   }
   if (mode === 'strat') { addCorner(lat, lon); return; }
   if (mode === 'patch') {
-    // STRICT CHECK - patch MUST be inside stratum
     if (!selectedPatchStratum) {
       showToast('❌ Select parent stratum first!', 'err');
       return;
@@ -819,18 +847,15 @@ function mapClickHandler(e) {
       showToast('❌ Parent stratum not found!', 'err');
       return;
     }
-    // Check if tap point is inside stratum
     if (!pointInPoly([lat,lon], s.corners)) {
       showToast('❌ Tap INSIDE the stratum boundary!', 'err');
       document.getElementById('patch-warn').classList.add('show');
       return;
     }
-    // Create patch and verify all corners are inside
     const c = make8x8(lat, lon);
     if (!patchInsideStratum(c, s.corners)) {
       showToast('⚠️ Patch extends outside stratum. Move toward center.', 'err');
       document.getElementById('patch-warn').classList.add('show');
-      // Still allow placement but warn
     } else {
       document.getElementById('patch-warn').classList.remove('show');
     }
@@ -1102,7 +1127,6 @@ window.addGPSCorner = function() {
 
 window.patchAtGPS = function() {
   if (!navigator.geolocation) return;
-  // CHECK PARENT STRATUM IS SELECTED
   if (!selectedPatchStratum) {
     showToast('❌ Select parent stratum first!', 'err');
     return;
@@ -1114,16 +1138,14 @@ window.patchAtGPS = function() {
       showToast('❌ Parent stratum not found!', 'err');
       return;
     }
-    // Check GPS is inside stratum
     if (!pointInPoly([lat,lon], s.corners)) {
-      showToast('⚠️ You are OUTSIDE selected stratum! Move inside or pick different stratum.', 'err');
+      showToast('⚠️ You are OUTSIDE selected stratum!', 'err');
       document.getElementById('patch-warn').classList.add('show');
       return;
     }
     const c = make8x8(lat, lon);
-    // Verify patch fits inside
     if (!patchInsideStratum(c, s.corners)) {
-      showToast('⚠️ Patch extends outside stratum edge. Move toward center.', 'err');
+      showToast('⚠️ Patch extends outside stratum edge.', 'err');
       document.getElementById('patch-warn').classList.add('show');
     } else {
       document.getElementById('patch-warn').classList.remove('show');
@@ -1162,7 +1184,6 @@ window.startMode = function(m) {
   b.className = 'mode-banner show ' + m;
   document.getElementById('banner-txt').textContent = m === 'tree' ? '🌳 Tap tree location' : m === 'strat' ? '📐 Tap corners' : '⬛ Tap to place patch (INSIDE stratum)';
   if (m === 'strat') { stratCorners = []; tempMkrs.forEach(t=>map.removeLayer(t)); tempMkrs=[]; if(previewPoly){map.removeLayer(previewPoly);previewPoly=null;} document.getElementById('corner-info').textContent='0 corners (need 3+)'; }
-  // Check if parent selected for patch
   if (m === 'patch' && !selectedPatchStratum) {
     showToast('❌ Select parent stratum first!', 'err');
     cancelMode();
@@ -1253,6 +1274,7 @@ function clearStratForm() {
   document.getElementById('s-name').value = '';
   document.getElementById('s-num').value = '';
   document.getElementById('corner-info').textContent = '';
+  document.getElementById('s-hint').classList.remove('show');
   stratCorners = [];
   tempMkrs.forEach(m => map.removeLayer(m)); tempMkrs = [];
   if (previewPoly) { map.removeLayer(previewPoly); previewPoly = null; }
@@ -1262,6 +1284,7 @@ function clearPatchForm() {
   document.getElementById('p-name').value = '';
   document.getElementById('patch-ready').style.display = 'none';
   document.getElementById('patch-warn').classList.remove('show');
+  document.getElementById('p-hint').classList.remove('show');
   pendingPatch = null;
   if (previewPoly) { map.removeLayer(previewPoly); previewPoly = null; }
 }
@@ -1272,18 +1295,35 @@ function clearTreeForm() {
   document.getElementById('t-web').value = 'None';
   document.getElementById('gps-result').style.display = 'none';
   document.getElementById('tree-warn').classList.remove('show');
+  document.getElementById('t-hint').classList.remove('show');
   currentPhotos = [];
   renderPhotoGrid();
 }
 
+// SAVE STRATUM with duplicate ID protection
 window.saveStrat = async function() {
   if (!uid) return;
-  const id = document.getElementById('s-id').value.trim();
+  let id = document.getElementById('s-id').value.trim();
   const num = document.getElementById('s-num').value.trim() || '1';
   const name = document.getElementById('s-name').value.trim();
   if (!id || !name) { showToast('Fill all fields', 'err'); return; }
   let cornersToSave = editingStrat ? (stratCorners.length >= 3 ? stratCorners : originalStratCorners) : stratCorners;
   if (cornersToSave.length < 3) { showToast('Need 3+ corners', 'err'); return; }
+  
+  // DUPLICATE ID CHECK
+  if (!editingStrat) {
+    if (strata.find(s => s.id === id)) {
+      let counter = 2;
+      let newId = `${id}-${counter}`;
+      while (strata.find(s => s.id === newId)) { counter++; newId = `${id}-${counter}`; }
+      if (!confirm(`⚠️ Stratum "${id}" already exists!\n\nSave as "${newId}" instead?\n(OK = save with new ID, Cancel = abort)`)) {
+        showToast('Cancelled. Use different ID.', 'err');
+        return;
+      }
+      id = newId;
+    }
+  }
+  
   try {
     await setDoc(doc(db, 'users', uid, 'strata', id), {
       num: String(num), name: String(name), color: String(sColor),
@@ -1293,23 +1333,37 @@ window.saveStrat = async function() {
     if (previewPoly) { map.removeLayer(previewPoly); previewPoly = null; }
     stratCorners = [];
     if (editingStrat) { cancelEdit('s'); showToast('✅ Updated'); }
-    else { clearStratForm(); showToast('✅ Saved'); }
+    else { clearStratForm(); showToast(`✅ Saved as "${id}"`); }
   } catch(e) { showToast('Save failed', 'err'); }
 };
 
+// SAVE PATCH with duplicate ID protection
 window.savePatch = async function() {
   if (!uid) return;
-  const id = document.getElementById('p-id').value.trim();
+  let id = document.getElementById('p-id').value.trim();
   if (!id) { showToast('Enter Patch ID', 'err'); return; }
   if (!selectedPatchStratum) { showToast('❌ Select parent stratum!', 'err'); return; }
   
   let cornersToSave = editingPatch ? (pendingPatch || originalPatchCorners) : pendingPatch;
   if (!cornersToSave) { showToast('Place patch first', 'err'); return; }
   
-  // FINAL VALIDATION - patch must be inside stratum
   const s = strata.find(x => x.id === selectedPatchStratum);
   if (s && !patchInsideStratum(cornersToSave, s.corners)) {
     if (!confirm('⚠️ Patch extends outside stratum boundary. Save anyway?')) return;
+  }
+  
+  // DUPLICATE ID CHECK
+  if (!editingPatch) {
+    if (patches.find(p => p.id === id)) {
+      let counter = 2;
+      let newId = `${id}-${counter}`;
+      while (patches.find(p => p.id === newId)) { counter++; newId = `${id}-${counter}`; }
+      if (!confirm(`⚠️ Patch "${id}" already exists!\n\nSave as "${newId}" instead?\n(OK = save with new ID, Cancel = abort)`)) {
+        showToast('Cancelled. Use different ID.', 'err');
+        return;
+      }
+      id = newId;
+    }
   }
   
   try {
@@ -1320,22 +1374,37 @@ window.savePatch = async function() {
     if (previewPoly) { map.removeLayer(previewPoly); previewPoly = null; }
     pendingPatch = null;
     if (editingPatch) { cancelEdit('p'); showToast('✅ Updated'); }
-    else { clearPatchForm(); showToast('✅ Saved inside stratum'); }
+    else { clearPatchForm(); showToast(`✅ Saved as "${id}"`); }
   } catch(e) { showToast('Save failed', 'err'); }
 };
 
+// SAVE TREE with duplicate ID protection
 window.saveTree = async function() {
   if (!uid) return;
-  const id = document.getElementById('t-id').value.trim();
+  let id = document.getElementById('t-id').value.trim();
   const sp = document.getElementById('t-sp').value.trim();
   const lat = parseFloat(document.getElementById('t-lat').value);
   const lon = parseFloat(document.getElementById('t-lon').value);
   if (!id || !sp || !selectedTreePatch || isNaN(lat) || isNaN(lon)) { showToast('Fill all fields', 'err'); return; }
   const patch = patches.find(p => p.id === selectedTreePatch);
   
-  // Validate tree is inside patch
   if (patch && !pointInPoly([lat,lon], patch.corners)) {
     if (!confirm('⚠️ Tree is outside patch. Save anyway?')) return;
+  }
+  
+  // DUPLICATE ID CHECK - PROTECTS YOUR DATA!
+  if (!editingTree) {
+    if (trees.find(t => t.id === id)) {
+      let counter = 2;
+      let newId = `${id}-${counter}`;
+      while (trees.find(t => t.id === newId)) { counter++; newId = `${id}-${counter}`; }
+      if (!confirm(`⚠️ Tree "${id}" already exists!\n\nSave as "${newId}" instead?\n\n(OK = save as new tree, Cancel = abort)\n\nThis protects your existing tree from being overwritten!`)) {
+        showToast('Cancelled. Use different ID.', 'err');
+        return;
+      }
+      id = newId;
+      document.getElementById('t-id').value = id;
+    }
   }
   
   try {
@@ -1377,7 +1446,7 @@ window.saveTree = async function() {
     hideUploadProgress();
     
     if (editingTree) { cancelEdit('t'); showToast('✅ Updated with ' + currentPhotos.length + ' photo(s)'); }
-    else { clearTreeForm(); showToast('✅ Saved with ' + currentPhotos.length + ' photo(s)'); }
+    else { clearTreeForm(); showToast(`✅ Saved as "${id}" with ${currentPhotos.length} photo(s)`); }
   } catch(e) {
     hideUploadProgress();
     console.error('Save error:', e);
