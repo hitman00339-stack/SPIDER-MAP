@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Spider Map — Public View</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--bg:#050810;--card:#0d1424;--card2:#172033;--bdr:#1f293b;--bdr2:#334155;--acc:#3b82f6;--acc2:#8b5cf6;--txt:#f8fafc;--txt2:#94a3b8;--muted:#475569;--green:#10b981;--yellow:#f59e0b;--red:#ef4444}
+html,body{width:100vw;height:100vh;height:100dvh;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--txt);overflow:hidden;position:fixed;top:0;left:0}
+#map{position:fixed!important;top:0;left:0;width:100vw!important;height:100vh!important;height:100dvh!important;z-index:1;background:#050810}
+.leaflet-container{width:100%!important;height:100%!important;background:#050810!important}
+
+#topbar{position:fixed;top:0;left:0;right:0;height:54px;background:rgba(5,8,16,0.95);border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;padding:0 12px;z-index:1000;backdrop-filter:blur(20px)}
+#topbar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--acc),var(--acc2),transparent)}
+.logo{display:flex;align-items:center;gap:8px;min-width:0}
+.logo-ico{width:32px;height:32px;background:linear-gradient(135deg,var(--acc),var(--acc2));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.logo-text{min-width:0;overflow:hidden}
+.logo h1{font-size:12px;font-weight:800;line-height:1.1}
+.logo p{font-size:9px;color:var(--txt2)}
+.view-badge{background:linear-gradient(135deg,#10b981,#059669);color:white;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:0.5px;box-shadow:0 2px 8px rgba(16,185,129,0.4)}
+.top-stats{display:flex;gap:5px}
+.stat-pill{background:var(--card);border:1px solid var(--bdr);border-radius:8px;padding:3px 7px;text-align:center;min-width:36px;position:relative}
+.stat-pill::before{content:'';position:absolute;top:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,var(--acc),var(--acc2))}
+.stat-pill-n{font-size:12px;font-weight:800;color:var(--acc);line-height:1}
+.stat-pill-l{font-size:7px;color:var(--muted);text-transform:uppercase}
+
+#tile-btn{position:fixed;top:62px;left:12px;background:rgba(13,20,36,0.96);border:1.5px solid var(--bdr2);border-radius:10px;padding:8px 12px;font-size:11px;font-weight:700;color:var(--txt);z-index:900;cursor:pointer;font-family:inherit;backdrop-filter:blur(10px)}
+
+#fab-group{position:fixed;right:12px;bottom:14px;z-index:900;display:flex;flex-direction:column;gap:9px}
+.fab{width:48px;height:48px;border-radius:50%;border:none;font-size:19px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 5px 18px rgba(0,0,0,0.5);transition:transform 0.15s}
+.fab:active{transform:scale(0.88)}
+.fab-fit{background:rgba(13,20,36,0.96);border:1.5px solid var(--bdr2);color:var(--txt2);font-size:17px}
+.fab-info{background:linear-gradient(135deg,#06b6d4,#0891b2);color:white;font-size:18px}
+.fab-tour{background:linear-gradient(135deg,#ec4899,#db2777);color:white;font-size:18px;animation:tourPulse 2s infinite}
+.fab-tour.recording{background:linear-gradient(135deg,#ef4444,#dc2626);animation:recordPulse 1s infinite}
+@keyframes tourPulse{0%,100%{box-shadow:0 5px 18px rgba(236,72,153,0.4)}50%{box-shadow:0 5px 25px rgba(236,72,153,0.8)}}
+@keyframes recordPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0.7)}50%{box-shadow:0 0 0 12px rgba(239,68,68,0)}}
+
+#loading{position:fixed;inset:0;background:#050810;z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;transition:opacity 0.4s}
+#loading.hide{opacity:0;pointer-events:none}
+.loader{width:40px;height:40px;border:3px solid var(--bdr);border-top-color:var(--acc);border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader-text{font-size:13px;color:var(--txt2)}
+.loader-sub{font-size:11px;color:var(--muted);max-width:280px;text-align:center;line-height:1.5}
+
+.tree-marker-wrap{position:relative;width:36px;height:46px;cursor:pointer;transition:transform 0.2s}
+.tree-marker-wrap:hover{transform:scale(1.15)}
+.tree-marker-pin{position:absolute;top:0;left:50%;width:36px;height:36px;border-radius:50% 50% 50% 0;transform-origin:50% 100%;transform:translateX(-50%) rotate(-45deg);box-shadow:0 4px 12px rgba(0,0,0,0.5),inset 0 2px 4px rgba(255,255,255,0.3);border:2.5px solid white;display:flex;align-items:center;justify-content:center}
+.tree-marker-pin::after{content:attr(data-count);position:absolute;font-size:13px;font-weight:800;color:white;transform:rotate(45deg);text-shadow:0 1px 2px rgba(0,0,0,0.5)}
+.tree-marker-shadow{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:14px;height:5px;background:rgba(0,0,0,0.4);border-radius:50%;filter:blur(2px)}
+.tree-pulse-ring{position:absolute;top:4px;left:50%;transform:translateX(-50%);width:28px;height:28px;border-radius:50%;border:2px solid currentColor;opacity:0;animation:treePulse 2s infinite;pointer-events:none}
+@keyframes treePulse{0%{transform:translateX(-50%) scale(0.5);opacity:1}100%{transform:translateX(-50%) scale(2.2);opacity:0}}
+
+.tree-pin-photo-wrap{position:relative;width:36px;height:46px;cursor:pointer;transition:transform 0.2s}
+.tree-pin-photo-wrap:hover{transform:scale(1.15);z-index:1000}
+.tree-pin-photo{position:absolute;top:0;left:50%;width:36px;height:36px;border-radius:50% 50% 50% 0;transform-origin:50% 100%;transform:translateX(-50%) rotate(-45deg);box-shadow:0 4px 12px rgba(0,0,0,0.5);border:2.5px solid white;overflow:hidden;animation:pinPop 0.4s cubic-bezier(0.34,1.56,0.64,1)}
+@keyframes pinPop{from{transform:translateX(-50%) rotate(-45deg) scale(0);opacity:0}to{transform:translateX(-50%) rotate(-45deg) scale(1);opacity:1}}
+.tree-pin-photo-inner{position:absolute;inset:0;transform:rotate(45deg);overflow:hidden;background:#000}
+.tree-pin-photo-inner img{width:100%;height:100%;object-fit:cover;display:block}
+.tree-pin-count{position:absolute;top:-3px;right:-3px;min-width:18px;height:18px;border-radius:9px;border:2px solid white;display:flex;align-items:center;justify-content:center;color:white;font-size:10px;font-weight:800;padding:0 4px;z-index:5;box-shadow:0 2px 5px rgba(0,0,0,0.5)}
+.tree-pin-pulse{position:absolute;top:4px;left:50%;transform:translateX(-50%);width:28px;height:28px;border-radius:50%;border:2px solid currentColor;opacity:0;animation:treePulse 2s infinite;pointer-events:none}
+.tree-pin-shadow{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:14px;height:5px;background:rgba(0,0,0,0.4);border-radius:50%;filter:blur(2px)}
+
+.leaflet-control-zoom{margin-top:60px!important;margin-right:12px!important}
+.leaflet-control-zoom a{background:rgba(13,20,36,0.95)!important;color:var(--txt)!important;border:1px solid var(--bdr2)!important}
+
+#popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,0);z-index:5000;display:none;align-items:center;justify-content:center;padding:20px;transition:background 0.3s ease}
+#popup-overlay.show{display:flex;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px)}
+#popup-modal{background:linear-gradient(145deg,#0d1424,#172033);border:1px solid var(--bdr2);border-radius:24px;width:100%;max-width:420px;max-height:90vh;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,0.8);transform:scale(0.7) translateY(40px);opacity:0;transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease;position:relative;display:flex;flex-direction:column}
+#popup-overlay.show #popup-modal{transform:scale(1) translateY(0);opacity:1}
+.popup-close-btn{position:absolute;top:12px;right:12px;width:36px;height:36px;background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.15);border-radius:50%;color:white;font-size:18px;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px)}
+.popup-gallery{width:100%;height:240px;background:#000;position:relative;overflow:hidden;flex-shrink:0}
+.popup-gallery.empty{height:100px;background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(139,92,246,0.15));display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px}
+.popup-gallery.empty .empty-emoji{font-size:48px;opacity:0.3}
+.popup-gallery.empty .empty-text{font-size:11px;color:var(--muted)}
+.popup-gallery.loading{height:120px;background:#000;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px}
+.popup-gallery.loading .load-txt{color:var(--txt2);font-size:11px}
+.gallery-img{width:100%;height:100%;object-fit:cover;cursor:pointer;display:block;animation:imgFadeIn 0.5s ease;background:#000}
+@keyframes imgFadeIn{from{opacity:0;transform:scale(1.05)}to{opacity:1;transform:scale(1)}}
+.gallery-counter{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.75);color:white;padding:4px 12px;border-radius:14px;font-size:11px;font-weight:700;backdrop-filter:blur(8px);z-index:2}
+.gallery-nav-btn{position:absolute;top:50%;transform:translateY(-50%);width:40px;height:40px;background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.15);color:white;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px);z-index:2}
+.gallery-nav-btn.prev{left:10px}
+.gallery-nav-btn.next{right:10px}
+.popup-body{padding:18px 20px;overflow-y:auto;flex:1}
+.popup-header-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px;animation:slideUp 0.5s ease 0.1s both}
+@keyframes slideUp{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+.popup-title-block .popup-tree-id{font-size:20px;font-weight:800;color:#f8fafc;line-height:1.1;margin-bottom:4px}
+.popup-title-block .popup-species{font-size:12px;color:#94a3b8;font-style:italic}
+.popup-spider-badge{display:flex;flex-direction:column;align-items:center;border-radius:14px;padding:8px 14px;border:2px solid;flex-shrink:0;min-width:62px}
+.popup-spider-badge .num{font-size:26px;font-weight:800;line-height:1}
+.popup-spider-badge .lbl{font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.6px;margin-top:3px}
+.popup-fields-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.popup-field-card{background:rgba(255,255,255,0.04);border:1px solid var(--bdr);border-radius:10px;padding:9px 11px}
+.popup-field-card .label{font-size:9px;color:#475569;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;font-weight:700}
+.popup-field-card .value{font-size:13px;font-weight:600;color:#e2e8f0}
+.popup-notes-box{background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:10px;padding:10px 12px;font-size:12px;color:#cbd5e1;line-height:1.5;font-style:italic;margin-bottom:12px}
+.popup-gps-bar{background:rgba(0,0,0,0.4);border-radius:8px;padding:7px 10px;font-size:10px;color:#64748b;text-align:center;font-family:'Courier New',monospace;display:flex;align-items:center;justify-content:center;gap:6px}
+.popup-thumbs{display:flex;gap:6px;padding:14px 20px;overflow-x:auto;border-top:1px solid var(--bdr);background:rgba(0,0,0,0.2);flex-shrink:0}
+.popup-thumbs::-webkit-scrollbar{display:none}
+.popup-thumb-mini{width:52px;height:52px;border-radius:8px;object-fit:cover;flex-shrink:0;border:2px solid transparent;cursor:pointer;opacity:0.5}
+.popup-thumb-mini.active{border-color:var(--acc);opacity:1;transform:scale(1.05)}
+
+#img-viewer{position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;cursor:pointer}
+#img-viewer.show{display:flex}
+#img-viewer img{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px}
+#img-viewer .close-viewer{position:absolute;top:20px;right:20px;background:rgba(255,255,255,0.15);border:none;color:white;width:44px;height:44px;border-radius:50%;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+#info-panel{position:fixed;top:60px;right:12px;background:rgba(13,20,36,0.97);border:1.5px solid var(--bdr2);border-radius:14px;padding:14px;z-index:900;max-width:280px;display:none;backdrop-filter:blur(15px);box-shadow:0 10px 30px rgba(0,0,0,0.5)}
+#info-panel.show{display:block;animation:slideInRight 0.3s}
+@keyframes slideInRight{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+.info-title{font-size:13px;font-weight:800;color:var(--acc);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.info-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--bdr);font-size:12px}
+.info-row:last-child{border-bottom:none}
+.info-label{color:var(--txt2)}
+.info-value{color:var(--txt);font-weight:700}
+.info-close{background:none;border:none;color:var(--txt2);cursor:pointer;font-size:16px;float:right;margin-top:-4px}
+
+#tour-overlay{position:fixed;inset:0;background:rgba(0,0,0,0);z-index:8000;display:none;align-items:center;justify-content:center;padding:20px;transition:background 0.3s}
+#tour-overlay.show{display:flex;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px)}
+#tour-modal{background:linear-gradient(145deg,#0d1424,#172033);border:1px solid var(--bdr2);border-radius:20px;max-width:380px;width:100%;padding:24px;text-align:center;animation:tourModalPop 0.4s cubic-bezier(0.34,1.56,0.64,1)}
+@keyframes tourModalPop{from{transform:scale(0.7);opacity:0}to{transform:scale(1);opacity:1}}
+.tour-icon{font-size:48px;margin-bottom:12px}
+.tour-title{font-size:20px;font-weight:800;color:#f8fafc;margin-bottom:8px}
+.tour-sub{font-size:13px;color:#94a3b8;line-height:1.6;margin-bottom:18px}
+.tour-stats{background:rgba(0,0,0,0.4);border-radius:11px;padding:12px;margin-bottom:18px;display:flex;justify-content:space-around}
+.tour-stat{text-align:center}
+.tour-stat-n{font-size:22px;font-weight:800;background:linear-gradient(135deg,#ec4899,#db2777);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.tour-stat-l{font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px}
+.tour-btn{width:100%;padding:14px;background:linear-gradient(135deg,#ec4899,#db2777);color:white;border:none;border-radius:11px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit}
+.tour-btn:active{transform:scale(0.97)}
+.tour-btn-secondary{background:rgba(255,255,255,0.08);border:1px solid var(--bdr2)}
+
+#tour-progress{position:fixed;top:60px;left:50%;transform:translateX(-50%);z-index:9000;background:rgba(0,0,0,0.85);color:white;padding:12px 20px;border-radius:14px;display:none;align-items:center;gap:14px;backdrop-filter:blur(10px);box-shadow:0 8px 30px rgba(236,72,153,0.4);min-width:260px;max-width:90vw}
+#tour-progress.show{display:flex}
+.tour-prog-icon{font-size:22px;animation:tourProgIcon 1.5s infinite}
+@keyframes tourProgIcon{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+.tour-prog-info{flex:1;min-width:0}
+.tour-prog-step{font-size:12px;font-weight:700;color:white;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tour-prog-bar{height:4px;background:rgba(255,255,255,0.15);border-radius:2px;overflow:hidden}
+.tour-prog-fill{height:100%;background:linear-gradient(90deg,#ec4899,#db2777);width:0%;transition:width 0.3s;border-radius:2px}
+.tour-stop-btn{background:rgba(239,68,68,0.3);border:1px solid #ef4444;color:white;border-radius:8px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
+
+#tour-caption{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:9000;background:linear-gradient(135deg,rgba(13,20,36,0.97),rgba(23,32,51,0.97));border:1px solid var(--bdr2);border-radius:16px;padding:14px 22px;display:none;text-align:center;backdrop-filter:blur(15px);box-shadow:0 10px 40px rgba(0,0,0,0.6);min-width:280px;max-width:90vw;animation:captionFadeIn 0.5s ease}
+#tour-caption.show{display:block}
+@keyframes captionFadeIn{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.caption-title{font-size:16px;font-weight:800;color:#fbcfe8;margin-bottom:4px;background:linear-gradient(135deg,#ec4899,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.caption-sub{font-size:12px;color:#cbd5e1;line-height:1.5}
+.caption-stats{display:flex;justify-content:center;gap:14px;margin-top:8px;padding-top:8px;border-top:1px solid var(--bdr);flex-wrap:wrap}
+.caption-stat{font-size:11px;color:#94a3b8}
+.caption-stat b{color:#fbcfe8;font-weight:700}
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <div class="loader"></div>
+  <div class="loader-text">Loading Spider Map...</div>
+  <div class="loader-sub">Fetching strata, patches, trees and photos from cloud</div>
+</div>
+
+<div id="map"></div>
+
+<div id="topbar">
+  <div class="logo">
+    <div class="logo-ico">🕷️</div>
+    <div class="logo-text"><h1>Spider Map</h1><p>Research Project</p></div>
+  </div>
+  <span class="view-badge">👀 View Only</span>
+  <div class="top-stats">
+    <div class="stat-pill"><div class="stat-pill-n" id="h-trees">0</div><div class="stat-pill-l">Tr</div></div>
+    <div class="stat-pill"><div class="stat-pill-n" id="h-sp">0</div><div class="stat-pill-l">Sp</div></div>
+    <div class="stat-pill"><div class="stat-pill-n" id="h-z">0</div><div class="stat-pill-l">Zn</div></div>
+  </div>
+</div>
+
+<button id="tile-btn" onclick="cycleTile()">🛰️ Satellite</button>
+
+<div id="info-panel">
+  <button class="info-close" onclick="document.getElementById('info-panel').classList.remove('show')">✕</button>
+  <div class="info-title">📊 Map Statistics</div>
+  <div class="info-row"><span class="info-label">Strata</span><span class="info-value" id="i-strata">0</span></div>
+  <div class="info-row"><span class="info-label">Patches</span><span class="info-value" id="i-patches">0</span></div>
+  <div class="info-row"><span class="info-label">Trees</span><span class="info-value" id="i-trees">0</span></div>
+  <div class="info-row"><span class="info-label">Total Spiders</span><span class="info-value" id="i-spiders">0</span></div>
+  <div class="info-row"><span class="info-label">Infested Trees</span><span class="info-value" id="i-infested">0</span></div>
+  <div class="info-row"><span class="info-label">Infestation Rate</span><span class="info-value" id="i-rate">0%</span></div>
+  <div class="info-row"><span class="info-label">With Photos</span><span class="info-value" id="i-photos">0</span></div>
+</div>
+
+<div id="fab-group">
+  <button class="fab fab-tour" id="tour-fab" onclick="startTour()" title="Start Tour">🎬</button>
+  <button class="fab fab-info" onclick="document.getElementById('info-panel').classList.toggle('show')" title="Statistics">📊</button>
+  <button class="fab fab-fit" onclick="fitAll()" title="Fit All">🎯</button>
+</div>
+
+<div id="popup-overlay" onclick="closePopup(event)">
+  <div id="popup-modal" onclick="event.stopPropagation()"></div>
+</div>
+
+<div id="img-viewer" onclick="this.classList.remove('show')">
+  <button class="close-viewer">✕</button>
+  <img id="viewer-img" src="" alt="">
+</div>
+
+<div id="tour-overlay">
+  <div id="tour-modal">
+    <div class="tour-icon">🎬</div>
+    <div class="tour-title">Map Tour</div>
+    <div class="tour-sub">Watch a cinematic tour of all data points!</div>
+    <div class="tour-stats">
+      <div class="tour-stat"><div class="tour-stat-n" id="tour-s-count">0</div><div class="tour-stat-l">Strata</div></div>
+      <div class="tour-stat"><div class="tour-stat-n" id="tour-p-count">0</div><div class="tour-stat-l">Patches</div></div>
+      <div class="tour-stat"><div class="tour-stat-n" id="tour-t-count">0</div><div class="tour-stat-l">Trees</div></div>
+      <div class="tour-stat"><div class="tour-stat-n" id="tour-duration">0s</div><div class="tour-stat-l">Duration</div></div>
+    </div>
+    <button class="tour-btn" onclick="beginTour()">▶️ Start Tour</button>
+    <button class="tour-btn tour-btn-secondary" onclick="closeTourModal()">Cancel</button>
+  </div>
+</div>
+
+<div id="tour-progress">
+  <div class="tour-prog-icon">🎬</div>
+  <div class="tour-prog-info">
+    <div class="tour-prog-step" id="tour-step-text">Starting tour...</div>
+    <div class="tour-prog-bar"><div class="tour-prog-fill" id="tour-prog-fill"></div></div>
+  </div>
+  <button class="tour-stop-btn" onclick="stopTour()">⏹ Stop</button>
+</div>
+
+<div id="tour-caption">
+  <div class="caption-title" id="caption-title">Title</div>
+  <div class="caption-sub" id="caption-sub">Subtitle</div>
+  <div class="caption-stats" id="caption-stats"></div>
+</div>
+
+<script type="module">
+import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import {getFirestore,collection,doc,getDocs} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBCowRMjoU5dfep_OGKKIyxuE-WxdhEfho",
+  authDomain: "spider-map-650e7.firebaseapp.com",
+  projectId: "spider-map-650e7",
+  messagingSenderId: "781791803461",
+  appId: "1:781791803461:web:4e8d7279aa4aac648e4b2c"
+};
+
+// IMPORTANT: Replace this with YOUR Firebase user ID
+// To find it: open editor app, sign in, press F12, type: firebase.auth().currentUser.uid
+const OWNER_UID = "vfaW1vgnWiOx7BYvbB9ptEpmRbm1";
+
+const fbApp = initializeApp(firebaseConfig);
+const db = getFirestore(fbApp);
+
+let trees=[], strata=[], patches=[];
+let tMkrs=[], sLayers=[], pLayers=[];
+let map=null, tiles=null, tileIdx=2;
+let photoCache={}, popupGalleryIdx={};
+let tourActive=false, tourTimeouts=[];
+
+const tileNames = ['🗺️ Street','🛰️ Satellite','🌍 Hybrid'];
+
+function tColor(n){if(n===0)return'#9e9e9e';if(n===1)return'#ffb300';if(n===2)return'#ef6c00';if(n<=4)return'#d32f2f';return'#7b1fa2';}
+function rgb(h){return[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)].join(',');}
+function emoji(sp){const s=(sp||'').toLowerCase();if(s.includes('neem'))return'🌿';if(s.includes('mango'))return'🥭';if(s.includes('peepal'))return'🍃';if(s.includes('banyan'))return'🌳';if(s.includes('ashoka'))return'🌲';return'🌳';}
+
+function objToCorners(obj) {
+  if (!obj) return [];
+  if (Array.isArray(obj)) return obj.map(c => Array.isArray(c) ? [Number(c[0]), Number(c[1])] : [Number(c.lat), Number(c.lon)]);
+  const arr = [];
+  const keys = Object.keys(obj).sort((a,b) => (parseInt(a.replace(/\D/g,''))||0) - (parseInt(b.replace(/\D/g,''))||0));
+  keys.forEach(k => {
+    if (obj[k] && typeof obj[k] === 'object' && 'lat' in obj[k]) arr.push([Number(obj[k].lat), Number(obj[k].lon)]);
+  });
+  return arr;
+}
+
+async function loadTreePhotos(treeId) {
+  if (photoCache[treeId]) return photoCache[treeId];
+  try {
+    const photosSnap = await getDocs(collection(db, 'users', OWNER_UID, 'trees', treeId, 'photos'));
+    const photoArr = [];
+    photosSnap.forEach(pDoc => {
+      const pData = pDoc.data();
+      photoArr.push({ idx: pData.idx || 0, data: pData.data });
+    });
+    photoArr.sort((a, b) => a.idx - b.idx);
+    const photos = photoArr.map(p => p.data);
+    photoCache[treeId] = photos;
+    return photos;
+  } catch(e) { return []; }
+}
+
+function initMap() {
+  map = L.map('map', {center:[28.9456,77.1015], zoom:16, zoomControl:true});
+  tiles = [
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:22}),
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:22}),
+    L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',{maxZoom:22})
+  ];
+  tiles[tileIdx].addTo(map);
+}
+
+function createTreeMarker(t) {
+  const col = tColor(t.cnt);
+  const photoCount = t.photoCount || 0;
+  const hasSpiders = t.cnt > 0;
+  const firstPhoto = (photoCache[t.id] && photoCache[t.id][0]) || null;
+  
+  let html;
+  if (firstPhoto) {
+    html = `<div class="tree-pin-photo-wrap">${hasSpiders ? `<div class="tree-pin-pulse" style="color:${col}"></div>` : ''}<div class="tree-pin-photo" style="background:${col}"><div class="tree-pin-photo-inner"><img src="${firstPhoto}" alt=""></div></div><div class="tree-pin-shadow"></div><div class="tree-pin-count" style="background:${col}">${t.cnt}</div></div>`;
+  } else {
+    html = `<div class="tree-marker-wrap">${hasSpiders ? `<div class="tree-pulse-ring" style="color:${col}"></div>` : ''}<div class="tree-marker-pin" style="background:linear-gradient(135deg,${col},${col}dd)" data-count="${t.cnt}"></div><div class="tree-marker-shadow"></div></div>`;
+  }
+  
+  const icon = L.divIcon({html, iconSize:[36,46], iconAnchor:[18,46], className:''});
+  const marker = L.marker([t.lat, t.lon], {icon, riseOnHover:true});
+  marker.bindTooltip(`<b>${t.id}</b> · ${t.sp} · ${t.cnt} spider${t.cnt!==1?'s':''}${photoCount?' · 📷'+photoCount:''}`, {sticky:true, direction:'top', offset:[0,-40]});
+  marker.on('click', () => showTreePopup(t.id));
+  
+  if (!firstPhoto && photoCount > 0) {
+    loadTreePhotos(t.id).then(photos => {
+      if (photos.length > 0) {
+        const idx = trees.findIndex(x => x.id === t.id);
+        if (idx >= 0 && tMkrs[idx]) {
+          map.removeLayer(tMkrs[idx]);
+          const newMarker = createTreeMarker(t);
+          newMarker.addTo(map);
+          tMkrs[idx] = newMarker;
+        }
+      }
+    });
+  }
+  return marker;
+}
+
+async function loadData() {
+  try {
+    // Load strata
+    const sSnap = await getDocs(collection(db, 'users', OWNER_UID, 'strata'));
+    sSnap.forEach(d => {
+      const data = d.data();
+      const corners = objToCorners(data.corners);
+      if (corners.length < 3) return;
+      const s = {id:d.id, num:data.num, name:data.name, color:data.color, corners};
+      strata.push(s);
+      const poly = L.polygon(corners, {color:s.color, fillColor:s.color, fillOpacity:0.12, weight:3, dashArray:'10,5'})
+        .addTo(map).on('click', () => showZonePopup('s', s.id));
+      sLayers.push(poly);
+    });
+    
+    // Load patches
+    const pSnap = await getDocs(collection(db, 'users', OWNER_UID, 'patches'));
+    pSnap.forEach(d => {
+      const data = d.data();
+      const corners = objToCorners(data.corners);
+      if (corners.length < 3) return;
+      const p = {id:d.id, str:data.str, name:data.name, color:data.color, corners};
+      patches.push(p);
+      const poly = L.polygon(corners, {color:p.color, fillColor:p.color, fillOpacity:0.35, weight:2.5})
+        .addTo(map).on('click', () => showZonePopup('p', p.id));
+      pLayers.push(poly);
+    });
+    
+    // Load trees
+    const tSnap = await getDocs(collection(db, 'users', OWNER_UID, 'trees'));
+    tSnap.forEach(d => {
+      const data = d.data();
+      const t = {id:d.id, ...data};
+      trees.push(t);
+      const marker = createTreeMarker(t);
+      marker.addTo(map);
+      tMkrs.push(marker);
+    });
+    
+    updateStats();
+    
+    // Fit all
+    setTimeout(() => {
+      const all = [...tMkrs, ...sLayers, ...pLayers];
+      if (all.length) map.fitBounds(L.featureGroup(all).getBounds(), {padding:[60,60]});
+    }, 300);
+    
+    document.getElementById('loading').classList.add('hide');
+  } catch(e) {
+    console.error('Load error:', e);
+    document.getElementById('loading').innerHTML = '<div style="color:#ef4444;font-size:14px">❌ Failed to load. Try refresh.</div>';
+  }
+}
+
+function updateStats() {
+  const totalSp = trees.reduce((s,t)=>s+(t.cnt||0),0);
+  const infested = trees.filter(t=>t.cnt>0).length;
+  const rate = trees.length ? Math.round((infested/trees.length)*100) : 0;
+  const withPhotos = trees.filter(t=>(t.photoCount||0)>0).length;
+  
+  document.getElementById('h-trees').textContent = trees.length;
+  document.getElementById('h-sp').textContent = totalSp;
+  document.getElementById('h-z').textContent = strata.length + patches.length;
+  
+  document.getElementById('i-strata').textContent = strata.length;
+  document.getElementById('i-patches').textContent = patches.length;
+  document.getElementById('i-trees').textContent = trees.length;
+  document.getElementById('i-spiders').textContent = totalSp;
+  document.getElementById('i-infested').textContent = infested;
+  document.getElementById('i-rate').textContent = rate + '%';
+  document.getElementById('i-photos').textContent = withPhotos;
+}
+
+window.showTreePopup = async function(treeId) {
+  const t = trees.find(x => x.id === treeId);
+  if (!t) return;
+  
+  const col = tColor(t.cnt);
+  const sp = t.sp || 'Unknown';
+  const e = emoji(sp);
+  
+  const fields = [];
+  if (t.str) fields.push({l:'Stratum', v:t.str});
+  if (t.pt) fields.push({l:'Patch', v:t.pt});
+  if (t.bark) fields.push({l:'Bark', v:t.bark});
+  if (t.web && t.web !== 'None') fields.push({l:'Web Type', v:t.web});
+  
+  const fieldsHTML = fields.length ? `<div class="popup-fields-grid">${fields.map(f => `<div class="popup-field-card"><div class="label">${f.l}</div><div class="value">${f.v}</div></div>`).join('')}</div>` : '';
+  
+  document.getElementById('popup-modal').innerHTML = `
+    <button class="popup-close-btn" onclick="closePopup()">✕</button>
+    <div class="popup-gallery loading"><div class="loader"></div><div class="load-txt">Loading photos...</div></div>
+    <div class="popup-body">
+      <div class="popup-header-row">
+        <div class="popup-title-block">
+          <div class="popup-tree-id">${e} ${t.id}</div>
+          <div class="popup-species">${sp}</div>
+        </div>
+        <div class="popup-spider-badge" style="border-color:${col};background:rgba(${rgb(col)},0.15)">
+          <div class="num" style="color:${col}">${t.cnt}</div>
+          <div class="lbl">spiders</div>
+        </div>
+      </div>
+      ${fieldsHTML}
+      ${t.nts ? `<div class="popup-notes-box">"${t.nts}"</div>` : ''}
+      <div class="popup-gps-bar">📍 ${t.lat.toFixed(5)}, ${t.lon.toFixed(5)}</div>
+    </div>
+  `;
+  
+  document.getElementById('popup-overlay').classList.add('show');
+  map.flyTo([t.lat, t.lon], 20, {duration: 0.8});
+  
+  const photos = await loadTreePhotos(treeId);
+  popupGalleryIdx[t.id] = 0;
+  
+  const gallery = document.querySelector('#popup-modal .popup-gallery');
+  if (!gallery) return;
+  
+  if (photos.length > 0) {
+    gallery.className = 'popup-gallery';
+    gallery.innerHTML = `
+      <img class="gallery-img" id="gallery-main-img" src="${photos[0]}" onclick="openImageViewer(this.src)">
+      ${photos.length > 1 ? `
+        <div class="gallery-counter" id="gallery-counter">1 / ${photos.length}</div>
+        <button class="gallery-nav-btn prev" onclick="changeGalleryImg('${t.id}', -1)">‹</button>
+        <button class="gallery-nav-btn next" onclick="changeGalleryImg('${t.id}', 1)">›</button>
+      ` : ''}
+    `;
+    
+    if (photos.length > 1) {
+      const body = document.querySelector('#popup-modal .popup-body');
+      const thumbsDiv = document.createElement('div');
+      thumbsDiv.className = 'popup-thumbs';
+      thumbsDiv.innerHTML = photos.map((p, i) => 
+        `<img class="popup-thumb-mini ${i === 0 ? 'active' : ''}" src="${p}" onclick="setGalleryImg('${t.id}', ${i})">`
+      ).join('');
+      body.parentNode.insertBefore(thumbsDiv, body.nextSibling);
+    }
+  } else {
+    gallery.className = 'popup-gallery empty';
+    gallery.innerHTML = `<div class="empty-emoji">${e}</div><div class="empty-text">No photos</div>`;
+  }
+};
+
+window.showZonePopup = function(type, id) {
+  const item = type === 's' ? strata.find(x => x.id === id) : patches.find(x => x.id === id);
+  if (!item) return;
+  const isStrat = type === 's';
+  const title = isStrat ? `Stratum ${item.num}` : `Patch ${item.id}`;
+  const subtitle = isStrat ? item.name : `8×8 meters · Stratum ${item.str}`;
+  let extraInfo = '';
+  if (isStrat) {
+    const childPatches = patches.filter(p => p.str === item.id);
+    const allTrees = trees.filter(t => t.str === item.id);
+    const totalSp = allTrees.reduce((s,t) => s + (t.cnt||0), 0);
+    extraInfo = `<div class="popup-fields-grid"><div class="popup-field-card"><div class="label">Patches</div><div class="value">${childPatches.length}</div></div><div class="popup-field-card"><div class="label">Trees</div><div class="value">${allTrees.length}</div></div><div class="popup-field-card"><div class="label">Spiders</div><div class="value">${totalSp}</div></div><div class="popup-field-card"><div class="label">Corners</div><div class="value">${item.corners.length}</div></div></div>`;
+  } else {
+    const childTrees = trees.filter(t => t.pt === item.id);
+    const totalSp = childTrees.reduce((s,t) => s + (t.cnt||0), 0);
+    extraInfo = `<div class="popup-fields-grid"><div class="popup-field-card"><div class="label">Trees</div><div class="value">${childTrees.length}</div></div><div class="popup-field-card"><div class="label">Spiders</div><div class="value">${totalSp}</div></div></div>`;
+  }
+  document.getElementById('popup-modal').innerHTML = `
+    <button class="popup-close-btn" onclick="closePopup()">✕</button>
+    <div class="popup-gallery empty" style="height:80px;background:linear-gradient(135deg,${item.color}33,${item.color}11)"><div style="font-size:38px">${isStrat ? '📐' : '⬛'}</div></div>
+    <div class="popup-body"><div class="popup-header-row"><div class="popup-title-block"><div class="popup-tree-id" style="color:${item.color}">${title}</div><div class="popup-species">${subtitle}</div></div></div>${extraInfo}</div>
+  `;
+  document.getElementById('popup-overlay').classList.add('show');
+};
+
+window.closePopup = function(e) { if (e && e.target.id !== 'popup-overlay') return; document.getElementById('popup-overlay').classList.remove('show'); };
+
+window.changeGalleryImg = async function(treeId, dir) {
+  const photos = await loadTreePhotos(treeId);
+  if (photos.length < 2) return;
+  popupGalleryIdx[treeId] = ((popupGalleryIdx[treeId] || 0) + dir + photos.length) % photos.length;
+  setGalleryImg(treeId, popupGalleryIdx[treeId]);
+};
+
+window.setGalleryImg = async function(treeId, idx) {
+  const photos = await loadTreePhotos(treeId);
+  if (!photos[idx]) return;
+  popupGalleryIdx[treeId] = idx;
+  const main = document.getElementById('gallery-main-img');
+  if (main) {
+    main.style.animation = 'none'; main.offsetHeight;
+    main.style.animation = 'imgFadeIn 0.4s ease';
+    main.src = photos[idx];
+    main.onclick = () => openImageViewer(photos[idx]);
+  }
+  const counter = document.getElementById('gallery-counter');
+  if (counter) counter.textContent = `${idx + 1} / ${photos.length}`;
+  document.querySelectorAll('.popup-thumb-mini').forEach((tb, i) => tb.classList.toggle('active', i === idx));
+};
+
+window.openImageViewer = function(src) {
+  document.getElementById('viewer-img').src = src;
+  document.getElementById('img-viewer').classList.add('show');
+};
+
+window.cycleTile = function() {
+  if (!map) return;
+  map.removeLayer(tiles[tileIdx]);
+  tileIdx = (tileIdx+1) % 3;
+  tiles[tileIdx].addTo(map);
+  document.getElementById('tile-btn').textContent = tileNames[(tileIdx+1)%3];
+};
+
+window.fitAll = function() {
+  if (!map) return;
+  const all = [...tMkrs, ...sLayers, ...pLayers];
+  if (all.length) map.fitBounds(L.featureGroup(all).getBounds(), {padding:[50,50]});
+};
+
+window.startTour = function() {
+  if (!trees.length && !strata.length && !patches.length) return;
+  document.getElementById('tour-s-count').textContent = strata.length;
+  document.getElementById('tour-p-count').textContent = patches.length;
+  document.getElementById('tour-t-count').textContent = trees.length;
+  const dur = 4 + (strata.length * 5) + (patches.length * 4) + (trees.length * 5) + 3;
+  const m = Math.floor(dur/60);
+  const s = dur%60;
+  document.getElementById('tour-duration').textContent = m ? `~${m}m ${s}s` : `~${s}s`;
+  document.getElementById('tour-overlay').classList.add('show');
+};
+
+window.closeTourModal = function() {
+  document.getElementById('tour-overlay').classList.remove('show');
+};
+
+window.beginTour = async function() {
+  closeTourModal();
+  closePopup();
+  tourActive = true;
+  document.getElementById('tour-fab').classList.add('recording');
+  document.getElementById('tour-progress').classList.add('show');
+  
+  const totalSteps = 1 + strata.length + patches.length + trees.length + 1;
+  let currentStep = 0;
+  
+  function updateProgress(step, text) {
+    currentStep = step;
+    document.getElementById('tour-prog-fill').style.width = `${(step/totalSteps)*100}%`;
+    document.getElementById('tour-step-text').textContent = text;
+  }
+  
+  function showCaption(title, sub, stats) {
+    const cap = document.getElementById('tour-caption');
+    document.getElementById('caption-title').textContent = title;
+    document.getElementById('caption-sub').textContent = sub;
+    if (stats) {
+      document.getElementById('caption-stats').innerHTML = stats;
+      document.getElementById('caption-stats').style.display = 'flex';
+    } else {
+      document.getElementById('caption-stats').style.display = 'none';
+    }
+    cap.classList.add('show');
+  }
+  
+  function wait(ms) { return new Promise(r => { const t = setTimeout(r, ms); tourTimeouts.push(t); }); }
+  
+  try {
+    updateProgress(++currentStep, '🌍 Overview');
+    showCaption('🕷️ Spider Distribution Map', 'Cinematic tour starting...',
+      `<div class="caption-stat"><b>${strata.length}</b> Strata</div><div class="caption-stat"><b>${patches.length}</b> Patches</div><div class="caption-stat"><b>${trees.length}</b> Trees</div><div class="caption-stat"><b>${trees.reduce((s,t)=>s+(t.cnt||0),0)}</b> Spiders</div>`);
+    const allLayers = [...tMkrs, ...sLayers, ...pLayers];
+    if (allLayers.length) map.flyToBounds(L.featureGroup(allLayers).getBounds(), {padding:[60,60], duration:2});
+    await wait(4500);
+    if (!tourActive) return;
+    
+    for (let i = 0; i < strata.length; i++) {
+      if (!tourActive) return;
+      const s = strata[i];
+      updateProgress(++currentStep, `📐 Stratum ${i+1}/${strata.length}: ${s.name}`);
+      const cP = patches.filter(p => p.str === s.id);
+      const cT = trees.filter(t => t.str === s.id);
+      const tS = cT.reduce((sm,t) => sm + (t.cnt||0), 0);
+      showCaption(`📐 Stratum ${s.num}: ${s.name}`, `Study area boundary`,
+        `<div class="caption-stat"><b>${cP.length}</b> Patches</div><div class="caption-stat"><b>${cT.length}</b> Trees</div><div class="caption-stat"><b>${tS}</b> Spiders</div>`);
+      const idx = strata.indexOf(s);
+      if (sLayers[idx]) map.flyToBounds(sLayers[idx].getBounds(), {padding:[40,40], duration:2});
+      await wait(4500);
+    }
+    
+    for (let i = 0; i < patches.length; i++) {
+      if (!tourActive) return;
+      const p = patches[i];
+      updateProgress(++currentStep, `⬛ Patch ${i+1}/${patches.length}: ${p.id}`);
+      const cT = trees.filter(t => t.pt === p.id);
+      const tS = cT.reduce((sm,t) => sm + (t.cnt||0), 0);
+      showCaption(`⬛ Patch ${p.id}`, `8×8 meter sampling area · Stratum ${p.str}`,
+        `<div class="caption-stat"><b>${cT.length}</b> Trees</div><div class="caption-stat"><b>${tS}</b> Spiders</div>${p.name?`<div class="caption-stat">${p.name}</div>`:''}`);
+      const idx = patches.indexOf(p);
+      if (pLayers[idx]) map.flyToBounds(pLayers[idx].getBounds(), {padding:[80,80], duration:2});
+      await wait(4000);
+    }
+    
+    for (let i = 0; i < trees.length; i++) {
+      if (!tourActive) return;
+      const t = trees[i];
+      updateProgress(++currentStep, `🌳 Tree ${i+1}/${trees.length}: ${t.id}`);
+      const sp = t.sp || 'Unknown';
+      const e = emoji(sp);
+      const pc = t.photoCount || 0;
+      const photos = await loadTreePhotos(t.id);
+      showCaption(`${e} ${t.id} — ${sp}`, pc > 0 ? `📷 ${pc} photo(s)` : `No photos`,
+        `<div class="caption-stat"><b>${t.cnt}</b> Spiders</div>${t.bark?`<div class="caption-stat">Bark: ${t.bark}</div>`:''}${t.web&&t.web!=='None'?`<div class="caption-stat">${t.web}</div>`:''}`);
+      map.flyTo([t.lat, t.lon], 20, {duration: 1.5});
+      await wait(1800);
+      if (!tourActive) return;
+      if (photos.length > 0) {
+        showTreePopup(t.id);
+        await wait(3500);
+        if (!tourActive) return;
+        closePopup();
+        await wait(400);
+      } else {
+        await wait(2000);
+      }
+    }
+    
+    if (!tourActive) return;
+    updateProgress(totalSteps, '✅ Tour complete!');
+    showCaption('✨ Tour Complete!', 'All data showcased',
+      `<div class="caption-stat"><b>${strata.length}</b> Strata</div><div class="caption-stat"><b>${patches.length}</b> Patches</div><div class="caption-stat"><b>${trees.length}</b> Trees</div>`);
+    if (allLayers.length) map.flyToBounds(L.featureGroup(allLayers).getBounds(), {padding:[60,60], duration:2});
+    await wait(4000);
+    finishTour();
+  } catch(err) { finishTour(); }
+};
+
+window.stopTour = function() {
+  tourActive = false;
+  tourTimeouts.forEach(t => clearTimeout(t));
+  tourTimeouts = [];
+  finishTour();
+};
+
+function finishTour() {
+  tourActive = false;
+  document.getElementById('tour-fab').classList.remove('recording');
+  document.getElementById('tour-progress').classList.remove('show');
+  document.getElementById('tour-caption').classList.remove('show');
+}
+
+// INIT
+initMap();
+loadData();
+</script>
+</body>
+</html>
