@@ -658,24 +658,27 @@ document.getElementById('signin-btn').onclick = async () => {
   }
 };
 
-// HARDCODE the owner UID so all users share same data
-uid = "vfaW1vgnWiOx7BYvbB9ptEpmRbm1";
+// Set owner UID — all data lives under this user
+const OWNER_UID = "vfaW1vgnWiOx7BYvbB9ptEpmRbm1";
+uid = OWNER_UID;
 
-// Skip login — show app immediately for everyone
+// Skip login — show app immediately
 document.getElementById('auth-overlay').style.display='none';
 document.getElementById('app').style.display='block';
 
-// Start map and sync immediately
-setTimeout(() => { initMap(); startSync(); }, 100);
-showToast('🌐 Welcome! Anyone can edit.');
+// Start map and sync after short delay
+setTimeout(() => {
+  initMap();
+  startSync();
+  showToast('🌐 Map loaded! Anyone can edit.');
+}, 200);
 
-// Optional: owner can still sign in for backup
+// Owner can optionally sign in for backup
 onAuthStateChanged(auth, user => {
   if (user) {
-    document.getElementById('user-avatar').src = user.photoURL || '';
-    if (user.uid === uid) {
-      showToast('✅ Owner: ' + user.displayName);
-    }
+    try {
+      document.getElementById('user-avatar').src = user.photoURL || '';
+    } catch(e) {}
   }
 });
 
