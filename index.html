@@ -658,21 +658,24 @@ document.getElementById('signin-btn').onclick = async () => {
   }
 };
 
+// HARDCODE the owner UID so all users share same data
+uid = "vfaW1vgnWiOx7BYvbB9ptEpmRbm1";
+
+// Skip login — show app immediately for everyone
+document.getElementById('auth-overlay').style.display='none';
+document.getElementById('app').style.display='block';
+
+// Start map and sync immediately
+setTimeout(() => { initMap(); startSync(); }, 100);
+showToast('🌐 Welcome! Anyone can edit.');
+
+// Optional: owner can still sign in for backup
 onAuthStateChanged(auth, user => {
   if (user) {
-    uid = user.uid;
-    document.getElementById('auth-overlay').style.display='none';
-    document.getElementById('app').style.display='block';
     document.getElementById('user-avatar').src = user.photoURL || '';
-    setTimeout(() => { initMap(); startSync(); }, 100);
-    showToast('✅ ' + (user.displayName||'User').split(' ')[0]);
-  } else {
-    uid = null;
-    document.getElementById('auth-overlay').style.display='flex';
-    document.getElementById('app').style.display='none';
-    document.getElementById('signin-btn').style.display='flex';
-    document.getElementById('auth-loading').style.display='none';
-    unsubs.forEach(u => u()); unsubs = [];
+    if (user.uid === uid) {
+      showToast('✅ Owner: ' + user.displayName);
+    }
   }
 });
 
